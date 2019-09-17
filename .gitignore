@@ -1,0 +1,35 @@
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+
+# Session
+Session.vim
+
+# Temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags
+
+# build
+# ignore all . folders but include . files
+.*/
+
+# dependencies
+vendor/
+
+# testing
+coverage/
+
+# production
+build/
+
+# misc
+.DS_Store
+.idea
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
