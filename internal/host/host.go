@@ -2,7 +2,6 @@ package host
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,14 +15,9 @@ import (
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/routing"
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
-	mplex "github.com/libp2p/go-libp2p-mplex"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
-	secio "github.com/libp2p/go-libp2p-secio"
-	yamux "github.com/libp2p/go-libp2p-yamux"
+	lconfig "github.com/libp2p/go-libp2p/config"
 	"github.com/libp2p/go-libp2p/p2p/discovery"
-	tcp "github.com/libp2p/go-tcp-transport"
-	ws "github.com/libp2p/go-ws-transport"
-	"github.com/multiformats/go-multiaddr"
 )
 
 type mdnsNotifee struct {
@@ -37,27 +31,48 @@ func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
 }
 
 // Start starts a new gossip host
-func Start(config *config.Config) error {
+func Start(conf *config.Config) error {
+	if conf == nil {
+		logger.Error("nil config")
+		return config.ErrNilConfig
+	}
+
+	var lOpts []lconfig.Option
+
+	// 1. create a context
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	transports := libp2p.ChainOptions(
-		libp2p.Transport(tcp.NewTCPTransport),
-		libp2p.Transport(ws.New),
-	)
+	// 2. create transports
+	transports, err := parseTransportOptions(conf.Host.Transports)
+	if err != nil {
+		logger.Errorf("err parsing transports\n%v", err)
+		return err
+	}
+	lOpts = append(lOpts, transports)
 
-	muxers := libp2p.ChainOptions(
-		libp2p.Muxer("/yamux/1.0.0", yamux.DefaultTransport),
-		libp2p.Muxer("/mplex/6.7.0", mplex.DefaultTransport),
-	)
+	// 3. create muxers
+	muxers, err := parseMuxerOptions(conf.Host.Muxers)
+	if err != nil {
+		logger.Errorf("err parsing muxers\n%v", err)
+		return err
+	}
+	lOpts = append(lOpts, muxers)
 
-	security := libp2p.Security(secio.ID, secio.New)
+	// 4. create security
+	security, err := parseSecurityOptions(conf.Host.Security)
+	if err != nil {
+		logger.Errorf("err parsing security\n%v", err)
+		return err
+	}
+	lOpts = append(lOpts, security)
 
-	listenAddrs := libp2p.ListenAddrStrings(
-		"/ip4/0.0.0.0/tcp/0",
-		"/ip4/0.0.0.0/tcp/0/ws",
-	)
+	// 5. add listen addresses
+	if len(conf.Host.Listens) > 0 {
+		lOpts = append(lOpts, libp2p.ListenAddrStrings(conf.Host.Listens...))
+	}
 
+	// 6. create router
 	var dht *kaddht.IpfsDHT
 	newDHT := func(h host.Host) (routing.PeerRouting, error) {
 		var err error
@@ -69,20 +84,20 @@ func Start(config *config.Config) error {
 		return dht, err
 	}
 	routing := libp2p.Routing(newDHT)
+	lOpts = append(lOpts, routing)
 
-	host, err := libp2p.New(
-		ctx,
-		transports,
-		listenAddrs,
-		muxers,
-		security,
-		routing,
-	)
+	if conf.Host.DisableRelay {
+		lOpts = append(lOpts, libp2p.DisableRelay())
+	}
+
+	// 7. build the libp2p host
+	host, err := libp2p.New(ctx, lOpts...)
 	if err != nil {
 		logger.Errorf("err creating new libp2p host\n%v", err)
 		return err
 	}
 
+	// 8. build the gossip pub/sub
 	ps, err := pubsub.NewGossipSub(ctx, host)
 	if err != nil {
 		logger.Errorf("err creating new gossip sub\n%v", err)
@@ -99,26 +114,13 @@ func Start(config *config.Config) error {
 		logger.Infof("Listening on %v", addr)
 	}
 
-	targetAddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/63785/ipfs/QmWjz6xb8v9K4KnYEwP5Yk75k5mMBCehzWFLCvvQpYxF3d")
-	if err != nil {
-		logger.Errorf("err parsing targetAddr from multiaddr\n%v", err)
+	// 9. Connect to peers
+	if err := bootstrapPeers(ctx, host, conf.Host.Peers); err != nil {
+		logger.Errorf("err bootstrapping peers\n%v", err)
 		return err
 	}
 
-	targetInfo, err := peer.AddrInfoFromP2pAddr(targetAddr)
-	if err != nil {
-		logger.Errorf("err parsing targetInfo from peer addr\n%v", err)
-		return err
-	}
-
-	err = host.Connect(ctx, *targetInfo)
-	if err != nil {
-		logger.Errorf("err connecting\n%v", err)
-		return err
-	}
-
-	fmt.Println("Connected to", targetInfo.ID)
-
+	// 10. create discovery service
 	mdns, err := discovery.NewMdnsService(ctx, host, time.Second*10, "")
 	if err != nil {
 		logger.Errorf("err discovering\n%v", err)
@@ -126,8 +128,8 @@ func Start(config *config.Config) error {
 	}
 	mdns.RegisterNotifee(&mdnsNotifee{h: host, ctx: ctx})
 
-	err = dht.Bootstrap(ctx)
-	if err != nil {
+	// note: is there a reason this is after the creation of the discovery service, or can it be moved up with dht initialization?
+	if err = dht.Bootstrap(ctx); err != nil {
 		logger.Errorf("err bootstrapping\n%v", err)
 		return err
 	}
@@ -135,14 +137,15 @@ func Start(config *config.Config) error {
 	donec := make(chan struct{}, 1)
 	go chatInputLoop(ctx, host, ps, donec)
 
+	// 11. capture the ctrl+c signal
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT)
 
+	// 12. start the server
 	select {
 	case <-stop:
-		logger.Info("shutting down...")
+		logger.Info("Received stop signal from os. Shutting down...")
 		host.Close()
-		logger.Info("exiting...")
 
 	case <-donec:
 		logger.Info("shutting down...")

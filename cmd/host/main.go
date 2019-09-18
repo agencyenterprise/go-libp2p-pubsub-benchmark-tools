@@ -24,12 +24,12 @@ func setup() {
 		Short: "Start node",
 		Long:  `Starts the gossip pub/sub node`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			logger.Infof("Loading config: %s", confLoc)
 			conf, err := config.Load(confLoc)
 			if err != nil {
 				logger.Errorf("error loading config\n%v", err)
 				return err
 			}
-			logger.Infof("conf: %v", *conf)
 			logger.Info("Loaded configuration. Starting host...")
 
 			if err = host.Start(conf); err != nil {
@@ -44,7 +44,7 @@ func setup() {
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "config.toml", "The configuration file.")
+	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "config.json", "The configuration file.")
 }
 
 func main() {

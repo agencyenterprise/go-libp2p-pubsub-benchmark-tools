@@ -1,19 +1,26 @@
 package config
 
 import (
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"encoding/json"
+	"io/ioutil"
 
-	"github.com/BurntSushi/toml"
+	"github.com/agencyenterprise/gossip-host/pkg/logger"
 )
 
 // Load reads the passed config file location and parses it into a config struct.
 func Load(confLoc string) (*Config, error) {
-	var config Config
+	var conf Config
 
-	if _, err := toml.DecodeFile(confLoc, &config); err != nil {
+	file, err := ioutil.ReadFile(confLoc)
+	if err != nil {
+		logger.Errorf("err reading configuration file:%s\n%v", confLoc, err)
+		return nil, err
+	}
+
+	if err = json.Unmarshal([]byte(file), &conf); err != nil {
 		logger.Errorf("err unmarshaling config\n%v", err)
 		return nil, err
 	}
 
-	return &config, nil
+	return &conf, nil
 }

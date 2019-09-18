@@ -31,29 +31,41 @@ ifndef LINTER
 	$(error "No golangci-lint in PATH, consider doing 'GO111MODULE=on go get github.com/golangci/golangci-lint/cmd/golangci-lint@latest'")
 endif
 
+## host: run the gossip pub/sub host.
+.PHONY: host
+host:
+	@echo "  >  Starting host..."
+	@go run ./cmd/host/main.go
+
 .PHONY: fmt
 fmt:
-	@gofmt -e -s -w .
+	@echo "  >  Formatting..."
+	@go list ./... | grep -v vendor | xargs gofmt -e -s -w
 
 .PHONY: lint
 lint: exists/linter
+	@echo "  >  Linting..."
 	@golangci-lint run ./...
 
-## test: run all tests
+## test: run all tests.
 .PHONY: test
 test: test/unit test/integration test/e2e
+	@echo "  >  Starting tests..."
 	@echo "passed all tests"
 
 .PHONY: test/unit
 test/unit:
+	@echo "  >  Running unit tests..."
 	@go test ./... -tags=unit -v && echo "passed unit tests"
 
 .PHONY: test/integration
 test/integration:
+	@echo "  >  Running integration tests..."
 	@go test ./... -tags=integration -v && echo "passed integration tests"
 
 .PHONY: test/e2e
 test/e2e:
+	@echo "  >  Running e2e tests..."
 	@go test ./... -tags=e2e -v && echo "passed e2e tests"
 
 ## compile: compile the binary.
@@ -104,7 +116,7 @@ kill/gopls:
 .PHONY: help
 help: Makefile
 	@echo
-	@echo " Choose a command run in "$(PROJECTNAME)":"
+	@echo " Choose a command to run in "$(PROJECTNAME)":"
 	@echo
 	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
 	@echo

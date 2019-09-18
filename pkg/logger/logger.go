@@ -62,4 +62,5 @@ func Warn(s string) {
 // Set modifies the logger
 func Set(hook ContextHook, setReport bool) {
 	logrus.SetReportCaller(setReport)
+	logrus.AddHook(hook)
 }
