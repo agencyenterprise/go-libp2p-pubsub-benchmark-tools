@@ -16,7 +16,9 @@ USER go_user
 COPY --chown=go_user:go_user . .
 
 # 6. Fetch deps
-RUN GO111MODULE=on go mod vendor
+# vendor or go get?
+# RUN GO111MODULE=on go mod vendor
+RUN GO111MODULE=on go get
 
 # 7. Expose the port
 # TODO @adam-hanna: fix this...
