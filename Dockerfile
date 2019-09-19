@@ -16,7 +16,7 @@ USER go_user
 COPY --chown=go_user:go_user . .
 
 # 6. Fetch deps
-# vendor or go get?
+# note: vendor or go get?
 # RUN GO111MODULE=on go mod vendor
 RUN GO111MODULE=on go get
 
