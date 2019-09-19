@@ -15,7 +15,6 @@ import (
 	yamux "github.com/libp2p/go-libp2p-yamux"
 	lconfig "github.com/libp2p/go-libp2p/config"
 	tcp "github.com/libp2p/go-tcp-transport"
-	utp "github.com/libp2p/go-utp-transport"
 	ws "github.com/libp2p/go-ws-transport"
 	"github.com/multiformats/go-multiaddr"
 )
@@ -34,8 +33,10 @@ func parseTransportOptions(opts []string) (lconfig.Option, error) {
 		case "quic":
 			lOpts = append(lOpts, libp2p.Transport(quic.NewTransport))
 
+		/* note: utp has a broken gx dep
 		case "utp":
 			lOpts = append(lOpts, libp2p.Transport(utp.NewUtpTransport))
+		*/
 
 		/* note: WIP
 		case "udp":

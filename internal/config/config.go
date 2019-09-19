@@ -2,39 +2,27 @@ package config
 
 import (
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
-
-	"github.com/spf13/viper"
 )
 
 // Load reads the passed config file location and parses it into a config struct.
 func Load(confLoc, listens, peers string) (*Config, error) {
-	var conf Config
+	var (
+		conf, defaults Config
+	)
 
-	viper.SetConfigName(trimExtension(confLoc))
+	if err := parseDefaults(&defaults); err != nil {
+		logger.Errorf("err parsing defaults:\n%v", err)
+	}
 
-	if err := viper.ReadInConfig(); err != nil {
-		logger.Errorf("err reading configuration file:%s\n%v", confLoc, err)
+	if err := parseConfigFile(&conf, confLoc); err != nil {
+		logger.Errorf("err parsing config file:\n%v", err)
 		return nil, err
 	}
 
-	if err := viper.Unmarshal(&conf); err != nil {
-		logger.Errorf("err unmarshaling config\n%v", err)
-		return nil, err
-	}
-	logger.Infof("config: %v", conf)
+	mergeDefaults(&conf, &defaults)
+	parseListens(&conf, listens)
+	parsePeers(&conf, peers)
 
-	/*
-		file, err := ioutil.ReadFile(confLoc)
-		if err != nil {
-			logger.Errorf("err reading configuration file:%s\n%v", confLoc, err)
-			return nil, err
-		}
-
-		if err = json.Unmarshal([]byte(file), &conf); err != nil {
-			logger.Errorf("err unmarshaling config\n%v", err)
-			return nil, err
-		}
-	*/
-
+	logger.Infof("configuration: %v", conf)
 	return &conf, nil
 }
