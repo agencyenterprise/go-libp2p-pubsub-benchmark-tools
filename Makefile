@@ -90,14 +90,22 @@ generate:
 	@echo "  >  Generating dependency files..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go generate $(generate)
 
+.PHONY: get/clean
+get/clean:
+	@rm go.sum
+
 ## get: Fetch all dependencies.
 .PHONY: get
-get:
+get: get/clean
 	@echo "  >  Checking if there is any missing dependencies..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get $(get)
 
+.PHONY: vendor/clean
+vendor/clean:
+	@rm -rf ./vendor/
+
 .PHONY: vendor
-vendor:
+vendor: vendor/clean
 	@GO111MODULE=on go mod vendor
 
 .PHONY: install
