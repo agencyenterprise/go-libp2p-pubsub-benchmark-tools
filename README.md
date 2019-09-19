@@ -16,7 +16,7 @@ TODO
 
 [**MIT**](LICENSE).
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fagencyenterprise%2Fgossip-host.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fagencyenterprise%2Fgossip-host?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fagencyenterprise%2Fgossip-host.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fagencyenterprise%2Fgossip-host?ref=badge_large)
 
 ```
 MIT License
