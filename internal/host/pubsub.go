@@ -2,54 +2,32 @@ package host
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"time"
 
+	"github.com/agencyenterprise/gossip-host/pkg/logger"
+
+	pb "github.com/agencyenterprise/gossip-host/internal/host/pb"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )
 
-var handles = map[string]string{}
+const pubsubTopic = "/libp2p/test/1.0.0"
 
-const pubsubTopic = "/libp2p/example/chat/1.0.0"
-
-func pubsubMessageHandler(id peer.ID, msg *SendMessage) {
-	handle, ok := handles[id.String()]
-	if !ok {
-		handle = id.ShortString()
-	}
-	fmt.Printf("%s: %s\n", handle, msg.Data)
-}
-
-func pubsubUpdateHandler(id peer.ID, msg *UpdatePeer) {
-	oldHandle, ok := handles[id.String()]
-	if !ok {
-		oldHandle = id.ShortString()
-	}
-	handles[id.String()] = string(msg.UserHandle)
-	fmt.Printf("%s -> %s\n", oldHandle, msg.UserHandle)
-}
-
-func pubsubHandler(ctx context.Context, sub *pubsub.Subscription) {
+func pubsubHandler(ctx context.Context, hostID peer.ID, sub *pubsub.Subscription) {
 	for {
-		msg, err := sub.Next(ctx)
+		nxt, err := sub.Next(ctx)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			logger.Errorf("err reading next:\n%v", err)
 			continue
 		}
 
-		req := &Request{}
-		err = req.Unmarshal(msg.Data)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+		msg := &pb.Message{}
+		if err = nxt.Unmarshal(nxt.Data); err != nil {
+			logger.Errorf("err unmarshaling next message:\n%v", err)
 			continue
 		}
 
-		switch *req.Type {
-		case Request_SEND_MESSAGE:
-			pubsubMessageHandler(msg.GetFrom(), req.SendMessage)
-		case Request_UPDATE_PEER:
-			pubsubUpdateHandler(msg.GetFrom(), req.UpdatePeer)
-		}
+		// TODO: how to increment sequence before sending out?
+		logger.Infof("%v,%v,%v,%d,%d", hostID, nxt.GetFrom(), msg.Id, time.Now().UnixNano(), msg.Sequence)
 	}
 }
