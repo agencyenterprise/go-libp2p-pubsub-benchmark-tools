@@ -2,6 +2,7 @@ package host
 
 import (
 	"context"
+	"crypto/rand"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,6 +12,8 @@ import (
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/libp2p/go-libp2p"
+	connmgr "github.com/libp2p/go-libp2p-connmgr"
+	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/routing"
@@ -39,11 +42,24 @@ func Start(conf *config.Config) error {
 
 	var lOpts []lconfig.Option
 
-	// 1. create a context
+	// create a context
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// 2. create transports
+	// add private key
+	if conf.Host.Priv == nil {
+		priv, _, err := lcrypto.GenerateECDSAKeyPair(rand.Reader)
+		if err != nil {
+			logger.Errorf("err generating private key:\n%v", err)
+			return err
+		}
+
+		lOpts = append(lOpts, libp2p.Identity(priv))
+	} else {
+		lOpts = append(lOpts, libp2p.Identity(conf.Host.Priv))
+	}
+
+	// create transports
 	transports, err := parseTransportOptions(conf.Host.Transports)
 	if err != nil {
 		logger.Errorf("err parsing transports\n%v", err)
@@ -51,7 +67,7 @@ func Start(conf *config.Config) error {
 	}
 	lOpts = append(lOpts, transports)
 
-	// 3. create muxers
+	// create muxers
 	muxers, err := parseMuxerOptions(conf.Host.Muxers)
 	if err != nil {
 		logger.Errorf("err parsing muxers\n%v", err)
@@ -59,7 +75,7 @@ func Start(conf *config.Config) error {
 	}
 	lOpts = append(lOpts, muxers)
 
-	// 4. create security
+	// create security
 	security, err := parseSecurityOptions(conf.Host.Security)
 	if err != nil {
 		logger.Errorf("err parsing security\n%v", err)
@@ -67,12 +83,23 @@ func Start(conf *config.Config) error {
 	}
 	lOpts = append(lOpts, security)
 
-	// 5. add listen addresses
+	// add listen addresses
 	if len(conf.Host.Listens) > 0 {
 		lOpts = append(lOpts, libp2p.ListenAddrStrings(conf.Host.Listens...))
 	}
 
-	// 6. create router
+	// Conn manager
+	if conf.Host.EnableConnectionManager {
+		cm := connmgr.NewConnManager(256, 512, 120)
+		lOpts = append(lOpts, libp2p.ConnectionManager(cm))
+	}
+
+	// NAT port map
+	if conf.Host.EnableNATPortMap {
+		lOpts = append(lOpts, libp2p.NATPortMap())
+	}
+
+	// create router
 	var dht *kaddht.IpfsDHT
 	newDHT := func(h host.Host) (routing.PeerRouting, error) {
 		var err error
@@ -86,18 +113,18 @@ func Start(conf *config.Config) error {
 	routing := libp2p.Routing(newDHT)
 	lOpts = append(lOpts, routing)
 
-	if conf.Host.DisableRelay {
+	if !conf.Host.EnableRelay {
 		lOpts = append(lOpts, libp2p.DisableRelay())
 	}
 
-	// 7. build the libp2p host
+	// build the libp2p host
 	host, err := libp2p.New(ctx, lOpts...)
 	if err != nil {
 		logger.Errorf("err creating new libp2p host\n%v", err)
 		return err
 	}
 
-	// 8. build the gossip pub/sub
+	// build the gossip pub/sub
 	ps, err := pubsub.NewGossipSub(ctx, host)
 	if err != nil {
 		logger.Errorf("err creating new gossip sub\n%v", err)
@@ -108,19 +135,19 @@ func Start(conf *config.Config) error {
 		logger.Errorf("err subscribing\n%v", err)
 		return err
 	}
-	go pubsubHandler(ctx, sub)
+	go pubsubHandler(ctx, host.ID(), sub)
 
 	for _, addr := range host.Addrs() {
 		logger.Infof("Listening on %v", addr)
 	}
 
-	// 9. Connect to peers
+	// connect to peers
 	if err := bootstrapPeers(ctx, host, conf.Host.Peers); err != nil {
 		logger.Errorf("err bootstrapping peers\n%v", err)
 		return err
 	}
 
-	// 10. create discovery service
+	// create discovery service
 	mdns, err := discovery.NewMdnsService(ctx, host, time.Second*10, "")
 	if err != nil {
 		logger.Errorf("err discovering\n%v", err)
@@ -134,21 +161,14 @@ func Start(conf *config.Config) error {
 		return err
 	}
 
-	donec := make(chan struct{}, 1)
-	go chatInputLoop(ctx, host, ps, donec)
-
-	// 11. capture the ctrl+c signal
+	// capture the ctrl+c signal
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT)
 
-	// 12. start the server
+	// lock the thread
 	select {
 	case <-stop:
 		logger.Info("Received stop signal from os. Shutting down...")
-		host.Close()
-
-	case <-donec:
-		logger.Info("shutting down...")
 		host.Close()
 	}
 
