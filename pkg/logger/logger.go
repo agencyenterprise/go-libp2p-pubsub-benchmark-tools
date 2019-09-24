@@ -73,6 +73,8 @@ func Set(hook ContextHook, fileLoc string, setReport bool) error {
 			return err
 		}
 
+		// note: threadsafe?
+		// https://stackoverflow.com/a/29981337/3512709
 		logrus.SetOutput(file)
 	}
 
