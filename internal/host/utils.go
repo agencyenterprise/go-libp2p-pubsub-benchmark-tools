@@ -2,20 +2,22 @@ package host
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
+	ipfsaddr "github.com/ipfs/go-ipfs-addr"
 	libp2p "github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p-core/host"
-	"github.com/libp2p/go-libp2p-core/peer"
 	mplex "github.com/libp2p/go-libp2p-mplex"
+	peerstore "github.com/libp2p/go-libp2p-peerstore"
+	quic "github.com/libp2p/go-libp2p-quic-transport"
 	secio "github.com/libp2p/go-libp2p-secio"
 	yamux "github.com/libp2p/go-libp2p-yamux"
 	lconfig "github.com/libp2p/go-libp2p/config"
 	tcp "github.com/libp2p/go-tcp-transport"
 	ws "github.com/libp2p/go-ws-transport"
-	"github.com/multiformats/go-multiaddr"
 )
 
 func parseTransportOptions(opts []string) (lconfig.Option, error) {
@@ -29,10 +31,8 @@ func parseTransportOptions(opts []string) (lconfig.Option, error) {
 		case "ws":
 			lOpts = append(lOpts, libp2p.Transport(ws.New))
 
-		/* note: getting dependency issues with quic..
 		case "quic":
 			lOpts = append(lOpts, libp2p.Transport(quic.NewTransport))
-		*/
 
 		/* note: utp has a broken gx dep
 		case "utp":
@@ -114,28 +114,25 @@ func parseSecurityOptions(opt string) (lconfig.Option, error) {
 }
 
 func bootstrapPeers(ctx context.Context, host host.Host, peers []string) error {
-	lenPeers := len(peers)
-
-	for idx, p := range peers {
-		logger.Infof("Connecting to %d of %d peers: %s", idx+1, lenPeers, p)
-		targetAddr, err := multiaddr.NewMultiaddr(p)
+	for _, p := range peers {
+		addr, err := ipfsaddr.ParseString(p)
 		if err != nil {
-			logger.Errorf("err parsing targetAddr from multiaddr\n%v", err)
-			return err
+			return fmt.Errorf("err parsing peer: %s\n%v", p, err)
 		}
 
-		targetInfo, err := peer.AddrInfoFromP2pAddr(targetAddr)
+		pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
 		if err != nil {
-			logger.Errorf("err parsing targetInfo from peer addr\n%v", err)
-			return err
+			return fmt.Errorf("err getting info from peerstore\n%v", err)
 		}
 
-		if err = host.Connect(ctx, *targetInfo); err != nil {
-			logger.Errorf("err connecting\n%v", err)
-			return err
+		logger.Infof("full peer addr: %s", addr.String())
+		logger.Infof("peer info: %v", pinfo)
+
+		if err := host.Connect(ctx, *pinfo); err != nil {
+			return fmt.Errorf("bootstrapping a peer failed\n%v", err)
 		}
 
-		logger.Infof("Connected to %v", targetInfo.ID)
+		logger.Infof("Connected to peer: %v", pinfo.ID)
 	}
 
 	return nil

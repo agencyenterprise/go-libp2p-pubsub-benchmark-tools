@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.helloworld";
+option java_outer_classname = "HelloWorldProto";
+
+package pb;
+
+message Message {
+  string id = 1;
+  int32 sequence = 2;
+  bytes data = 3;
+}
+
+message PublishReply {
+  string msgId = 1;
+  bool success = 2;
+}
+
+// The publisher service definition.
+service Publisher {
+  // Publishes a message on the pubsub channel
+  rpc PublishMessage(Message) returns (PublishReply) {}
+}
