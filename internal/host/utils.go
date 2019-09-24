@@ -10,6 +10,7 @@ import (
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/peer"
 	mplex "github.com/libp2p/go-libp2p-mplex"
+	quic "github.com/libp2p/go-libp2p-quic-transport"
 	secio "github.com/libp2p/go-libp2p-secio"
 	yamux "github.com/libp2p/go-libp2p-yamux"
 	lconfig "github.com/libp2p/go-libp2p/config"
@@ -29,10 +30,8 @@ func parseTransportOptions(opts []string) (lconfig.Option, error) {
 		case "ws":
 			lOpts = append(lOpts, libp2p.Transport(ws.New))
 
-		/* note: getting dependency issues with quic..
 		case "quic":
 			lOpts = append(lOpts, libp2p.Transport(quic.NewTransport))
-		*/
 
 		/* note: utp has a broken gx dep
 		case "utp":
