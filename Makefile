@@ -31,12 +31,6 @@ ifndef LINTER
 	$(error "No golangci-lint in PATH, consider doing 'GO111MODULE=on go get github.com/golangci/golangci-lint/cmd/golangci-lint@latest'")
 endif
 
-## host: run the gossip pub/sub host.
-.PHONY: host
-host:
-	@echo "  >  Starting host..."
-	@go run ./cmd/host/main.go
-
 .PHONY: fmt
 fmt:
 	@echo "  >  Formatting..."
