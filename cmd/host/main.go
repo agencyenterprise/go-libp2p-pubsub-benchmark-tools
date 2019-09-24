@@ -34,6 +34,7 @@ func setup() *cobra.Command {
 			}
 			logger.Info("Loaded configuration. Starting host...")
 
+			// note: this is blocking
 			if err = host.Start(conf); err != nil {
 				logger.Errorf("err starting host\n%v", err)
 				return err
