@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/agencyenterprise/gossip-host/internal/config"
+	rpcHost "github.com/agencyenterprise/gossip-host/internal/grpc/host"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/libp2p/go-libp2p"
@@ -30,6 +31,7 @@ type mdnsNotifee struct {
 
 // HandlePeerFound...
 func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
+	logger.Infof("peer found: %v", pi)
 	m.h.Connect(m.ctx, pi)
 }
 
@@ -89,13 +91,13 @@ func Start(conf *config.Config) error {
 	}
 
 	// Conn manager
-	if conf.Host.EnableConnectionManager {
+	if !conf.Host.OmitConnectionManager {
 		cm := connmgr.NewConnManager(256, 512, 120)
 		lOpts = append(lOpts, libp2p.ConnectionManager(cm))
 	}
 
 	// NAT port map
-	if conf.Host.EnableNATPortMap {
+	if !conf.Host.OmitNATPortMap {
 		lOpts = append(lOpts, libp2p.NATPortMap())
 	}
 
@@ -113,7 +115,7 @@ func Start(conf *config.Config) error {
 	routing := libp2p.Routing(newDHT)
 	lOpts = append(lOpts, routing)
 
-	if !conf.Host.EnableRelay {
+	if conf.Host.OmitRelay {
 		lOpts = append(lOpts, libp2p.DisableRelay())
 	}
 
@@ -137,8 +139,17 @@ func Start(conf *config.Config) error {
 	}
 	go pubsubHandler(ctx, host.ID(), sub)
 
-	for _, addr := range host.Addrs() {
-		logger.Infof("Listening on %v", addr)
+	// Start the RPC server
+	publisher := &publisher{ps}
+	rHost := rpcHost.New(publisher.publish)
+	go func() {
+		if err := rHost.Listen(ctx, conf.Host.RPCAddress); err != nil {
+			logger.Errorf("err listening on rpc:\n%v", err)
+		}
+	}()
+
+	for i, addr := range host.Addrs() {
+		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, host.ID().Pretty())
 	}
 
 	// connect to peers

@@ -16,7 +16,7 @@ var (
 
 func setup() {
 	var (
-		confLoc, listens, peers string
+		confLoc, listens, rpcListen, peers string
 	)
 
 	rootCmd = &cobra.Command{
@@ -25,7 +25,7 @@ func setup() {
 		Long:  `Starts the gossip pub/sub node`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Infof("Loading config: %s", confLoc)
-			conf, err := config.Load(confLoc, listens, peers)
+			conf, err := config.Load(confLoc, listens, rpcListen, peers)
 			if err != nil {
 				logger.Errorf("error loading config\n%v", err)
 				return err
@@ -47,6 +47,7 @@ func setup() {
 	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "config.json", "The configuration file.")
 	rootCmd.PersistentFlags().StringVarP(&listens, "listens", "l", "", "Addresses on which to listen. Comma separated. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated. Overides config.json.")
+	rootCmd.PersistentFlags().StringVarP(&rpcListen, "rpc-listen", "r", "", "RPC listen address. Overides config.json.")
 }
 
 func main() {
