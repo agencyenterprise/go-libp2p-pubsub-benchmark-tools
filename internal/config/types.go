@@ -33,12 +33,12 @@ type Host struct {
 	Muxers [][]string `json:"muxers,omitempty"`
 	// Security specifies the security to use
 	Security string `json:"security,omitempty"`
-	// Enable relay disables the relay
-	EnableRelay bool `json:"enableRelay,omitempty"`
-	// EnableConnectionManager enables the connection manager
-	EnableConnectionManager bool `json:"enableConnectionManager,omitempty"`
-	// EnableNatPortMap enables the nat port map
-	EnableNATPortMap bool `json:"enableNATPortMap,omitempty"`
+	// OmitRelay disables the relay
+	OmitRelay bool `json:"omitRelay,omitempty"`
+	// OmitConnectionManager enables the connection manager
+	OmitConnectionManager bool `json:"omitConnectionManager,omitempty"`
+	// OmitNatPortMap enables the nat port map
+	OmitNATPortMap bool `json:"omitNATPortMap,omitempty"`
 }
 
 // ErrNilConfig is returned when a config is expected but none is given
