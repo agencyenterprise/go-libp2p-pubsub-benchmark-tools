@@ -35,3 +35,8 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# logs
+log.txt
+logs.txt
+*.log
