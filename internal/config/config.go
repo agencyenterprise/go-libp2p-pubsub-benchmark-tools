@@ -8,7 +8,7 @@ import (
 )
 
 // Load reads the passed config file location and parses it into a config struct.
-func Load(confLoc, listens, peers string) (*Config, error) {
+func Load(confLoc, listens, rpcListen, peers string) (*Config, error) {
 	var (
 		conf, defaults Config
 		err            error
@@ -41,6 +41,9 @@ func Load(confLoc, listens, peers string) (*Config, error) {
 	mergeDefaults(&conf, &defaults)
 	parseListens(&conf, listens)
 	parsePeers(&conf, peers)
+	if rpcListen != "" {
+		conf.Host.RPCAddress = rpcListen
+	}
 
 	logger.Infof("configuration: %v", conf)
 	return &conf, nil

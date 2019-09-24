@@ -2,6 +2,8 @@ package host
 
 import (
 	"github.com/agencyenterprise/gossip-host/pkg/cerr"
+
+	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )
 
 // ErrUnknownTransportOption is returned when an unknown transport has been specified
@@ -18,3 +20,9 @@ const ErrImproperMuxerOption = cerr.Error("improper muxer option")
 
 // ErrUnknownSecurityOption is returned when an unknown security option has been specified
 const ErrUnknownSecurityOption = cerr.Error("unknown security option")
+
+const pubsubTopic = "/libp2p/test/1.0.0"
+
+type publisher struct {
+	ps *pubsub.PubSub
+}

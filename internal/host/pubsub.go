@@ -6,12 +6,10 @@ import (
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
-	pb "github.com/agencyenterprise/gossip-host/internal/host/pb"
+	pb "github.com/agencyenterprise/gossip-host/internal/pb/publisher"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )
-
-const pubsubTopic = "/libp2p/test/1.0.0"
 
 func pubsubHandler(ctx context.Context, hostID peer.ID, sub *pubsub.Subscription) {
 	for {
@@ -28,6 +26,18 @@ func pubsubHandler(ctx context.Context, hostID peer.ID, sub *pubsub.Subscription
 		}
 
 		// TODO: how to increment sequence before sending out?
-		logger.Infof("%v,%v,%v,%d,%d", hostID, nxt.GetFrom(), msg.Id, time.Now().UnixNano(), msg.Sequence)
+		logger.Infof("Pubsub message received: %v,%v,%v,%d,%d", hostID, nxt.GetFrom(), msg.Id, time.Now().UnixNano(), msg.Sequence)
 	}
+}
+
+func (publisher *publisher) publish(msg *pb.Message) error {
+	var b []byte
+
+	bs, err := msg.XXX_Marshal(b, true)
+	if err != nil {
+		logger.Errorf("err marshaling message:\n%v", err)
+		return err
+	}
+
+	return publisher.ps.Publish(pubsubTopic, bs)
 }

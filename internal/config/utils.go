@@ -200,4 +200,7 @@ func mergeDefaults(conf, defaults *Config) {
 	if conf.Host.Security == "" {
 		conf.Host.Security = defaults.Host.Security
 	}
+	if conf.Host.RPCAddress == "" {
+		conf.Host.RPCAddress = defaults.Host.RPCAddress
+	}
 }

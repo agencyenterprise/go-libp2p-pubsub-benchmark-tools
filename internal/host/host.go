@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/agencyenterprise/gossip-host/internal/config"
+	rpcHost "github.com/agencyenterprise/gossip-host/internal/grpc/host"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/libp2p/go-libp2p"
@@ -30,6 +31,7 @@ type mdnsNotifee struct {
 
 // HandlePeerFound...
 func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
+	logger.Infof("peer found: %v", pi)
 	m.h.Connect(m.ctx, pi)
 }
 
@@ -137,8 +139,17 @@ func Start(conf *config.Config) error {
 	}
 	go pubsubHandler(ctx, host.ID(), sub)
 
-	for _, addr := range host.Addrs() {
-		logger.Infof("Listening on %v", addr)
+	// Start the RPC server
+	publisher := &publisher{ps}
+	rHost := rpcHost.New(publisher.publish)
+	go func() {
+		if err := rHost.Listen(ctx, conf.Host.RPCAddress); err != nil {
+			logger.Errorf("err listening on rpc:\n%v", err)
+		}
+	}()
+
+	for i, addr := range host.Addrs() {
+		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, host.ID().Pretty())
 	}
 
 	// connect to peers
