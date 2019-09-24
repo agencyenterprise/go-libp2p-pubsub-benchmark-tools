@@ -20,9 +20,10 @@ COPY --chown=go_user:go_user . .
 # RUN GO111MODULE=on go mod vendor
 RUN GO111MODULE=on go get
 
-# 7. Expose the port
-# TODO @adam-hanna: fix this...
+# 7. Expose the ports
 EXPOSE 8080
+EXPOSE 3000
+EXPOSE 3001
 
 # 8. Run the app
 CMD ["go", "run", "/home/go_user/app/cmd/host/main.go"]
