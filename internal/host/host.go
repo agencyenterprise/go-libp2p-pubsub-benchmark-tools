@@ -89,13 +89,13 @@ func Start(conf *config.Config) error {
 	}
 
 	// Conn manager
-	if conf.Host.EnableConnectionManager {
+	if !conf.Host.OmitConnectionManager {
 		cm := connmgr.NewConnManager(256, 512, 120)
 		lOpts = append(lOpts, libp2p.ConnectionManager(cm))
 	}
 
 	// NAT port map
-	if conf.Host.EnableNATPortMap {
+	if !conf.Host.OmitNATPortMap {
 		lOpts = append(lOpts, libp2p.NATPortMap())
 	}
 
@@ -113,7 +113,7 @@ func Start(conf *config.Config) error {
 	routing := libp2p.Routing(newDHT)
 	lOpts = append(lOpts, routing)
 
-	if !conf.Host.EnableRelay {
+	if conf.Host.OmitRelay {
 		lOpts = append(lOpts, libp2p.DisableRelay())
 	}
 
