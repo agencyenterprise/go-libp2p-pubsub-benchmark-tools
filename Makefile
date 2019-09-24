@@ -81,7 +81,15 @@ clean:
 	@-rm $(GOBIN)/$(PROJECTNAME) 2> /dev/null
 	@-$(MAKE) go/clean
 
-build: get fmt lint test build
+.PHONY: packr
+packr:
+	@packr2
+
+.PHONY: packr/clean
+packr/clean:
+	@packr2 clean
+
+build: get fmt lint test packr build packr/clean
 	@echo "  >  Building binary..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(GOBIN)/$(PROJECTNAME) $(GOFILES)
 
@@ -92,17 +100,18 @@ generate:
 
 .PHONY: get/clean
 get/clean:
-	@rm go.sum
+	@-rm go.sum
 
 ## get: Fetch all dependencies.
 .PHONY: get
 get: get/clean
 	@echo "  >  Checking if there is any missing dependencies..."
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get $(get)
+	@go get -v all
+	#@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get $(get)
 
 .PHONY: vendor/clean
 vendor/clean:
-	@rm -rf ./vendor/
+	@-rm -rf ./vendor/
 
 .PHONY: vendor
 vendor: vendor/clean

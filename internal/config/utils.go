@@ -2,19 +2,16 @@ package config
 
 import (
 	"bufio"
-	"crypto/x509"
 	"encoding/json"
-	"encoding/pem"
-	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
-	acrypto "github.com/adam-hanna/go-libp2p-core/crypto"
+	// TODO: wait for pr merge and go back to lcrypto
+	//acrypto "github.com/adam-hanna/go-libp2p-core/crypto"
 	"github.com/gobuffalo/packr/v2"
-	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/spf13/viper"
 )
 
@@ -77,6 +74,8 @@ func loadDefaultPriv() ([]byte, error) {
 	return box.Find(defaultPEMName)
 }
 
+// TODO: wait for pr merge and go back to lcrypto
+/*
 func loadAndSavePriv(conf *Config) error {
 	privB, err := loadPriv(conf.Host.PrivPEM)
 	if err != nil {
@@ -91,8 +90,10 @@ func loadAndSavePriv(conf *Config) error {
 	}
 
 	conf.Host.Priv = priv
+
 	return nil
 }
+*/
 
 func loadPriv(loc string) ([]byte, error) {
 	privateKeyFile, err := os.Open(loc)
@@ -115,6 +116,8 @@ func loadPriv(loc string) ([]byte, error) {
 	return []byte(pembytes), err
 }
 
+// TODO: waiting on PR merge to lcrypto
+/*
 func parseDefaultPriv() (lcrypto.PrivKey, error) {
 	defaultPriv, err := loadDefaultPriv()
 	if err != nil {
@@ -124,7 +127,10 @@ func parseDefaultPriv() (lcrypto.PrivKey, error) {
 
 	return parsePrivateKey(defaultPriv)
 }
+*/
 
+// TODO: waiting on PR merge to lcrypto
+/*
 func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 	data, _ := pem.Decode(privB)
 	if data == nil {
@@ -147,6 +153,7 @@ func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 
 	return priv.(lcrypto.PrivKey), nil
 }
+*/
 
 func parseDefaults(conf *Config) error {
 	defaultConfig, err := loadDefaultConfig()
@@ -160,12 +167,15 @@ func parseDefaults(conf *Config) error {
 		return err
 	}
 
-	priv, err := parseDefaultPriv()
-	if err != nil {
-		logger.Errorf("err parsing default private key:\n%v", err)
-		return err
-	}
-	conf.Host.Priv = priv
+	// TODO: waiting on PR merge to lcrypto
+	/*
+		priv, err := parseDefaultPriv()
+		if err != nil {
+			logger.Errorf("err parsing default private key:\n%v", err)
+			return err
+		}
+		conf.Host.Priv = priv
+	*/
 
 	return nil
 }
