@@ -6,23 +6,25 @@ import (
 	"github.com/agencyenterprise/gossip-host/internal/client"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var (
-	rootCmd *cobra.Command
-)
-
-func setup() {
+func setup() *cobra.Command {
 	var (
-		msgLoc, peers string
+		msgLoc, peers, loggerLoc string
 	)
 
-	rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:   "start",
 		Short: "Start client",
 		Long:  `Starts the client and sends the message to the peers`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+				logrus.Errorf("err initiating logger:\n%v", err)
+				return err
+			}
+
 			logger.Infof("sending message to peers")
 			if err := client.Send(msgLoc, peers); err != nil {
 				logger.Errorf("err sending messages\n%v", err)
@@ -35,12 +37,13 @@ func setup() {
 
 	rootCmd.PersistentFlags().StringVarP(&msgLoc, "message", "m", "message.json", "The message file to send to peers.")
 	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated.")
+	rootCmd.PersistentFlags().StringVarP(&loggerLoc, "log", "", "", "Log file location. Defaults to standard out.")
+
+	return rootCmd
 }
 
 func main() {
-	logger.Set(logger.ContextHook{}, false)
-
-	setup()
+	rootCmd := setup()
 
 	if err := rootCmd.Execute(); err != nil {
 		logger.Errorf("err executing command\n%v", err)

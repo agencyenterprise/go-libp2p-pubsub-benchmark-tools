@@ -3,6 +3,7 @@ package host
 import (
 	"context"
 	"crypto/rand"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -125,6 +126,7 @@ func Start(conf *config.Config) error {
 		logger.Errorf("err creating new libp2p host\n%v", err)
 		return err
 	}
+	defer host.Close()
 
 	// build the gossip pub/sub
 	ps, err := pubsub.NewGossipSub(ctx, host)
@@ -179,8 +181,9 @@ func Start(conf *config.Config) error {
 	// lock the thread
 	select {
 	case <-stop:
+		// note: I don't like '^C' showing up on the same line as the next logged line...
+		fmt.Println("")
 		logger.Info("Received stop signal from os. Shutting down...")
-		host.Close()
 	}
 
 	return nil
