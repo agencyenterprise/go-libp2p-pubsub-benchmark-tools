@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"os"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -60,7 +62,19 @@ func Warn(s string) {
 }
 
 // Set modifies the logger
-func Set(hook ContextHook, setReport bool) {
+func Set(hook ContextHook, fileLoc string, setReport bool) error {
 	logrus.SetReportCaller(setReport)
 	logrus.AddHook(hook)
+	if fileLoc != "" {
+		// note: need to pass back some way to file.Close()?
+		file, err := os.OpenFile(fileLoc, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			logrus.Errorf("err opening file %s:\n%v", fileLoc, err)
+			return err
+		}
+
+		logrus.SetOutput(file)
+	}
+
+	return nil
 }
