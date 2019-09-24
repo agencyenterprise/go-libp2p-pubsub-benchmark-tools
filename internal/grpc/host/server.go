@@ -10,8 +10,7 @@ import (
 
 // PublishMessage implements PublisherServer
 func (s *Server) PublishMessage(ctx context.Context, in *pb.Message) (*pb.PublishReply, error) {
-	logger.Info("Received message")
-	logger.Infof("%v", s)
+	logger.Info("received rpc message; will now publish to subscribers")
 	spew.Dump(in)
 
 	var err error
@@ -19,7 +18,6 @@ func (s *Server) PublishMessage(ctx context.Context, in *pb.Message) (*pb.Publis
 		logger.Errorf("err publishing message:\n%v", err)
 	}
 
-	// TODO: send message!
 	return &pb.PublishReply{
 		MsgId:   in.Id,
 		Success: err == nil,
