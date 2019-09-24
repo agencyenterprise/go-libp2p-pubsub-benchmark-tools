@@ -58,18 +58,16 @@ func parseConfigFile(conf *Config, confLoc string) error {
 	return nil
 }
 
-func loadDefaultConfig() ([]byte, error) {
-	// set up a new box by giving it a name and an optional (relative) path to a folder on disk:
-	box := packr.New("defaults", defaultsLoc)
+func loadDefaultBox() *packr.Box {
+	return packr.New("defaults", defaultsLoc)
+}
 
+func loadDefaultConfig(box *packr.Box) ([]byte, error) {
 	// Get the string representation of a file, or an error if it doesn't exist:
 	return box.Find(defaultConfigName)
 }
 
-func loadDefaultPriv() ([]byte, error) {
-	// set up a new box by giving it a name and an optional (relative) path to a folder on disk:
-	box := packr.New("defaults", defaultsLoc)
-
+func loadDefaultPriv(box *packr.Box) ([]byte, error) {
 	// Get the string representation of a file, or an error if it doesn't exist:
 	return box.Find(defaultPEMName)
 }
@@ -118,8 +116,8 @@ func loadPriv(loc string) ([]byte, error) {
 
 // TODO: waiting on PR merge to lcrypto
 /*
-func parseDefaultPriv() (lcrypto.PrivKey, error) {
-	defaultPriv, err := loadDefaultPriv()
+func parseDefaultPriv(box *packr.Box) (lcrypto.PrivKey, error) {
+	defaultPriv, err := loadDefaultPriv(box)
 	if err != nil {
 		logger.Errorf("err loading default private key:\n%v", err)
 		return nil, err
@@ -156,7 +154,9 @@ func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 */
 
 func parseDefaults(conf *Config) error {
-	defaultConfig, err := loadDefaultConfig()
+	box := loadDefaultBox()
+
+	defaultConfig, err := loadDefaultConfig(box)
 	if err != nil {
 		logger.Errorf("err loading default config:\n%v", err)
 		return err
@@ -169,7 +169,7 @@ func parseDefaults(conf *Config) error {
 
 	// TODO: waiting on PR merge to lcrypto
 	/*
-		priv, err := parseDefaultPriv()
+		priv, err := parseDefaultPriv(box)
 		if err != nil {
 			logger.Errorf("err parsing default private key:\n%v", err)
 			return err
