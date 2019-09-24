@@ -25,6 +25,8 @@ type Host struct {
 	Priv lcrypto.PrivKey
 	// Listen are addresses on which to listen
 	Listens []string `json:"listens,omitempty"`
+	// RPCAddress is the address to listen on for RPC
+	RPCAddress string `json:"rcpAddress,omitempty"`
 	// Peers are peers to be bootstrapped (e.g. /ip4/127.0.0.1/tcp/63785/ipfs/QmWjz6xb8v9K4KnYEwP5Yk75k5mMBCehzWFLCvvQpYxF3d)
 	Peers []string `json:"peers,omitempty"`
 	// Transports are the transport protocols which the host is to use (e.g. "tcp", "ws", etc)
