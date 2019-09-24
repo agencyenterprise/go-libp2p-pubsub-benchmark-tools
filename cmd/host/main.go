@@ -7,23 +7,25 @@ import (
 	"github.com/agencyenterprise/gossip-host/internal/host"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var (
-	rootCmd *cobra.Command
-)
-
-func setup() {
+func setup() *cobra.Command {
 	var (
-		confLoc, listens, rpcListen, peers string
+		confLoc, listens, rpcListen, peers, loggerLoc string
 	)
 
-	rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:   "start",
 		Short: "Start node",
 		Long:  `Starts the gossip pub/sub node`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+				logrus.Errorf("err initiating logger:\n%v", err)
+				return err
+			}
+
 			logger.Infof("Loading config: %s", confLoc)
 			conf, err := config.Load(confLoc, listens, rpcListen, peers)
 			if err != nil {
@@ -48,15 +50,15 @@ func setup() {
 	rootCmd.PersistentFlags().StringVarP(&listens, "listens", "l", "", "Addresses on which to listen. Comma separated. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&rpcListen, "rpc-listen", "r", "", "RPC listen address. Overides config.json.")
+	rootCmd.PersistentFlags().StringVarP(&loggerLoc, "log", "", "", "Log file location. Defaults to standard out.")
+
+	return rootCmd
 }
 
 func main() {
-	logger.Set(logger.ContextHook{}, false)
-
-	setup()
+	rootCmd := setup()
 
 	if err := rootCmd.Execute(); err != nil {
-		logger.Errorf("err executing command\n%v", err)
-		os.Exit(1)
+		logrus.Fatalf("err executing command\n%v", err)
 	}
 }
