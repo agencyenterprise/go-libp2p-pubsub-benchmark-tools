@@ -11,16 +11,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	rootCmd *cobra.Command
-)
-
-func setup() {
+func setup() *cobra.Command {
 	var (
 		confLoc, listens, rpcListen, peers, loggerLoc string
 	)
 
-	rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:   "start",
 		Short: "Start node",
 		Long:  `Starts the gossip pub/sub node`,
@@ -55,10 +51,12 @@ func setup() {
 	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&rpcListen, "rpc-listen", "r", "", "RPC listen address. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&loggerLoc, "log", "", "", "Log file location. Defaults to standard out.")
+
+	return rootCmd
 }
 
 func main() {
-	setup()
+	rootCmd := setup()
 
 	if err := rootCmd.Execute(); err != nil {
 		logrus.Fatalf("err executing command\n%v", err)
