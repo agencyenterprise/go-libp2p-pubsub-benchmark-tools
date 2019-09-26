@@ -39,6 +39,7 @@ func setup() *cobra.Command {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
+			// create the host
 			// note: performed conf nil check, above
 			h, err := host.New(ctx, *conf)
 			if err != nil {
@@ -46,6 +47,7 @@ func setup() *cobra.Command {
 				return err
 			}
 
+			// start the server
 			// note: this is blocking
 			if err = h.Start(); err != nil {
 				logger.Errorf("err starting host\n%v", err)
