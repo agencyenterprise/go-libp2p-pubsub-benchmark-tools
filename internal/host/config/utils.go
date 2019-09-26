@@ -188,9 +188,6 @@ func mergeDefaults(conf, defaults *Config) {
 	if len(conf.Host.Listens) == 0 {
 		conf.Host.Listens = defaults.Host.Listens
 	}
-	if len(conf.Host.Peers) == 0 {
-		conf.Host.Peers = defaults.Host.Peers
-	}
 	if len(conf.Host.Transports) == 0 {
 		conf.Host.Transports = defaults.Host.Transports
 	}

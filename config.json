@@ -9,6 +9,9 @@
     "security": "secio",
     "omitRelay": false,
     "omitConnectionManager": false,
-    "omitNATPortMap": false
+    "omitNATPortMap": false,
+    "omitRPCServer": false,
+    "omitDiscoverService": false,
+    "omitRouting": false
   }
 }

@@ -1,10 +1,11 @@
 package main
 
 import (
+	"context"
 	"os"
 
-	"github.com/agencyenterprise/gossip-host/internal/config"
 	"github.com/agencyenterprise/gossip-host/internal/host"
+	"github.com/agencyenterprise/gossip-host/internal/host/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/sirupsen/logrus"
@@ -28,14 +29,25 @@ func setup() *cobra.Command {
 
 			logger.Infof("Loading config: %s", confLoc)
 			conf, err := config.Load(confLoc, listens, rpcListen, peers)
-			if err != nil {
+			if err != nil || conf == nil {
 				logger.Errorf("error loading config\n%v", err)
 				return err
 			}
 			logger.Info("Loaded configuration. Starting host...")
 
+			// create a context
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			// note: performed conf nil check, above
+			h, err := host.New(ctx, *conf)
+			if err != nil {
+				logger.Errorf("err creating new host:\n%v", err)
+				return err
+			}
+
 			// note: this is blocking
-			if err = host.Start(conf); err != nil {
+			if err = h.Start(); err != nil {
 				logger.Errorf("err starting host\n%v", err)
 				return err
 			}

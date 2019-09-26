@@ -37,10 +37,19 @@ type Host struct {
 	Security string `json:"security,omitempty"`
 	// OmitRelay disables the relay
 	OmitRelay bool `json:"omitRelay,omitempty"`
-	// OmitConnectionManager enables the connection manager
+	// OmitConnectionManager disables the connection manager
 	OmitConnectionManager bool `json:"omitConnectionManager,omitempty"`
-	// OmitNatPortMap enables the nat port map
+	// OmitNatPortMap disables the nat port map
 	OmitNATPortMap bool `json:"omitNATPortMap,omitempty"`
+	// OmitRPCServer disables the rpc server
+	OmitRPCServer bool `json:"omitRPCServer,omitempty"`
+	// OmitDiscoveryService disables the discovery service
+	OmitDiscoveryService bool `json:"omitDiscoveryService,omitempty"`
+	// OmitBootstrapPeers disables bootstrapping of peers
+	OmitBootstrapPeers bool `json:"omitBootstrapPeers,omitempty"`
+	// OmitRouting disables ipfs routing (e.g. dht);
+	// note: DHT is the only router supported, for now...
+	OmitRouting bool `json:"omitRouting,omitempty"`
 }
 
 // ErrNilConfig is returned when a config is expected but none is given
