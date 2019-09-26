@@ -8,7 +8,7 @@ import (
 )
 
 // Load reads the passed config file location and parses it into a config struct.
-func Load(confLoc, listens, rpcListen, peers string) (*Config, error) {
+func Load(confLoc, listens, rpcListen, peers string) (Config, error) {
 	var (
 		conf, defaults Config
 		err            error
@@ -20,7 +20,7 @@ func Load(confLoc, listens, rpcListen, peers string) (*Config, error) {
 
 	if err = parseConfigFile(&conf, confLoc); err != nil {
 		logger.Errorf("err parsing config file:\n%v", err)
-		return nil, err
+		return conf, err
 	}
 
 	// TODO: wait for pr merge and go back to lcrypto
@@ -35,7 +35,7 @@ func Load(confLoc, listens, rpcListen, peers string) (*Config, error) {
 	conf.Host.Priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
 	if err != nil {
 		logger.Errorf("err generating ecdsa key pair:\n%v", err)
-		return nil, err
+		return conf, err
 	}
 
 	mergeDefaults(&conf, &defaults)
@@ -45,6 +45,5 @@ func Load(confLoc, listens, rpcListen, peers string) (*Config, error) {
 		conf.Host.RPCAddress = rpcListen
 	}
 
-	logger.Infof("configuration: %v", conf)
-	return &conf, nil
+	return conf, nil
 }

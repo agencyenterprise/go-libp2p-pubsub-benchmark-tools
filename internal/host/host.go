@@ -13,6 +13,7 @@ import (
 	"github.com/agencyenterprise/gossip-host/internal/host/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
+	ipfsaddr "github.com/ipfs/go-ipfs-addr"
 	"github.com/libp2p/go-libp2p"
 	connmgr "github.com/libp2p/go-libp2p-connmgr"
 	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
@@ -20,6 +21,7 @@ import (
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/routing"
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
+	peerstore "github.com/libp2p/go-libp2p-peerstore"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	lconfig "github.com/libp2p/go-libp2p/config"
 	"github.com/libp2p/go-libp2p/p2p/discovery"
@@ -159,6 +161,36 @@ func (h *Host) IFPSAddresses() []string {
 	}
 
 	return addresses
+}
+
+// Connect connects the host to the list of peers
+// note: it expects the peers to be in IPFS form
+func (h *Host) Connect(peers []string) error {
+	for _, p := range peers {
+		addr, err := ipfsaddr.ParseString(p)
+		if err != nil {
+			logger.Errorf("err parsing peer: %s\n%v", p, err)
+			return err
+		}
+
+		pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
+		if err != nil {
+			logger.Errorf("err getting info from peerstore\n%v", err)
+			return err
+		}
+
+		logger.Infof("full peer addr: %s", addr.String())
+		logger.Infof("peer info: %v", pinfo)
+
+		if err := h.host.Connect(h.ctx, *pinfo); err != nil {
+			logger.Errorf("bootstrapping a peer failed\n%v", err)
+			return err
+		}
+
+		logger.Infof("Connected to peer: %v", pinfo.ID)
+	}
+
+	return nil
 }
 
 // Start starts a new gossip host
