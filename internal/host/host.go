@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/agencyenterprise/gossip-host/internal/config"
 	rpcHost "github.com/agencyenterprise/gossip-host/internal/grpc/host"
+	"github.com/agencyenterprise/gossip-host/internal/host/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/libp2p/go-libp2p"
@@ -36,25 +36,22 @@ func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
 	m.h.Connect(m.ctx, pi)
 }
 
-// Start starts a new gossip host
-func Start(conf *config.Config) error {
-	if conf == nil {
-		logger.Error("nil config")
-		return config.ErrNilConfig
+// New returns a new host
+// note: not passing reference to config because want it to be read only.
+func New(ctx context.Context, conf config.Config) (*Host, error) {
+	h := &Host{
+		ctx:  ctx,
+		conf: conf,
 	}
 
 	var lOpts []lconfig.Option
-
-	// create a context
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	// add private key
 	if conf.Host.Priv == nil {
 		priv, _, err := lcrypto.GenerateECDSAKeyPair(rand.Reader)
 		if err != nil {
 			logger.Errorf("err generating private key:\n%v", err)
-			return err
+			return nil, err
 		}
 
 		lOpts = append(lOpts, libp2p.Identity(priv))
@@ -66,7 +63,7 @@ func Start(conf *config.Config) error {
 	transports, err := parseTransportOptions(conf.Host.Transports)
 	if err != nil {
 		logger.Errorf("err parsing transports\n%v", err)
-		return err
+		return nil, err
 	}
 	lOpts = append(lOpts, transports)
 
@@ -74,7 +71,7 @@ func Start(conf *config.Config) error {
 	muxers, err := parseMuxerOptions(conf.Host.Muxers)
 	if err != nil {
 		logger.Errorf("err parsing muxers\n%v", err)
-		return err
+		return nil, err
 	}
 	lOpts = append(lOpts, muxers)
 
@@ -82,7 +79,7 @@ func Start(conf *config.Config) error {
 	security, err := parseSecurityOptions(conf.Host.Security)
 	if err != nil {
 		logger.Errorf("err parsing security\n%v", err)
-		return err
+		return nil, err
 	}
 	lOpts = append(lOpts, security)
 
@@ -103,18 +100,21 @@ func Start(conf *config.Config) error {
 	}
 
 	// create router
-	var dht *kaddht.IpfsDHT
-	newDHT := func(h host.Host) (routing.PeerRouting, error) {
-		var err error
-		dht, err = kaddht.New(ctx, h)
-		if err != nil {
-			logger.Errorf("err creating new kaddht\n%v", err)
-		}
+	if !conf.Host.OmitRouting {
+		newDHT := func(hst host.Host) (routing.PeerRouting, error) {
+			var err error
+			dht, err := kaddht.New(ctx, hst)
+			if err != nil {
+				logger.Errorf("err creating new kaddht\n%v", err)
+			}
 
-		return dht, err
+			h.router = dht
+
+			return dht, err
+		}
+		routing := libp2p.Routing(newDHT)
+		lOpts = append(lOpts, routing)
 	}
-	routing := libp2p.Routing(newDHT)
-	lOpts = append(lOpts, routing)
 
 	if conf.Host.OmitRelay {
 		lOpts = append(lOpts, libp2p.DisableRelay())
@@ -124,12 +124,53 @@ func Start(conf *config.Config) error {
 	host, err := libp2p.New(ctx, lOpts...)
 	if err != nil {
 		logger.Errorf("err creating new libp2p host\n%v", err)
+		return nil, err
+	}
+	h.host = host
+
+	// create discovery service
+	if !conf.Host.OmitDiscoveryService {
+		mdns, err := discovery.NewMdnsService(ctx, host, time.Second*10, "")
+		if err != nil {
+			logger.Errorf("err discovering\n%v", err)
+			return nil, err
+		}
+		mdns.RegisterNotifee(&mdnsNotifee{h: host, ctx: ctx})
+	}
+
+	return h, nil
+}
+
+// Addresses returns the listening addresses of the host
+func (h *Host) Addresses() []string {
+	var addresses []string
+	for _, addr := range h.host.Addrs() {
+		addresses = append(addresses, fmt.Sprintf("%s", addr))
+	}
+
+	return addresses
+}
+
+// IPFSAddresses returns the ipfs listening addresses of the host
+func (h *Host) IFPSAddresses() []string {
+	var addresses []string
+	for _, addr := range h.host.Addrs() {
+		addresses = append(addresses, fmt.Sprintf("%s/ipfs/%s", addr, h.host.ID().Pretty()))
+	}
+
+	return addresses
+}
+
+// Start starts a new gossip host
+func (h *Host) Start() error {
+	// connect to peers
+	if err := connectToPeers(h.ctx, h.host, h.conf.Host.Peers); err != nil {
+		logger.Errorf("err connecting to peers\n%v", err)
 		return err
 	}
-	defer host.Close()
 
 	// build the gossip pub/sub
-	ps, err := pubsub.NewGossipSub(ctx, host)
+	ps, err := pubsub.NewGossipSub(h.ctx, h.host)
 	if err != nil {
 		logger.Errorf("err creating new gossip sub\n%v", err)
 		return err
@@ -139,51 +180,57 @@ func Start(conf *config.Config) error {
 		logger.Errorf("err subscribing\n%v", err)
 		return err
 	}
-	go pubsubHandler(ctx, host.ID(), sub)
+	go pubsubHandler(h.ctx, h.host.ID(), sub)
 
 	// Start the RPC server
-	publisher := &publisher{ps}
-	rHost := rpcHost.New(publisher.publish)
-	go func() {
-		if err := rHost.Listen(ctx, conf.Host.RPCAddress); err != nil {
-			logger.Errorf("err listening on rpc:\n%v", err)
+	ch := make(chan error)
+	if !h.conf.Host.OmitRPCServer {
+		publisher := &publisher{ps}
+		rHost := rpcHost.New(publisher.publish)
+		go func() {
+			if err := rHost.Listen(h.ctx, h.conf.Host.RPCAddress); err != nil {
+				logger.Errorf("err listening on rpc:\n%v", err)
+				ch <- err
+			}
+		}()
+	}
+
+	if !h.conf.Host.OmitRouting {
+		if h.router == nil {
+			return ErrNilRouter
 		}
-	}()
 
-	for i, addr := range host.Addrs() {
-		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, host.ID().Pretty())
-	}
-
-	// connect to peers
-	if err := bootstrapPeers(ctx, host, conf.Host.Peers); err != nil {
-		logger.Errorf("err bootstrapping peers\n%v", err)
-		return err
-	}
-
-	// create discovery service
-	mdns, err := discovery.NewMdnsService(ctx, host, time.Second*10, "")
-	if err != nil {
-		logger.Errorf("err discovering\n%v", err)
-		return err
-	}
-	mdns.RegisterNotifee(&mdnsNotifee{h: host, ctx: ctx})
-
-	// note: is there a reason this is after the creation of the discovery service, or can it be moved up with dht initialization?
-	if err = dht.Bootstrap(ctx); err != nil {
-		logger.Errorf("err bootstrapping\n%v", err)
-		return err
+		if err = h.router.Bootstrap(h.ctx); err != nil {
+			logger.Errorf("err bootstrapping\n%v", err)
+			return err
+		}
 	}
 
 	// capture the ctrl+c signal
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT)
 
+	for i, addr := range h.host.Addrs() {
+		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, h.host.ID().Pretty())
+	}
+
 	// lock the thread
+	defer h.host.Close()
 	select {
 	case <-stop:
 		// note: I don't like '^C' showing up on the same line as the next logged line...
 		fmt.Println("")
 		logger.Info("Received stop signal from os. Shutting down...")
+
+	case err = <-ch:
+		logger.Errorf("received err on rpc channel:\n%v", err)
+		return err
+
+	case <-h.ctx.Done():
+		if err = h.ctx.Err(); err != nil {
+			logger.Errorf("err on the context:\n%v", err)
+			return err
+		}
 	}
 
 	return nil

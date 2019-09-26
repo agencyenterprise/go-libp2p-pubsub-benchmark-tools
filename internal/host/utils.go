@@ -113,7 +113,7 @@ func parseSecurityOptions(opt string) (lconfig.Option, error) {
 	}
 }
 
-func bootstrapPeers(ctx context.Context, host host.Host, peers []string) error {
+func connectToPeers(ctx context.Context, host host.Host, peers []string) error {
 	for _, p := range peers {
 		addr, err := ipfsaddr.ParseString(p)
 		if err != nil {
