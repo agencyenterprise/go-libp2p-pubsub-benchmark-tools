@@ -10,8 +10,23 @@ TODO
 1. Check the options in the `config.json` file
 2. `$ make get`
 3. `$ go run ./cmd/host/main.go`
-4. Connect another host to the first: `$ go run ./cmd/host/main.go -l /ip4/127.0.0.2/tcp/0,/ip4/127.0.0.2/tcp/0/ws -r :8081 -p <prev. host listen addrs>`. Note, the `-l` flag are the listen addresses. Notice how we've incremented standard local host from `127.0.0.1` to `127.0.0.2`. We could have also simply changed the port address. Also, `-r` is the rpc listen address and needs to be different for this host than the default `:8080`.
+4. Connect a second host to the first: `$ go run ./cmd/host/main.go -l /ip4/127.0.0.2/tcp/0,/ip4/127.0.0.2/tcp/0/ws -r :8081 -p <prev. host listen addrs>`. Note, the `-l` flag are the listen addresses. Notice how we've incremented standard local host from `127.0.0.1` to `127.0.0.2`. We could have also simply changed the port address. Also, `-r` is the rpc listen address and needs to be different for this host than the default `:8080`.
 5. Send a message to the first host on the rpc channel. The host will then gossip the message to its peers: `$ go run ./cmd/client/main.go -p :8080`
+
+
+## Commands
+
+### Client
+
+TODO
+
+### Host
+
+TODO
+
+### Subnet
+
+TODO
 
 
 ## License

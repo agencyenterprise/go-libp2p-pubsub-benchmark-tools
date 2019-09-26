@@ -2,7 +2,6 @@ package host
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
@@ -113,23 +112,27 @@ func parseSecurityOptions(opt string) (lconfig.Option, error) {
 	}
 }
 
+// note: it expects the peers to be in IPFS form
 func connectToPeers(ctx context.Context, host host.Host, peers []string) error {
 	for _, p := range peers {
 		addr, err := ipfsaddr.ParseString(p)
 		if err != nil {
-			return fmt.Errorf("err parsing peer: %s\n%v", p, err)
+			logger.Errorf("err parsing peer: %s\n%v", p, err)
+			return err
 		}
 
 		pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
 		if err != nil {
-			return fmt.Errorf("err getting info from peerstore\n%v", err)
+			logger.Errorf("err getting info from peerstore\n%v", err)
+			return err
 		}
 
 		logger.Infof("full peer addr: %s", addr.String())
 		logger.Infof("peer info: %v", pinfo)
 
 		if err := host.Connect(ctx, *pinfo); err != nil {
-			return fmt.Errorf("bootstrapping a peer failed\n%v", err)
+			logger.Errorf("bootstrapping a peer failed\n%v", err)
+			return err
 		}
 
 		logger.Infof("Connected to peer: %v", pinfo.ID)

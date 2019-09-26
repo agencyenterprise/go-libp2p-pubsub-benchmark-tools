@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/agencyenterprise/gossip-host/internal/host"
-	"github.com/agencyenterprise/gossip-host/internal/host/config"
+	"github.com/agencyenterprise/gossip-host/internal/subnet/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/sirupsen/logrus"
@@ -14,21 +14,21 @@ import (
 
 func setup() *cobra.Command {
 	var (
-		confLoc, listens, rpcListen, peers, loggerLoc string
+		confLoc string
 	)
 
 	rootCmd := &cobra.Command{
 		Use:   "start",
-		Short: "Start node",
-		Long:  `Starts the gossip pub/sub node`,
+		Short: "Start subnet",
+		Long:  `Start a subnet of interconnected gossipsub hosts`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, "", false); err != nil {
 				logrus.Errorf("err initiating logger:\n%v", err)
 				return err
 			}
 
 			logger.Infof("Loading config: %s", confLoc)
-			conf, err := config.Load(confLoc, listens, rpcListen, peers)
+			conf, err := config.Load(confLoc)
 			if err != nil {
 				logger.Errorf("error loading config\n%v", err)
 				return err
@@ -40,7 +40,8 @@ func setup() *cobra.Command {
 			defer cancel()
 
 			// create the host
-			h, err := host.New(ctx, conf)
+			// note: performed conf nil check, above
+			h, err := host.New(ctx, *conf)
 			if err != nil {
 				logger.Errorf("err creating new host:\n%v", err)
 				return err
@@ -61,10 +62,6 @@ func setup() *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "host.config.json", "The configuration file.")
-	rootCmd.PersistentFlags().StringVarP(&listens, "listens", "l", "", "Addresses on which to listen. Comma separated. Overides config.json.")
-	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated. Overides config.json.")
-	rootCmd.PersistentFlags().StringVarP(&rpcListen, "rpc-listen", "r", "", "RPC listen address. Overides config.json.")
-	rootCmd.PersistentFlags().StringVarP(&loggerLoc, "log", "", "", "Log file location. Defaults to standard out.")
 
 	return rootCmd
 }

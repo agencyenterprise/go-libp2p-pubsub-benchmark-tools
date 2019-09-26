@@ -35,7 +35,7 @@ func setup() *cobra.Command {
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&msgLoc, "message", "m", "message.json", "The message file to send to peers.")
+	rootCmd.PersistentFlags().StringVarP(&msgLoc, "message", "m", "client.message.json", "The message file to send to peers.")
 	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated.")
 	rootCmd.PersistentFlags().StringVarP(&loggerLoc, "log", "", "", "Log file location. Defaults to standard out.")
 

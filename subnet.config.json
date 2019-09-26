@@ -1,10 +1,14 @@
 {
+  "subnet": {
+    "numHosts": 10,
+    "pubsubCIDR": "127.0.0.0/8",
+    "pubsubPortRange": [3000, 4000],
+    "rpcCIDR": "127.0.0.0/8",
+    "rpcPortRange": [8000, 9000],
+    "peerTopology": "whiteblocks"
+  },
   "host": {
-    "privPEM": "",
     "transports": ["tcp", "ws"],
-    "listens": ["/ip4/0.0.0.0/tcp/3000","/ip4/0.0.0.0/tcp/3001/ws"],
-    "rpcAddress": "0.0.0.0:8080",
-    "peers": [],
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
     "omitRelay": false,
