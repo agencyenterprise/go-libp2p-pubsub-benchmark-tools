@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/agencyenterprise/gossip-host/internal/host"
-	"github.com/agencyenterprise/gossip-host/internal/subnet/config"
+	"github.com/agencyenterprise/gossip-host/pkg/host"
+	"github.com/agencyenterprise/gossip-host/pkg/subnet/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/sirupsen/logrus"

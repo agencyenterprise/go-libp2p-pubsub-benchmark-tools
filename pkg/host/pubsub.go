@@ -8,7 +8,7 @@ import (
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 	"github.com/davecgh/go-spew/spew"
 
-	pb "github.com/agencyenterprise/gossip-host/internal/pb/publisher"
+	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )

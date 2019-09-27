@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	pb "github.com/agencyenterprise/gossip-host/internal/pb/publisher"
+	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 )
 

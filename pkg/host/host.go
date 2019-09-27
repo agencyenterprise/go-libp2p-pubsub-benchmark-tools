@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	rpcHost "github.com/agencyenterprise/gossip-host/internal/grpc/host"
-	"github.com/agencyenterprise/gossip-host/internal/host/config"
+	rpcHost "github.com/agencyenterprise/gossip-host/pkg/grpc/host"
+	"github.com/agencyenterprise/gossip-host/pkg/host/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	ipfsaddr "github.com/ipfs/go-ipfs-addr"
