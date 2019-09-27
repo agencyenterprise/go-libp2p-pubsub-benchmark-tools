@@ -3,7 +3,7 @@ package host
 import (
 	"context"
 
-	"github.com/agencyenterprise/gossip-host/internal/host/config"
+	"github.com/agencyenterprise/gossip-host/pkg/host/config"
 	"github.com/agencyenterprise/gossip-host/pkg/cerr"
 
 	lhost "github.com/libp2p/go-libp2p-core/host"

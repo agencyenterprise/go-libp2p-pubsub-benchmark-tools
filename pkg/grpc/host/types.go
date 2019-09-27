@@ -1,6 +1,6 @@
 package host
 
-import pb "github.com/agencyenterprise/gossip-host/internal/pb/publisher"
+import pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
 
 // Host listens on grpc
 type Host struct {

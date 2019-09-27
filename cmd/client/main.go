@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/agencyenterprise/gossip-host/internal/client"
+	"github.com/agencyenterprise/gossip-host/pkg/client"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/sirupsen/logrus"

@@ -1,7 +1,7 @@
 package client
 
 import (
-	rpcClient "github.com/agencyenterprise/gossip-host/internal/grpc/client"
+	rpcClient "github.com/agencyenterprise/gossip-host/pkg/grpc/client"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 )
 

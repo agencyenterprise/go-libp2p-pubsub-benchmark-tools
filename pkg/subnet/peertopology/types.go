@@ -1,7 +1,7 @@
 package peertopology
 
 import (
-	"github.com/agencyenterprise/gossip-host/internal/host"
+	"github.com/agencyenterprise/gossip-host/pkg/host"
 )
 
 // PeerTopology is a peering algorithm that connects hosts
