@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"os"
 
 	"github.com/agencyenterprise/gossip-host/pkg/host"
 	"github.com/agencyenterprise/gossip-host/pkg/host/config"
@@ -53,14 +52,11 @@ func setup() *cobra.Command {
 				return err
 			}
 
-			// note: we are capturing the ctrl+c signal and need to exit, here
-			os.Exit(0)
-
 			return nil
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "host.config.json", "The configuration file.")
+	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "configs/host/config.json", "The configuration file.")
 	rootCmd.PersistentFlags().StringVarP(&listens, "listens", "l", "", "Addresses on which to listen. Comma separated. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&rpcListen, "rpc-listen", "r", "", "RPC listen address. Overides config.json.")
@@ -75,4 +71,6 @@ func main() {
 	if err := rootCmd.Execute(); err != nil {
 		logrus.Fatalf("err executing command\n%v", err)
 	}
+
+	logger.Info("done")
 }
