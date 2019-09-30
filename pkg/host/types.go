@@ -3,8 +3,8 @@ package host
 import (
 	"context"
 
-	"github.com/agencyenterprise/gossip-host/pkg/host/config"
 	"github.com/agencyenterprise/gossip-host/pkg/cerr"
+	"github.com/agencyenterprise/gossip-host/pkg/host/config"
 
 	lhost "github.com/libp2p/go-libp2p-core/host"
 	lrouter "github.com/libp2p/go-libp2p-core/routing"

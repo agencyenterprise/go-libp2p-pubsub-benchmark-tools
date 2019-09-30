@@ -21,11 +21,11 @@ type Subnet struct {
 	// PubsubCIDR is the range of ip addrs for the pubsub to listen. Ports are incremented before IP
 	PubsubCIDR string `json:"pubsubCIDR,omitempty"`
 	// PubsubPortRange is the range of ports of pubsub to listen. Range is inclusive. Ports are incremented before IP
-	PubsubPortRange []int `json:"pubsubPortRange,omitempty"`
+	PubsubPortRange [2]int `json:"pubsubPortRange,omitempty"`
 	// RPCCIDR is the range of ip addrs for the rpc host to listen. Ports are incremented before IP
 	RPCCIDR string `json:"rpcCIDR,omitempty"`
 	// RPCPortRange is the range of ports for the rpc to listen. Range is inclusive. Ports are incremented before IP
-	RPCPortRange []int `json:"rpcPortRange,omitempty"`
+	RPCPortRange [2]int `json:"rpcPortRange,omitempty"`
 }
 
 type Host struct {

@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/agencyenterprise/gossip-host/pkg/host"
-	"github.com/agencyenterprise/gossip-host/pkg/subnet/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/gossip-host/pkg/subnet"
+	"github.com/agencyenterprise/gossip-host/pkg/subnet/config"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -35,33 +38,32 @@ func setup() *cobra.Command {
 			}
 			logger.Infof("Loaded configuration. Starting host.\n%v", conf)
 
+			// capture the ctrl+c signal
+			stop := make(chan os.Signal, 1)
+			signal.Notify(stop, syscall.SIGINT)
+
 			// create a context
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			// create the host
-			// note: performed conf nil check, above
-			h, err := host.New(ctx, *conf)
-			if err != nil {
-				logger.Errorf("err creating new host:\n%v", err)
+			// start the subnet
+			if err = subnet.Start(ctx, conf); err != nil {
+				logger.Errorf("err starting subnet\n%v", err)
 				return err
 			}
 
-			// start the server
-			// note: this is blocking
-			if err = h.Start(); err != nil {
-				logger.Errorf("err starting host\n%v", err)
-				return err
+			select {
+			case <-stop:
+				// note: I don't like '^C' showing up on the same line as the next logged line...
+				fmt.Println("")
+				logger.Info("Received stop signal from os. Shutting down...")
 			}
-
-			// note: we are capturing the ctrl+c signal and need to exit, here
-			os.Exit(0)
 
 			return nil
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "host.config.json", "The configuration file.")
+	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "configs/subnet/config.json", "The configuration file.")
 
 	return rootCmd
 }
@@ -72,4 +74,6 @@ func main() {
 	if err := rootCmd.Execute(); err != nil {
 		logrus.Fatalf("err executing command\n%v", err)
 	}
+
+	logger.Info("done")
 }
