@@ -78,6 +78,9 @@ func mergeDefaults(conf, defaults *Config) {
 	if len(conf.Subnet.RPCPortRange) == 0 {
 		conf.Subnet.RPCPortRange = defaults.Subnet.RPCPortRange
 	}
+	if conf.Subnet.PeerTopology == "" {
+		conf.Subnet.PeerTopology = defaults.Subnet.PeerTopology
+	}
 
 	// host
 	//if conf.Host.Priv == nil {
