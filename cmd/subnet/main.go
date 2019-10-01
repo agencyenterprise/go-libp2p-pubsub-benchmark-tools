@@ -17,7 +17,7 @@ import (
 
 func setup() *cobra.Command {
 	var (
-		confLoc string
+		confLoc, loggerLoc string
 	)
 
 	rootCmd := &cobra.Command{
@@ -37,6 +37,26 @@ func setup() *cobra.Command {
 				return err
 			}
 			logger.Infof("Loaded configuration. Starting host.\n%v", conf)
+
+			// check the logger location in the conf file
+			if conf.General.LoggerLocation != "" {
+				switch loggerLoc {
+				case conf.General.LoggerLocation:
+					break
+
+				case "":
+					logger.Warnf("logs will now be written to %s", conf.General.LoggerLocation)
+					if err = logger.SetLoggerLoc(conf.General.LoggerLocation); err != nil {
+						logger.Errorf("err setting log location to %s:\n%v", conf.General.LoggerLocation, err)
+						return err
+					}
+
+					break
+
+				default:
+					logger.Warnf("log location confliction between flag (%s) and config file (%s); defering to flag (%s)", loggerLoc, conf.General.LoggerLocation, loggerLoc)
+				}
+			}
 
 			// capture the ctrl+c signal
 			stop := make(chan os.Signal, 1)
@@ -64,6 +84,7 @@ func setup() *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "configs/subnet/config.json", "The configuration file.")
+	rootCmd.PersistentFlags().StringVarP(&loggerLoc, "log", "", "", "Log file location. Defaults to standard out.")
 
 	return rootCmd
 }

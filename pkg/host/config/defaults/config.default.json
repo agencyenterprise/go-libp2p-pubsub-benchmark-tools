@@ -12,6 +12,7 @@
     "omitNATPortMap": false,
     "omitRPCServer": false,
     "omitDiscoverService": false,
-    "omitRouting": false
+    "omitRouting": false,
+    "loggerLocation": ""
   }
 }

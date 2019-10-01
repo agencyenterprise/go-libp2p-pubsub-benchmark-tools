@@ -34,6 +34,26 @@ func setup() *cobra.Command {
 			}
 			logger.Infof("Loaded configuration. Starting host.\n%v", conf)
 
+			// check the logger location in the conf file
+			if conf.Host.LoggerLocation != "" {
+				switch loggerLoc {
+				case conf.Host.LoggerLocation:
+					break
+
+				case "":
+					logger.Warnf("logs will now be written to %s", conf.Host.LoggerLocation)
+					if err = logger.SetLoggerLoc(conf.Host.LoggerLocation); err != nil {
+						logger.Errorf("err setting log location to %s:\n%v", conf.Host.LoggerLocation, err)
+						return err
+					}
+
+					break
+
+				default:
+					logger.Warnf("log location confliction between flag (%s) and config file (%s); defering to flag (%s)", loggerLoc, conf.Host.LoggerLocation, loggerLoc)
+				}
+			}
+
 			// create a context
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
