@@ -153,6 +153,7 @@ func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 }
 */
 
+// note: this could panic!
 func parseDefaults(conf *Config) error {
 	box := loadDefaultBox()
 
@@ -199,5 +200,8 @@ func mergeDefaults(conf, defaults *Config) {
 	}
 	if conf.Host.RPCAddress == "" {
 		conf.Host.RPCAddress = defaults.Host.RPCAddress
+	}
+	if conf.Host.LoggerLocation == "" {
+		conf.Host.LoggerLocation = defaults.Host.LoggerLocation
 	}
 }

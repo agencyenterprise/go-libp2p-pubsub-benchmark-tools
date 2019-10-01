@@ -3,7 +3,7 @@
     "privPEM": "",
     "transports": ["tcp", "ws"],
     "listens": ["/ip4/127.0.0.1/tcp/3000","/ip4/127.0.0.1/tcp/3001/ws"],
-    "rpcAddress": "0.0.0.0:8080",
+    "rpcAddress": "127.0.0.1:8080",
     "peers": [],
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
@@ -12,6 +12,7 @@
     "omitNATPortMap": false,
     "omitRPCServer": false,
     "omitDiscoverService": false,
-    "omitRouting": false
+    "omitRouting": false,
+    "loggerLocation": ""
   }
 }

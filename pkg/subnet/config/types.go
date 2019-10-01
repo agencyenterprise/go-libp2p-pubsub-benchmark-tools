@@ -11,8 +11,9 @@ const (
 
 // Config is a struct to hold the config options
 type Config struct {
-	Subnet Subnet `json:"subnet,omitempty"`
-	Host   Host   `json:"host,omitempty"`
+	Subnet  Subnet  `json:"subnet,omitempty"`
+	Host    Host    `json:"host,omitempty"`
+	General General `json:"general,omitempty"`
 }
 
 type Subnet struct {
@@ -54,4 +55,10 @@ type Host struct {
 	// OmitRouting disables ipfs routing (e.g. dht);
 	// note: DHT is the only router supported, for now...
 	OmitRouting bool `json:"omitRouting,omitempty"`
+}
+
+// General store general config directives
+type General struct {
+	// LogerLocation points to the log file. One will be create if not exists. Default is std out.
+	LoggerLocation string `json:"loggerLocation,omitempty"`
 }

@@ -17,5 +17,8 @@
     "omitRPCServer": false,
     "omitDiscoverService": false,
     "omitRouting": false
+  },
+  "general": {
+    "loggerLocation": ""
   }
 }

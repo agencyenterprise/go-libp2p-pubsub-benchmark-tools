@@ -51,6 +51,8 @@ type Host struct {
 	// OmitRouting disables ipfs routing (e.g. dht);
 	// note: DHT is the only router supported, for now...
 	OmitRouting bool `json:"omitRouting,omitempty"`
+	// LogerLocation points to the log file. One will be create if not exists. Default is std out.
+	LoggerLocation string `json:"loggerLocation,omitempty"`
 }
 
 // ErrNilConfig is returned when a config is expected but none is given
