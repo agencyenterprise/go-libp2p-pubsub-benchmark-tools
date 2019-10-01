@@ -48,6 +48,7 @@ func Start(ctx context.Context, conf config.Config) error {
 		return err
 	}
 
+	// build router/discover
 	if err = buildDiscovery(hosts); err != nil {
 		logger.Errorf("err building discovery:\n%v", err)
 		return err
