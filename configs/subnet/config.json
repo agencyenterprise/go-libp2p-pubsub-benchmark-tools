@@ -1,10 +1,10 @@
 {
   "subnet": {
     "numHosts": 10,
-    "pubsubCIDR": "127.0.0.0/8",
+    "pubsubCIDR": "127.0.0.1/8",
     "pubsubPortRange": [3000, 4000],
-    "rpcCIDR": "127.0.0.0/8",
-    "rpcPortRange": [8000, 9000],
+    "rpcCIDR": "127.0.0.1/8",
+    "rpcPortRange": [8080, 9080],
     "peerTopology": "whiteblocks"
   },
   "host": {
