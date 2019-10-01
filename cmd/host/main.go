@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/agencyenterprise/gossip-host/internal/config"
-	"github.com/agencyenterprise/gossip-host/internal/host"
+	"github.com/agencyenterprise/gossip-host/pkg/host"
+	"github.com/agencyenterprise/gossip-host/pkg/host/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/sirupsen/logrus"
@@ -32,22 +35,81 @@ func setup() *cobra.Command {
 				logger.Errorf("error loading config\n%v", err)
 				return err
 			}
-			logger.Info("Loaded configuration. Starting host...")
+			logger.Infof("Loaded configuration. Starting host.\n%v", conf)
 
-			// note: this is blocking
-			if err = host.Start(conf); err != nil {
-				logger.Errorf("err starting host\n%v", err)
+			// check the logger location in the conf file
+			if conf.Host.LoggerLocation != "" {
+				switch loggerLoc {
+				case conf.Host.LoggerLocation:
+					break
+
+				case "":
+					logger.Warnf("logs will now be written to %s", conf.Host.LoggerLocation)
+					if err = logger.SetLoggerLoc(conf.Host.LoggerLocation); err != nil {
+						logger.Errorf("err setting log location to %s:\n%v", conf.Host.LoggerLocation, err)
+						return err
+					}
+
+					break
+
+				default:
+					logger.Warnf("log location confliction between flag (%s) and config file (%s); defering to flag (%s)", loggerLoc, conf.Host.LoggerLocation, loggerLoc)
+				}
+			}
+
+			// create a context
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			// create the host
+			h, err := host.New(ctx, conf)
+			if err != nil {
+				logger.Errorf("err creating new host:\n%v", err)
 				return err
 			}
 
-			// note: we are capturing the ctrl+c signal and need to exit, here
-			os.Exit(0)
+			// build pubsub
+			ps, err := h.BuildPubSub()
+			if err != nil || ps == nil {
+				logger.Errorf("err building pubsub:\n%v", err)
+				return err
+			}
+
+			// build rpc
+			ch := make(chan error)
+			if err = h.BuildRPC(ch, ps); err != nil {
+				logger.Errorf("err building rpc:\n%v", err)
+				return err
+			}
+
+			// connect to peers
+			if err = h.Connect(conf.Host.Peers); err != nil {
+				logger.Errorf("err connecting to peers:\n%v", err)
+				return err
+			}
+
+			// add the router
+			if err = h.BuildDiscoveryAndRouting(); err != nil {
+				logger.Errorf("err building router:\n%v", err)
+				return err
+			}
+
+			// capture the ctrl+c signal
+			stop := make(chan os.Signal, 1)
+			signal.Notify(stop, syscall.SIGINT)
+
+			// start the server
+			// note: this is blocking
+			if err = h.Start(ch, stop); err != nil {
+				logger.Errorf("err starting host\n%v", err)
+				return err
+			}
 
 			return nil
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "config.json", "The configuration file.")
+	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "configs/host/config.json", "The configuration file.")
 	rootCmd.PersistentFlags().StringVarP(&listens, "listens", "l", "", "Addresses on which to listen. Comma separated. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&rpcListen, "rpc-listen", "r", "", "RPC listen address. Overides config.json.")
@@ -62,4 +124,6 @@ func main() {
 	if err := rootCmd.Execute(); err != nil {
 		logrus.Fatalf("err executing command\n%v", err)
 	}
+
+	logger.Info("done")
 }

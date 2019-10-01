@@ -124,6 +124,14 @@ go/clean:
 kill/gopls:
 	@killall gopls
 
+.PHONY: docker/host
+docker/host:
+	@docker build -t gossip-host -f ./docker/dockerfiles/host/Dockerfile .
+
+.PHONY: docker/client
+docker/client:
+	@docker build -t gossip-client -f ./docker/dockerfiles/client/Dockerfile .
+
 .PHONY: help
 help: Makefile
 	@echo
