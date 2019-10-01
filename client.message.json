@@ -1,5 +1,5 @@
 {
   "id": "foo",
-  "squence": 0,
-  "data": []
+  "sequence": 1,
+  "data": [0, 1, 2, 3, 5]
 }

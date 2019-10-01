@@ -1,4 +1,4 @@
-# github.com/btcsuite/btcd v0.0.0-20190523000118-16327141da8c
+# github.com/btcsuite/btcd v0.0.0-20190824003749-130ea5bddde3
 github.com/btcsuite/btcd/btcec
 # github.com/cheekybits/genny v1.0.0
 github.com/cheekybits/genny/generic
@@ -36,7 +36,7 @@ github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/timestamp
 # github.com/google/uuid v1.1.1
 github.com/google/uuid
-# github.com/gorilla/websocket v1.4.0
+# github.com/gorilla/websocket v1.4.1
 github.com/gorilla/websocket
 # github.com/hashicorp/golang-lru v0.5.3
 github.com/hashicorp/golang-lru
@@ -109,7 +109,7 @@ github.com/libp2p/go-conn-security-multistream
 github.com/libp2p/go-eventbus
 # github.com/libp2p/go-flow-metrics v0.0.1
 github.com/libp2p/go-flow-metrics
-# github.com/libp2p/go-libp2p v0.3.1
+# github.com/libp2p/go-libp2p v0.4.0
 github.com/libp2p/go-libp2p
 github.com/libp2p/go-libp2p/config
 github.com/libp2p/go-libp2p/p2p/discovery
@@ -122,12 +122,12 @@ github.com/libp2p/go-libp2p/p2p/protocol/ping
 # github.com/libp2p/go-libp2p-autonat v0.1.0
 github.com/libp2p/go-libp2p-autonat
 github.com/libp2p/go-libp2p-autonat/pb
-# github.com/libp2p/go-libp2p-circuit v0.1.1
+# github.com/libp2p/go-libp2p-circuit v0.1.3
 github.com/libp2p/go-libp2p-circuit
 github.com/libp2p/go-libp2p-circuit/pb
 # github.com/libp2p/go-libp2p-connmgr v0.1.1
 github.com/libp2p/go-libp2p-connmgr
-# github.com/libp2p/go-libp2p-core v0.2.2
+# github.com/libp2p/go-libp2p-core v0.2.3
 github.com/libp2p/go-libp2p-core/connmgr
 github.com/libp2p/go-libp2p-core/crypto
 github.com/libp2p/go-libp2p-core/crypto/pb
@@ -186,7 +186,7 @@ github.com/libp2p/go-libp2p-routing/notifications
 # github.com/libp2p/go-libp2p-secio v0.2.0
 github.com/libp2p/go-libp2p-secio
 github.com/libp2p/go-libp2p-secio/pb
-# github.com/libp2p/go-libp2p-swarm v0.2.1
+# github.com/libp2p/go-libp2p-swarm v0.2.2
 github.com/libp2p/go-libp2p-swarm
 # github.com/libp2p/go-libp2p-transport-upgrader v0.1.1
 github.com/libp2p/go-libp2p-transport-upgrader
@@ -211,7 +211,7 @@ github.com/libp2p/go-reuseport-transport
 github.com/libp2p/go-stream-muxer-multistream
 # github.com/libp2p/go-tcp-transport v0.1.1
 github.com/libp2p/go-tcp-transport
-# github.com/libp2p/go-ws-transport v0.1.1
+# github.com/libp2p/go-ws-transport v0.1.2
 github.com/libp2p/go-ws-transport
 # github.com/libp2p/go-yamux v1.2.3
 github.com/libp2p/go-yamux
@@ -237,7 +237,7 @@ github.com/mattn/go-isatty
 github.com/miekg/dns
 # github.com/minio/blake2b-simd v0.0.0-20160723061019-3f5f724cb5b1
 github.com/minio/blake2b-simd
-# github.com/minio/sha256-simd v0.1.1-0.20190913151208-6de447530771
+# github.com/minio/sha256-simd v0.1.1
 github.com/minio/sha256-simd
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
@@ -300,7 +300,7 @@ github.com/whyrusleeping/go-logging
 github.com/whyrusleeping/go-notifier
 # github.com/whyrusleeping/mafmt v1.2.8
 github.com/whyrusleeping/mafmt
-# github.com/whyrusleeping/mdns v0.0.0-20180901202407-ef14215e6b30
+# github.com/whyrusleeping/mdns v0.0.0-20190826153040-b9b60ed33aa9
 github.com/whyrusleeping/mdns
 # github.com/whyrusleeping/multiaddr-filter v0.0.0-20160516205228-e903e4adabd7
 github.com/whyrusleeping/multiaddr-filter
@@ -315,7 +315,7 @@ go.opencensus.io/stats
 go.opencensus.io/stats/internal
 go.opencensus.io/stats/view
 go.opencensus.io/tag
-# golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4
+# golang.org/x/crypto v0.0.0-20190923035154-9ee001bba392
 golang.org/x/crypto/blake2s
 golang.org/x/crypto/chacha20poly1305
 golang.org/x/crypto/cryptobyte

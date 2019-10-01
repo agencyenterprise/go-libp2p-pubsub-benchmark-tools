@@ -20,25 +20,22 @@ func pubsubHandler(ctx context.Context, hostID peer.ID, sub *pubsub.Subscription
 			logger.Errorf("err reading next:\n%v", err)
 			continue
 		}
+		logger.Info("msg received on pubsub channel")
 
-		// TODO: fix this. It isn't working
-		msg := &pb.Message{}
-		if err = nxt.Unmarshal(nxt.Data); err != nil {
+		msg := pb.Message{}
+		if err = msg.XXX_Unmarshal(nxt.GetData()); err != nil {
 			logger.Errorf("err unmarshaling next message:\n%v", err)
 			continue
 		}
 		spew.Dump(msg)
 
 		// TODO: how to increment sequence before sending out?
-		// note: what is nxt.GetFrom()? It doesn't seem to be the sender id but it doesn't match the original host peer.Id?
-		logger.Infof("Pubsub message received: %v,%v,%v,%v,%d,%d", hostID, nxt.GetFrom(), msg.GetId(), binary.BigEndian.Uint64(nxt.GetSeqno()), time.Now().UnixNano(), msg.Sequence)
+		logger.Infof("Pubsub message received: %v,%v,%v,%v,%d,%d", hostID, nxt.GetFrom(), msg.GetId(), binary.BigEndian.Uint64(nxt.GetSeqno()), time.Now().UnixNano(), msg.GetSequence())
 	}
 }
 
 func (publisher *publisher) publish(msg *pb.Message) error {
-	var b []byte
-
-	bs, err := msg.XXX_Marshal(b, true)
+	bs, err := msg.XXX_Marshal(nil, true)
 	if err != nil {
 		logger.Errorf("err marshaling message:\n%v", err)
 		return err

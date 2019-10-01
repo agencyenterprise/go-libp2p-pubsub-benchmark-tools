@@ -7,10 +7,11 @@ import (
 
 func Send(msgLoc, peers string) error {
 	msg, err := parseMessageFile(msgLoc)
-	if err != nil {
+	if err != nil || msg == nil {
 		logger.Errorf("err parsing message file:\n%v", err)
 		return err
 	}
+	logger.Infof("message is %s", msg.String())
 
 	peersArr := parsePeers(peers)
 	for _, peer := range peersArr {

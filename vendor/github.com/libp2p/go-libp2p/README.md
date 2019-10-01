@@ -22,12 +22,6 @@
   <br>
 </p>
 
-# Project status
-
-[![Throughput Graph](https://graphs.waffle.io/libp2p/go-libp2p/throughput.svg)](https://waffle.io/libp2p/go-libp2p/metrics/throughput)
-
-[**`Weekly Core Dev Calls`**](https://github.com/ipfs/pm/issues/674)
-
 # Table of Contents
 
 - [Background](#background)
@@ -40,6 +34,7 @@
   - [Tests](#tests)
   - [Packages](#packages)
 - [Contribute](#contribute)
+- [Weekly Core Dev Calls](https://github.com/ipfs/pm/issues/674)
 
 ## Background
 
@@ -58,9 +53,9 @@ libp2p is the product of a long, and arduous quest of understanding -- a deep di
 
 ## Usage
 
-This repository (`go-libp2p`) serves as the entrypoint to the universe of modules that compose the Go implementation of the libp2p stack.
+This repository (`go-libp2p`) serves as the entrypoint to the universe of modules that compose the Go implementation of the libp2p stack. Libp2p requires go 1.12+.
 
-We mainly use [Go modules](https://github.com/golang/go/wiki/Modules) for our dependency and release management (and thus require go >= 1.11). In order to get the best developer experience, we recommend you do too. Otherwise, you may ocassionally encounter a breaking build as you'll be running off master (which, by definition, is not guaranteed to be stable).
+We mainly use [Go modules](https://github.com/golang/go/wiki/Modules) for our dependency and release management (and thus require go >= 1.12+). In order to get the best developer experience, we recommend you do too. Otherwise, you may ocassionally encounter a breaking build as you'll be running off master (which, by definition, is not guaranteed to be stable).
 
 You can start using go-libp2p in your Go application simply by adding imports from our repos, e.g.:
 
@@ -135,7 +130,7 @@ List of packages currently in existence for libp2p:
 | [`go-libp2p-reuseport-transport`](//github.com/libp2p/go-libp2p-reuseport-transport) | [![Travis CI](https://travis-ci.com/libp2p/go-libp2p-reuseport-transport.svg?branch=master)](https://travis-ci.com/libp2p/go-libp2p-reuseport-transport) | [![codecov](https://codecov.io/gh/libp2p/go-libp2p-reuseport-transport/branch/master/graph/badge.svg)](https://codecov.io/gh/libp2p/go-libp2p-reuseport-transport) | partial transport for building transports that reuse ports |
 | **Encrypted Channels** |
 | [`go-libp2p-secio`](//github.com/libp2p/go-libp2p-secio) | [![Travis CI](https://travis-ci.com/libp2p/go-libp2p-secio.svg?branch=master)](https://travis-ci.com/libp2p/go-libp2p-secio) | [![codecov](https://codecov.io/gh/libp2p/go-libp2p-secio/branch/master/graph/badge.svg)](https://codecov.io/gh/libp2p/go-libp2p-secio) | SecIO crypto channel |
-| [`go-libp2p-tls-transport`](//github.com/libp2p/go-libp2p-tls-transport) | [![Travis CI](https://travis-ci.com/libp2p/go-libp2p-tls-transport.svg?branch=master)](https://travis-ci.com/libp2p/go-libp2p-tls-transport) | [![codecov](https://codecov.io/gh/libp2p/go-libp2p-tls-transport/branch/master/graph/badge.svg)](https://codecov.io/gh/libp2p/go-libp2p-tls-transport) | TLS 1.3+ crypto channel |
+| [`go-libp2p-tls`](//github.com/libp2p/go-libp2p-tls) | [![Travis CI](https://travis-ci.com/libp2p/go-libp2p-tls.svg?branch=master)](https://travis-ci.com/libp2p/go-libp2p-tls) | [![codecov](https://codecov.io/gh/libp2p/go-libp2p-tls/branch/master/graph/badge.svg)](https://codecov.io/gh/libp2p/go-libp2p-tls) | TLS 1.3+ crypto channel |
 | [`go-conn-security-multistream`](//github.com/libp2p/go-conn-security-multistream) | [![Travis CI](https://travis-ci.com/libp2p/go-conn-security-multistream.svg?branch=master)](https://travis-ci.com/libp2p/go-conn-security-multistream) | [![codecov](https://codecov.io/gh/libp2p/go-conn-security-multistream/branch/master/graph/badge.svg)](https://codecov.io/gh/libp2p/go-conn-security-multistream) | multistream multiplexed meta crypto channel |
 | **Private Network** |
 | [`go-libp2p-pnet`](//github.com/libp2p/go-libp2p-pnet) | [![Travis CI](https://travis-ci.com/libp2p/go-libp2p-pnet.svg?branch=master)](https://travis-ci.com/libp2p/go-libp2p-pnet) | [![codecov](https://codecov.io/gh/libp2p/go-libp2p-pnet/branch/master/graph/badge.svg)](https://codecov.io/gh/libp2p/go-libp2p-pnet) | reference private networking implementation |
