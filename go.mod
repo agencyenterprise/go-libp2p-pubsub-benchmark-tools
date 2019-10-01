@@ -3,7 +3,6 @@ module github.com/agencyenterprise/gossip-host
 go 1.13
 
 require (
-	github.com/apparentlymart/go-cidr v1.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/gobuffalo/packr/v2 v2.6.0
 	github.com/golang/protobuf v1.3.2

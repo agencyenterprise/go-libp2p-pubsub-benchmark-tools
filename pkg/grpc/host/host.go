@@ -4,16 +4,16 @@ import (
 	"context"
 	"net"
 
-	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
 
 	"google.golang.org/grpc"
 )
 
-func New(messagePublisher func(msg *pb.Message) error) *Host {
+func New(PblshMessage func(msg *pb.Message) error) *Host {
 	return &Host{
-		&Server{
-			messagePublisher,
+		Server: &Server{
+			PblshMessage,
 		},
 	}
 }
