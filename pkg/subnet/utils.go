@@ -35,7 +35,7 @@ func buildHosts(ctx context.Context, conf config.Config, pubsubIP, rpcIP net.IP,
 
 		h, err := host.New(ctx, hostConf)
 		if err != nil {
-			logger.Errorf("err building host #%d:\n%v", err)
+			logger.Errorf("err building host #%d:\n%v", i+1, err)
 			return nil, err
 		}
 
@@ -112,12 +112,12 @@ func nextListenAddresses(conf config.Config, currPubsubIP net.IP, pubsubNet *net
 	var addresses []string
 
 	for _, transport := range conf.Host.Transports {
-		if *currPubsubPort < pubsubPorts[1] {
-			var t string
-			if transport != "tcp" {
-				t = transport
-			}
+		var t string
+		if transport != "tcp" {
+			t = transport
+		}
 
+		if *currPubsubPort < pubsubPorts[1] {
 			// TODO: fixme; assumes tcp
 			addresses = append(addresses, fmt.Sprintf("/ip4/%s/tcp/%d/%s", currPubsubIP.String(), *currPubsubPort, t))
 			*currPubsubPort++
@@ -133,7 +133,8 @@ func nextListenAddresses(conf config.Config, currPubsubIP net.IP, pubsubNet *net
 			return nil, ErrIPOutOfCIDRRange
 		}
 
-		addresses = append(addresses, fmt.Sprintf("%s:%d", currPubsubIP, *currPubsubPort))
+		// TODO: fixme; assumes tcp
+		addresses = append(addresses, fmt.Sprintf("/ip4/%s/tcp/%d/%s", currPubsubIP.String(), *currPubsubPort, t))
 		*currPubsubPort++
 	}
 

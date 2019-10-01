@@ -32,7 +32,6 @@ type mdnsNotifee struct {
 
 // HandlePeerFound...
 func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
-	logger.Infof("peer found: %v", pi)
 	m.h.Connect(m.ctx, pi)
 }
 
