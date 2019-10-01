@@ -1,7 +1,12 @@
 package whiteblocks
 
-import "math/rand"
+import (
+	"math/rand"
+	"time"
+)
 
+// note: min/max are inclusive
 func randBetween(min, max int) int {
-	return rand.Intn(max-min) + min
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(max-min+1) + min
 }
