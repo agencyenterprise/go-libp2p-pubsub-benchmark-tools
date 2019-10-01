@@ -26,7 +26,7 @@ func buildHosts(ctx context.Context, conf config.Config, pubsubIP, rpcIP net.IP,
 	)
 
 	for i := 0; i < conf.Subnet.NumHosts; i++ {
-		hostConf, err = buildHostConf(conf, currPubsubIP, currRPCIP, pubsubNet, rpcNet, currPubsubPort, currRPCPort, pubsubPorts, rpcPorts)
+		hostConf, err = buildHostConf(conf, currPubsubIP, currRPCIP, pubsubNet, rpcNet, &currPubsubPort, &currRPCPort, pubsubPorts, rpcPorts)
 		if err != nil {
 			logger.Errorf("err building host #%d:\n%v", i+1, err)
 			return nil, err
@@ -44,21 +44,21 @@ func buildHosts(ctx context.Context, conf config.Config, pubsubIP, rpcIP net.IP,
 	return hosts, nil
 }
 
-func buildHostConf(conf config.Config, currPubsubIP, currRPCIP net.IP, pubsubNet, rpcNet *net.IPNet, currPubsubPort, currRPCPort int, pubsubPorts, rpcPorts [2]int) (hconf.Config, error) {
+func buildHostConf(conf config.Config, currPubsubIP, currRPCIP net.IP, pubsubNet, rpcNet *net.IPNet, currPubsubPort, currRPCPort *int, pubsubPorts, rpcPorts [2]int) (hconf.Config, error) {
 	hostConfig, err := parseSubnetConfig(conf)
 	if err != nil {
 		logger.Errorf("err parsing subnet config for host config:\n%v", err)
 		return hostConfig, err
 	}
 
-	nextRPCAddress, err := nextRPCAddress(currRPCIP, rpcNet, &currRPCPort, rpcPorts)
+	nextRPCAddress, err := nextRPCAddress(currRPCIP, rpcNet, currRPCPort, rpcPorts)
 	if err != nil {
 		logger.Errorf("err getting next rpc address:\n%v", err)
 		return hostConfig, err
 	}
 	hostConfig.Host.RPCAddress = nextRPCAddress
 
-	nextListenAddresses, err := nextListenAddresses(currPubsubIP, pubsubNet, &currPubsubPort, pubsubPorts)
+	nextListenAddresses, err := nextListenAddresses(conf, currPubsubIP, pubsubNet, currPubsubPort, pubsubPorts)
 	if err != nil {
 		logger.Errorf("err getting next listen addresses:\n%v", err)
 		return hostConfig, err
@@ -68,7 +68,6 @@ func buildHostConf(conf config.Config, currPubsubIP, currRPCIP net.IP, pubsubNet
 	return hostConfig, nil
 }
 
-// TODO: implement
 // note: rpcPorts is []int{minRPCPort, maxRPCPort}, inclusive
 // TODO: should probably use a struct so it's more self documenting...
 func nextRPCAddress(currRPCIP net.IP, rpcNet *net.IPNet, currRPCPort *int, rpcPorts [2]int) (string, error) {
@@ -79,9 +78,12 @@ func nextRPCAddress(currRPCIP net.IP, rpcNet *net.IPNet, currRPCPort *int, rpcPo
 		return "", ErrNilPort
 	}
 
-	*currRPCPort++
+	var addr string
+
 	if *currRPCPort < rpcPorts[1] {
-		return fmt.Sprintf("%s:%s", currRPCIP.String(), *currRPCPort), nil
+		addr = fmt.Sprintf("%s:%d", currRPCIP.String(), *currRPCPort)
+		*currRPCPort++
+		return addr, nil
 	}
 
 	// note: currRPCPort is above limit; need to inc ip
@@ -93,12 +95,50 @@ func nextRPCAddress(currRPCIP net.IP, rpcNet *net.IPNet, currRPCPort *int, rpcPo
 		return "", ErrIPOutOfCIDRRange
 	}
 
-	return fmt.Sprintf("%s:%s", currRPCIP, currRPCPort), nil
+	addr = fmt.Sprintf("%s:%d", currRPCIP, *currRPCPort)
+	*currRPCPort++
+	return addr, nil
 }
 
-// TODO: implement
-func nextListenAddresses(currPubsubIP net.IP, pubsubNet *net.IPNet, currPubsubPort *int, pubsubPorts [2]int) ([]string, error) {
-	return []string{}, nil
+func nextListenAddresses(conf config.Config, currPubsubIP net.IP, pubsubNet *net.IPNet, currPubsubPort *int, pubsubPorts [2]int) ([]string, error) {
+	if pubsubNet == nil {
+		return nil, ErrNilIPNet
+	}
+	if currPubsubPort == nil {
+		return nil, ErrNilPort
+	}
+
+	var addresses []string
+
+	// note: need an address for each transport
+	addressesNeeded := len(conf.Host.Transports)
+
+	if currPubsubIP[0] == 0 {
+		// note: it is listening on all adresses, so assume it needs double the addresses
+		addressesNeeded *= 2
+	}
+
+	for i := 0; i < addressesNeeded; i++ {
+		if *currPubsubPort < pubsubPorts[1] {
+			addresses = append(addresses, fmt.Sprintf("%s:%d", currPubsubIP.String(), *currPubsubPort))
+			*currPubsubPort++
+			continue
+		}
+
+		// note: currRPCPort is above limit; need to inc ip
+		*currPubsubPort = pubsubPorts[0]
+		incIP(currPubsubIP)
+		if !pubsubNet.Contains(currPubsubIP) {
+			// out of ip addresses given CIDR constraints
+			logger.Errorf("ip %s is not in CIDR: %s", currPubsubIP.String(), pubsubNet.String())
+			return nil, ErrIPOutOfCIDRRange
+		}
+
+		addresses = append(addresses, fmt.Sprintf("%s:%d", currPubsubIP, *currPubsubPort))
+		*currPubsubPort++
+	}
+
+	return addresses, nil
 }
 
 func parseSubnetConfig(conf config.Config) (hconf.Config, error) {
@@ -129,7 +169,8 @@ func parseSubnetConfig(conf config.Config) (hconf.Config, error) {
 	return hostConfig, nil
 }
 
-func Hosts(cidr string) ([]net.IP, error) {
+// note: range through IP's from CIDR.
+func all(cidr string) ([]net.IP, error) {
 	ip, ipnet, err := net.ParseCIDR(cidr)
 	if err != nil {
 		return nil, err
@@ -158,4 +199,36 @@ func incIP(ip net.IP) {
 			break
 		}
 	}
+}
+
+func buildPubsubAndRPC(ch chan error, hosts []*host.Host) error {
+	for _, h := range hosts {
+		// build pubsub
+		ps, err := h.BuildPubSub()
+		if err != nil || ps == nil {
+			logger.Errorf("err building pubsub:\n%v", err)
+			return err
+		}
+
+		// build rpc
+		if err = h.BuildRPC(ch, ps); err != nil {
+			logger.Errorf("err building rpc:\n%v", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func buildDiscovery(hosts []*host.Host) error {
+	var err error
+
+	for _, h := range hosts {
+		if err = h.BuildDiscoveryAndRouting(); err != nil {
+			logger.Errorf("err building router:\n%v", err)
+			return err
+		}
+	}
+
+	return nil
 }

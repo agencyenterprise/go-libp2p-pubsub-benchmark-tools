@@ -27,6 +27,8 @@ type Subnet struct {
 	RPCCIDR string `json:"rpcCIDR,omitempty"`
 	// RPCPortRange is the range of ports for the rpc to listen. Range is inclusive. Ports are incremented before IP
 	RPCPortRange [2]int `json:"rpcPortRange,omitempty"`
+	// PeerTopology is the named peering topology
+	PeerTopology string `json:"peerTopology,omitempty"`
 }
 
 type Host struct {
