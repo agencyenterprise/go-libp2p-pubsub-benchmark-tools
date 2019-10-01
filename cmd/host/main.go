@@ -65,9 +65,29 @@ func setup() *cobra.Command {
 				return err
 			}
 
+			// build pubsub
+			ps, err := h.BuildPubSub()
+			if err != nil || ps == nil {
+				logger.Errorf("err building pubsub:\n%v", err)
+				return err
+			}
+
+			// build rpc
+			ch, err := h.BuildRPC(ps)
+			if err != nil {
+				logger.Errorf("err building rpc:\n%v", err)
+				return err
+			}
+
+			// connect to peers
+			if err = h.Connect(conf.Host.Peers); err != nil {
+				logger.Errorf("err connecting to peers:\n%v", err)
+				return err
+			}
+
 			// start the server
 			// note: this is blocking
-			if err = h.Start(); err != nil {
+			if err = h.Start(ch); err != nil {
 				logger.Errorf("err starting host\n%v", err)
 				return err
 			}
