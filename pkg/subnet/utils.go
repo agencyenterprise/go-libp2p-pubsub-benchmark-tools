@@ -31,7 +31,7 @@ func buildHosts(ctx context.Context, conf config.Config, pubsubIP, rpcIP net.IP,
 			logger.Errorf("err building host #%d:\n%v", i+1, err)
 			return nil, err
 		}
-		logger.Warnf("host conf #%d: %v", i+1, hostConf)
+		logger.Infof("host conf #%d: %v", i+1, hostConf)
 
 		h, err := host.New(ctx, hostConf)
 		if err != nil {
