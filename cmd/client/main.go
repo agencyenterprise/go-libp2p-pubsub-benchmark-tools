@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/agencyenterprise/gossip-host/internal/client"
+	"github.com/agencyenterprise/gossip-host/pkg/client"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/sirupsen/logrus"
@@ -35,8 +35,8 @@ func setup() *cobra.Command {
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&msgLoc, "message", "m", "message.json", "The message file to send to peers.")
-	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated.")
+	rootCmd.PersistentFlags().StringVarP(&msgLoc, "message", "m", "client.message.json", "The message file to send to peers.")
+	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", ":8080", "Peers to connect. Comma separated.")
 	rootCmd.PersistentFlags().StringVarP(&loggerLoc, "log", "", "", "Log file location. Defaults to standard out.")
 
 	return rootCmd
