@@ -5,8 +5,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	rpcHost "github.com/agencyenterprise/gossip-host/pkg/grpc/host"
@@ -133,6 +131,11 @@ func New(ctx context.Context, conf config.Config) (*Host, error) {
 	return h, nil
 }
 
+// ID returns the host's id
+func (h *Host) ID() string {
+	return h.host.ID().Pretty()
+}
+
 // Addresses returns the listening addresses of the host
 func (h *Host) Addresses() []string {
 	var addresses []string
@@ -200,9 +203,8 @@ func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 	return ps, nil
 }
 
-func (h *Host) BuildRPC(ps *pubsub.PubSub) (chan error, error) {
+func (h *Host) BuildRPC(ch chan error, ps *pubsub.PubSub) error {
 	// Start the RPC server
-	ch := make(chan error)
 	publisher := &Publisher{ps}
 	h.publisher = publisher
 	if !h.conf.Host.OmitRPCServer {
@@ -215,11 +217,11 @@ func (h *Host) BuildRPC(ps *pubsub.PubSub) (chan error, error) {
 		}(rHost, ch)
 	}
 
-	return ch, nil
+	return nil
 }
 
-// Start starts a new gossip host
-func (h *Host) Start(ch chan error) error {
+// BuildDiscoveryAndRouting ...
+func (h *Host) BuildDiscoveryAndRouting() error {
 	// create discovery service
 	if !h.conf.Host.OmitDiscoveryService {
 		mdns, err := discovery.NewMdnsService(h.ctx, h.host, time.Second*10, "")
@@ -241,10 +243,11 @@ func (h *Host) Start(ch chan error) error {
 		}
 	}
 
-	// capture the ctrl+c signal
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, syscall.SIGINT)
+	return nil
+}
 
+// Start starts a new gossip host
+func (h *Host) Start(ch chan error, stop chan os.Signal) error {
 	for i, addr := range h.host.Addrs() {
 		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, h.host.ID().Pretty())
 	}

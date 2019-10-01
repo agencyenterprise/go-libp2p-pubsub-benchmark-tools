@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/agencyenterprise/gossip-host/pkg/host"
 	"github.com/agencyenterprise/gossip-host/pkg/host/config"
@@ -73,8 +76,8 @@ func setup() *cobra.Command {
 			}
 
 			// build rpc
-			ch, err := h.BuildRPC(ps)
-			if err != nil {
+			ch := make(chan error)
+			if err = h.BuildRPC(ch, ps); err != nil {
 				logger.Errorf("err building rpc:\n%v", err)
 				return err
 			}
@@ -85,9 +88,19 @@ func setup() *cobra.Command {
 				return err
 			}
 
+			// add the router
+			if err = h.BuildDiscoveryAndRouting(); err != nil {
+				logger.Errorf("err building router:\n%v", err)
+				return err
+			}
+
+			// capture the ctrl+c signal
+			stop := make(chan os.Signal, 1)
+			signal.Notify(stop, syscall.SIGINT)
+
 			// start the server
 			// note: this is blocking
-			if err = h.Start(ch); err != nil {
+			if err = h.Start(ch, stop); err != nil {
 				logger.Errorf("err starting host\n%v", err)
 				return err
 			}
