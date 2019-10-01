@@ -34,7 +34,8 @@ func pubsubHandler(ctx context.Context, hostID peer.ID, sub *pubsub.Subscription
 	}
 }
 
-func (publisher *publisher) publish(msg *pb.Message) error {
+// Publish publishes a message on the pubsub channel
+func (publisher *Publisher) Publish(msg *pb.Message) error {
 	bs, err := msg.XXX_Marshal(nil, true)
 	if err != nil {
 		logger.Errorf("err marshaling message:\n%v", err)
