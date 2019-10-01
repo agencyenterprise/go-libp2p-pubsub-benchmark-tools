@@ -1,16 +1,12 @@
 package host
 
 import (
-	"context"
 	"strings"
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
-	ipfsaddr "github.com/ipfs/go-ipfs-addr"
 	libp2p "github.com/libp2p/go-libp2p"
-	"github.com/libp2p/go-libp2p-core/host"
 	mplex "github.com/libp2p/go-libp2p-mplex"
-	peerstore "github.com/libp2p/go-libp2p-peerstore"
 	quic "github.com/libp2p/go-libp2p-quic-transport"
 	secio "github.com/libp2p/go-libp2p-secio"
 	yamux "github.com/libp2p/go-libp2p-yamux"
@@ -110,33 +106,4 @@ func parseSecurityOptions(opt string) (lconfig.Option, error) {
 		logger.Errorf("unknown security option: %s", opt)
 		return nil, ErrUnknownSecurityOption
 	}
-}
-
-// note: it expects the peers to be in IPFS form
-func connectToPeers(ctx context.Context, host host.Host, peers []string) error {
-	for _, p := range peers {
-		addr, err := ipfsaddr.ParseString(p)
-		if err != nil {
-			logger.Errorf("err parsing peer: %s\n%v", p, err)
-			return err
-		}
-
-		pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
-		if err != nil {
-			logger.Errorf("err getting info from peerstore\n%v", err)
-			return err
-		}
-
-		logger.Infof("full peer addr: %s", addr.String())
-		logger.Infof("peer info: %v", pinfo)
-
-		if err := host.Connect(ctx, *pinfo); err != nil {
-			logger.Errorf("bootstrapping a peer failed\n%v", err)
-			return err
-		}
-
-		logger.Infof("Connected to peer: %v", pinfo.ID)
-	}
-
-	return nil
 }

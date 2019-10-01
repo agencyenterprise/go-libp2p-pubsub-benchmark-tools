@@ -130,16 +130,6 @@ func New(ctx context.Context, conf config.Config) (*Host, error) {
 	}
 	h.host = host
 
-	// create discovery service
-	if !conf.Host.OmitDiscoveryService {
-		mdns, err := discovery.NewMdnsService(ctx, host, time.Second*10, "")
-		if err != nil {
-			logger.Errorf("err discovering\n%v", err)
-			return nil, err
-		}
-		mdns.RegisterNotifee(&mdnsNotifee{h: host, ctx: ctx})
-	}
-
 	return h, nil
 }
 
@@ -168,13 +158,13 @@ func (h *Host) IFPSAddresses() []string {
 func (h *Host) Connect(peers []string) error {
 	for _, p := range peers {
 		addr, err := ipfsaddr.ParseString(p)
-		if err != nil {
+		if err != nil || addr == nil {
 			logger.Errorf("err parsing peer: %s\n%v", p, err)
 			return err
 		}
 
 		pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
-		if err != nil {
+		if err != nil || pinfo == nil {
 			logger.Errorf("err getting info from peerstore\n%v", err)
 			return err
 		}
@@ -183,7 +173,7 @@ func (h *Host) Connect(peers []string) error {
 		logger.Infof("peer info: %v", pinfo)
 
 		if err := h.host.Connect(h.ctx, *pinfo); err != nil {
-			logger.Errorf("bootstrapping a peer failed\n%v", err)
+			logger.Errorf("connecting to peer failed\n%v", err)
 			return err
 		}
 
@@ -193,38 +183,51 @@ func (h *Host) Connect(peers []string) error {
 	return nil
 }
 
-// Start starts a new gossip host
-func (h *Host) Start() error {
-	// connect to peers
-	if err := connectToPeers(h.ctx, h.host, h.conf.Host.Peers); err != nil {
-		logger.Errorf("err connecting to peers\n%v", err)
-		return err
-	}
-
+func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 	// build the gossip pub/sub
 	ps, err := pubsub.NewGossipSub(h.ctx, h.host)
 	if err != nil {
 		logger.Errorf("err creating new gossip sub\n%v", err)
-		return err
+		return nil, err
 	}
 	sub, err := ps.Subscribe(pubsubTopic)
 	if err != nil {
 		logger.Errorf("err subscribing\n%v", err)
-		return err
+		return nil, err
 	}
 	go pubsubHandler(h.ctx, h.host.ID(), sub)
 
+	return ps, nil
+}
+
+func (h *Host) BuildRPC(ps *pubsub.PubSub) (chan error, error) {
 	// Start the RPC server
 	ch := make(chan error)
+	publisher := &Publisher{ps}
+	h.publisher = publisher
 	if !h.conf.Host.OmitRPCServer {
-		publisher := &publisher{ps}
-		rHost := rpcHost.New(publisher.publish)
-		go func() {
-			if err := rHost.Listen(h.ctx, h.conf.Host.RPCAddress); err != nil {
+		rHost := rpcHost.New(publisher.Publish)
+		go func(rh *rpcHost.Host, c chan error) {
+			if err := rh.Listen(h.ctx, h.conf.Host.RPCAddress); err != nil {
 				logger.Errorf("err listening on rpc:\n%v", err)
-				ch <- err
+				c <- err
 			}
-		}()
+		}(rHost, ch)
+	}
+
+	return ch, nil
+}
+
+// Start starts a new gossip host
+func (h *Host) Start(ch chan error) error {
+	// create discovery service
+	if !h.conf.Host.OmitDiscoveryService {
+		mdns, err := discovery.NewMdnsService(h.ctx, h.host, time.Second*10, "")
+		if err != nil {
+			logger.Errorf("err discovering\n%v", err)
+			return err
+		}
+		mdns.RegisterNotifee(&mdnsNotifee{h: h.host, ctx: h.ctx})
 	}
 
 	if !h.conf.Host.OmitRouting {
@@ -232,7 +235,7 @@ func (h *Host) Start() error {
 			return ErrNilRouter
 		}
 
-		if err = h.router.Bootstrap(h.ctx); err != nil {
+		if err := h.router.Bootstrap(h.ctx); err != nil {
 			logger.Errorf("err bootstrapping\n%v", err)
 			return err
 		}
@@ -246,20 +249,18 @@ func (h *Host) Start() error {
 		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, h.host.ID().Pretty())
 	}
 
-	// lock the thread
-	defer h.host.Close()
 	select {
 	case <-stop:
 		// note: I don't like '^C' showing up on the same line as the next logged line...
 		fmt.Println("")
 		logger.Info("Received stop signal from os. Shutting down...")
 
-	case err = <-ch:
+	case err := <-ch:
 		logger.Errorf("received err on rpc channel:\n%v", err)
 		return err
 
 	case <-h.ctx.Done():
-		if err = h.ctx.Err(); err != nil {
+		if err := h.ctx.Err(); err != nil {
 			logger.Errorf("err on the context:\n%v", err)
 			return err
 		}
