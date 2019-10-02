@@ -1,6 +1,6 @@
 {
   "subnet": {
-    "numHosts": 20,
+    "numHosts": 10,
     "pubsubCIDR": "127.0.0.1/8",
     "pubsubPortRange": [3000, 4000],
     "rpcCIDR": "127.0.0.1/8",
