@@ -15,6 +15,7 @@ type Props struct {
 	PS          *pubsub.PubSub
 	PubsubTopic string
 	CTX         context.Context
+	Shutdown    chan struct{}
 }
 
 // Host listens on grpc
