@@ -7,14 +7,16 @@ import (
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/golang/protobuf/ptypes/empty"
+	ipfsaddr "github.com/ipfs/go-ipfs-addr"
+	peerstore "github.com/libp2p/go-libp2p-peerstore"
 	"google.golang.org/grpc"
 )
 
-func New(PblshMessage func(msg *pb.Message) error) *Host {
+func New(props *Props) *Host {
 	return &Host{
-		Server: &Server{
-			PblshMessage,
-		},
+		props: props,
 	}
 }
 
@@ -28,11 +30,168 @@ func (h *Host) Listen(ctx context.Context, addr string) error {
 	defer lis.Close()
 
 	s := grpc.NewServer()
-	pb.RegisterPublisherServer(s, h.Server)
+	pb.RegisterPublisherServer(s, h)
 	if err := s.Serve(lis); err != nil {
 		logger.Errorf("failed to serve: %v", err)
 		return err
 	}
 
 	return nil
+}
+
+// PublishMessage implements
+func (h *Host) PublishMessage(ctx context.Context, in *pb.Message) (*pb.PublishReply, error) {
+	logger.Info("received rpc message; will now publish to subscribers")
+	spew.Dump(in)
+
+	bs, err := in.XXX_Marshal(nil, true)
+	if err != nil {
+		logger.Errorf("err marshaling message:\n%v", err)
+		h.props.CH <- err
+		return nil, err
+	}
+
+	if err = h.props.PS.Publish(h.props.PubsubTopic, bs); err != nil {
+		logger.Errorf("err publishing message:\n%v", err)
+		h.props.CH <- err
+		return nil, err
+	}
+
+	return &pb.PublishReply{
+		MsgId:   in.Id,
+		Success: err == nil,
+	}, nil
+}
+
+// CloseAllPeerConnections closes all connections
+func (h *Host) CloseAllPeerConnections(ctx context.Context, _ *empty.Empty) (*pb.CloseAllPeerConnectionsReply, error) {
+	peerIDs := h.props.Host.Network().Peers()
+	for _, peerID := range peerIDs {
+		if err := h.props.Host.Network().ClosePeer(peerID); err != nil {
+			logger.Errorf("err closing connection to %s\n%v", peerID, err)
+			h.props.CH <- err
+			return nil, err
+		}
+	}
+
+	return &pb.CloseAllPeerConnectionsReply{
+		Success: true,
+	}, nil
+}
+
+// ClosePeerConnections closes connections to listed peers
+func (h *Host) ClosePeerConnections(ctx context.Context, peersList *pb.PeersList) (*pb.ClosePeerConnectionsReply, error) {
+	// TODO: ...
+	//var results []*pb.OpenPeerConnectionReply
+	for _, peer := range peersList.Peers {
+		addr, err := ipfsaddr.ParseString(peer)
+		if err != nil || addr == nil {
+			logger.Errorf("err parsing peer: %s\n%v", peer, err)
+			h.props.CH <- err
+			return nil, err
+		}
+
+		pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
+		if err != nil || pinfo == nil {
+			logger.Errorf("err getting info from peerstore\n%v", err)
+			h.props.CH <- err
+			return nil, err
+		}
+		if err = h.props.Host.Network().ClosePeer(pinfo.ID); err != nil {
+			logger.Errorf("err closing connection to %s\n%v", pinfo.ID, err)
+			h.props.CH <- err
+			return nil, err
+		}
+	}
+
+	return &pb.ClosePeerConnectionsReply{
+		Success: true,
+	}, nil
+}
+
+// OpenPeerConnections opens connections to listed peers
+func (h *Host) OpenPeersConnections(ctx context.Context, peersList *pb.PeersList) (*pb.OpenPeersConnectionsReplies, error) {
+	var results []*pb.OpenPeerConnectionReply
+
+	for _, p := range peersList.Peers {
+		addr, err := ipfsaddr.ParseString(p)
+		if err != nil || addr == nil {
+			logger.Errorf("err parsing peer: %s\n%v", p, err)
+			continue
+		}
+
+		pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
+		if err != nil || pinfo == nil {
+			logger.Errorf("err getting info from peerstore\n%v", err)
+			continue
+		}
+
+		logger.Infof("full peer addr: %s", addr.String())
+		logger.Infof("peer info: %v", pinfo)
+
+		if err := h.props.Host.Connect(h.props.CTX, *pinfo); err != nil {
+			logger.Errorf("connecting to peer failed\n%v", err)
+			continue
+		}
+
+		logger.Infof("Connected to peer: %v", pinfo.ID)
+		results = append(results, &pb.OpenPeerConnectionReply{
+			Success: true,
+			Peer:    p,
+		})
+	}
+
+	return &pb.OpenPeersConnectionsReplies{
+		PeerConnections: results,
+	}, nil
+}
+
+// ListConnectedPeers lists the host's connected peers
+func (h *Host) ListConnectedPeers(ctx context.Context, _ *empty.Empty) (*pb.PeersList, error) {
+	var peers []string
+
+	// note: is this the correct method?
+	peerIDs := h.props.Host.Network().Peers()
+	for _, peerID := range peerIDs {
+		multiAddrs := h.props.Host.Peerstore().Addrs(peerID)
+		for _, multiAddr := range multiAddrs {
+			peers = append(peers, multiAddr.String())
+		}
+	}
+
+	return &pb.PeersList{
+		Peers: peers,
+	}, nil
+}
+
+// Shutdown shuts the host down
+func (h *Host) Shutdown(ctx context.Context, _ *empty.Empty) (*pb.ShutdownReply, error) {
+	if err := h.props.Host.Close(); err != nil {
+		logger.Errorf("err shutting down server:\n%v", err)
+		h.props.CH <- err
+		return nil, err
+	}
+
+	return &pb.ShutdownReply{
+		Success: true,
+	}, nil
+}
+
+func (h *Host) ID(ctx context.Context, _ *empty.Empty) (*pb.IDReply, error) {
+	return &pb.IDReply{
+		ID: string(h.props.Host.ID()),
+	}, nil
+}
+
+func (h *Host) ListenAddresses(ctx context.Context, _ *empty.Empty) (*pb.ListenAddressesReply, error) {
+	var addresses []string
+
+	multiAddrs := h.props.Host.Addrs()
+	for _, multiAddr := range multiAddrs {
+		addresses = append(addresses, multiAddr.String())
+	}
+
+	return &pb.ListenAddressesReply{
+		Addresses: addresses,
+	}, nil
 }

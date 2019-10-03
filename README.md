@@ -28,6 +28,11 @@ TODO
 TODO
 
 
+## Protobufs
+
+This implementation uses RPC to connect to hosts. In order to make the protobuf, you will need to first follow the installation instructions, [here](https://github.com/golang/protobuf), and then run `$ make -C ./pkg/pb/`.
+
+
 ## License
 
 [**MIT**](LICENSE).
