@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
 
 	"google.golang.org/grpc"
 )
@@ -22,7 +22,7 @@ func Send(address string, msg *pb.Message) error {
 	c := pb.NewPublisherClient(conn)
 
 	// Contact the server and print out its response.
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
 	r, err := c.PublishMessage(ctx, msg)
