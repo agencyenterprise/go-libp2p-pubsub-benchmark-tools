@@ -2,6 +2,7 @@ package subnet
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"net"
 
@@ -9,6 +10,7 @@ import (
 	hconf "github.com/agencyenterprise/gossip-host/pkg/host/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 	"github.com/agencyenterprise/gossip-host/pkg/subnet/config"
+	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 )
 
 func buildHosts(ctx context.Context, conf config.Config, pubsubIP, rpcIP net.IP, pubsubNet, rpcNet *net.IPNet, pubsubPorts, rpcPorts [2]int) ([]*host.Host, error) {
@@ -58,6 +60,14 @@ func buildHostConf(conf config.Config, currPubsubIP, currRPCIP net.IP, pubsubNet
 		return hostConfig, err
 	}
 	hostConfig.Host.Listens = nextListenAddresses
+
+	if hostConfig.Host.Priv == nil {
+		conf.Host.Priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
+		if err != nil {
+			logger.Errorf("err generating private key:\n%v", err)
+			return hostConfig, err
+		}
+	}
 
 	return hostConfig, nil
 }

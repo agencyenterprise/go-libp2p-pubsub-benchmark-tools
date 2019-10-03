@@ -32,7 +32,9 @@ type mdnsNotifee struct {
 
 // HandlePeerFound...
 func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
-	m.h.Connect(m.ctx, pi)
+	if err := m.h.Connect(m.ctx, pi); err != nil {
+		logger.Warnf("mdns err connecting to peer with id %v:\n%v", pi.ID, err)
+	}
 }
 
 // New returns a new host
@@ -146,7 +148,7 @@ func (h *Host) Addresses() []string {
 }
 
 // IPFSAddresses returns the ipfs listening addresses of the host
-func (h *Host) IFPSAddresses() []string {
+func (h *Host) IPFSAddresses() []string {
 	var addresses []string
 	for _, addr := range h.host.Addrs() {
 		addresses = append(addresses, fmt.Sprintf("%s/ipfs/%s", addr, h.host.ID().Pretty()))
@@ -185,6 +187,7 @@ func (h *Host) Connect(peers []string) error {
 	return nil
 }
 
+// BuildPubSub returns a pubsub service
 func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 	// build the gossip pub/sub
 	ps, err := pubsub.NewGossipSub(h.ctx, h.host)
@@ -202,6 +205,7 @@ func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 	return ps, nil
 }
 
+// BuildRPC returns an rpc service
 func (h *Host) BuildRPC(ch chan error, ps *pubsub.PubSub) error {
 	// Start the RPC server
 	publisher := &Publisher{ps}
