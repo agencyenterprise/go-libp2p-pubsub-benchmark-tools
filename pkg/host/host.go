@@ -208,10 +208,14 @@ func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 // BuildRPC returns an rpc service
 func (h *Host) BuildRPC(ch chan error, ps *pubsub.PubSub) error {
 	// Start the RPC server
-	publisher := &Publisher{ps}
-	h.publisher = publisher
 	if !h.conf.Host.OmitRPCServer {
-		rHost := rpcHost.New(publisher.Publish)
+		rHost := rpcHost.New(&rpcHost.Props{
+			Host:        h.host,
+			CH:          ch,
+			PS:          ps,
+			PubsubTopic: pubsubTopic,
+			CTX:         h.ctx,
+		})
 		go func(rh *rpcHost.Host, c chan error) {
 			if err := rh.Listen(h.ctx, h.conf.Host.RPCAddress); err != nil {
 				logger.Errorf("err listening on rpc:\n%v", err)
@@ -254,6 +258,11 @@ func (h *Host) Start(ch chan error, stop chan os.Signal) error {
 	for i, addr := range h.host.Addrs() {
 		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, h.host.ID().Pretty())
 	}
+	defer func() {
+		if err := h.host.Close(); err != nil {
+			logger.Errorf("err closing host:\n%v", err)
+		}
+	}()
 
 	select {
 	case <-stop:

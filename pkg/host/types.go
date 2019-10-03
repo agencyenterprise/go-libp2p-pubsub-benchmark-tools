@@ -28,17 +28,12 @@ const (
 	pubsubTopic = "/libp2p/test/1.0.0"
 )
 
-// Publisher holds the pubsub pointer
-type Publisher struct {
-	ps *pubsub.PubSub
-}
-
 // Host is the gossipsub host
 // note: lhost.Host and lrouter.Routing are interfaces
 type Host struct {
-	host      lhost.Host
-	ctx       context.Context
-	conf      config.Config
-	router    lrouter.Routing
-	publisher *Publisher
+	host   lhost.Host
+	ctx    context.Context
+	conf   config.Config
+	router lrouter.Routing
+	ps     *pubsub.PubSub
 }

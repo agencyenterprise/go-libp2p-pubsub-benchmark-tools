@@ -1,13 +1,23 @@
 package host
 
-import pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
+import (
+	"context"
+
+	"github.com/libp2p/go-libp2p-core/host"
+
+	pubsub "github.com/libp2p/go-libp2p-pubsub"
+)
+
+// Props are passed to New
+type Props struct {
+	Host        host.Host
+	CH          chan error
+	PS          *pubsub.PubSub
+	PubsubTopic string
+	CTX         context.Context
+}
 
 // Host listens on grpc
 type Host struct {
-	Server *Server
-}
-
-// Server is used to implement PublisherServer.
-type Server struct {
-	PblshMessage func(msg *pb.Message) error
+	props *Props
 }
