@@ -117,6 +117,22 @@ func setup() (*cobra.Command, error) {
 		},
 	}
 
+	shutdownCMD := &cobra.Command{
+		Use:   "shutdown",
+		Short: "Shutsdown the host(s)",
+		Long:  "Ask the host(s) to shutdown",
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+				logrus.Fatalf("err initiating logger:\n%v", err)
+			}
+
+			logger.Infof("requesting shutdown")
+			if err := client.Shutdown(peers, timeout); err != nil {
+				logger.Fatalf("err shutting down\n%v", err)
+			}
+		},
+	}
+
 	listenAddressesCMD := &cobra.Command{
 		Use:   "listens",
 		Short: "Get listen addresses",
@@ -141,6 +157,7 @@ func setup() (*cobra.Command, error) {
 		listConnectedPeersCMD,
 		idCMD,
 		listenAddressesCMD,
+		shutdownCMD,
 	)
 	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", ":8080", "Peers to connect. Comma separated.")
 	rootCmd.PersistentFlags().IntVarP(&timeout, "timeout", "t", 20, "Timeout, in seconds")

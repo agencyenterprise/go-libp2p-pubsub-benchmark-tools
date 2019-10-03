@@ -7,6 +7,7 @@ import (
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
+	"github.com/golang/protobuf/ptypes/empty"
 
 	grpc "google.golang.org/grpc"
 )
@@ -78,7 +79,7 @@ func CloseAll(peers string, timeout int) error {
 		// Contact the server and print out its response.
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 
-		r, err := c.CloseAllPeerConnections(ctx, nil)
+		r, err := c.CloseAllPeerConnections(ctx, &empty.Empty{})
 		if err != nil {
 			logger.Errorf("err closing all peer connections for %s:\n%v", peer, err)
 			failed = true
@@ -216,7 +217,7 @@ func ListPeers(peers string, timeout int) error {
 		// Contact the server and print out its response.
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 
-		r, err := c.ListConnectedPeers(ctx, nil)
+		r, err := c.ListConnectedPeers(ctx, &empty.Empty{})
 		if err != nil {
 			logger.Errorf("err closing all peer connections for peer %s:\n%v", peer, err)
 			conn.Close()
@@ -234,7 +235,7 @@ func ListPeers(peers string, timeout int) error {
 	}
 
 	if failed {
-		return errors.New("open peers failed")
+		return errors.New("list peers failed")
 	}
 
 	return nil
@@ -258,7 +259,7 @@ func IDs(peers string, timeout int) error {
 		// Contact the server and print out its response.
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 
-		r, err := c.ID(ctx, nil)
+		r, err := c.ID(ctx, &empty.Empty{})
 		if err != nil {
 			logger.Errorf("err getting id for %s:\n%v", peer, err)
 			conn.Close()
@@ -297,7 +298,7 @@ func Listens(peers string, timeout int) error {
 		// Contact the server and print out its response.
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 
-		r, err := c.ListenAddresses(ctx, nil)
+		r, err := c.ListenAddresses(ctx, &empty.Empty{})
 		if err != nil {
 			logger.Errorf("err getting listens for %s:\n%v", peer, err)
 			conn.Close()
@@ -312,7 +313,45 @@ func Listens(peers string, timeout int) error {
 	}
 
 	if failed {
-		return errors.New("get id failed")
+		return errors.New("get listens failed")
+	}
+
+	return nil
+}
+
+func Shutdown(peers string, timeout int) error {
+	peersArr := parsePeers(peers)
+	var failed = false
+
+	for _, peer := range peersArr {
+		// Set up a connection to the server.
+		conn, err := grpc.Dial(peer, grpc.WithInsecure())
+		if err != nil {
+			logger.Errorf("did not connect to %s:\n%v", peer, err)
+			failed = true
+			continue
+		}
+
+		c := pb.NewPublisherClient(conn)
+
+		// Contact the server and print out its response.
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+
+		_, err = c.Shutdown(ctx, &empty.Empty{})
+		if err != nil {
+			logger.Errorf("err shutting down for %s:\n%v", peer, err)
+			conn.Close()
+			cancel()
+			failed = true
+			continue
+		}
+
+		conn.Close()
+		cancel()
+	}
+
+	if failed {
+		return errors.New("shutting down failed")
 	}
 
 	return nil
