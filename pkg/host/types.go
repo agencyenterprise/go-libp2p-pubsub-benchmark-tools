@@ -28,6 +28,7 @@ const (
 	pubsubTopic = "/libp2p/test/1.0.0"
 )
 
+// Publisher holds the pubsub pointer
 type Publisher struct {
 	ps *pubsub.PubSub
 }

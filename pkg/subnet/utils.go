@@ -10,7 +10,6 @@ import (
 	hconf "github.com/agencyenterprise/gossip-host/pkg/host/config"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 	"github.com/agencyenterprise/gossip-host/pkg/subnet/config"
-
 	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 )
 
@@ -46,11 +45,7 @@ func buildHosts(ctx context.Context, conf config.Config, pubsubIP, rpcIP net.IP,
 }
 
 func buildHostConf(conf config.Config, currPubsubIP, currRPCIP net.IP, pubsubNet, rpcNet *net.IPNet, currPubsubPort, currRPCPort *int, pubsubPorts, rpcPorts [2]int) (hconf.Config, error) {
-	hostConfig, err := parseSubnetConfig(conf)
-	if err != nil {
-		logger.Errorf("err parsing subnet config for host config:\n%v", err)
-		return hostConfig, err
-	}
+	hostConfig := parseSubnetConfig(conf)
 
 	nextRPCAddress, err := nextRPCAddress(currRPCIP, rpcNet, currRPCPort, rpcPorts)
 	if err != nil {
@@ -65,6 +60,14 @@ func buildHostConf(conf config.Config, currPubsubIP, currRPCIP net.IP, pubsubNet
 		return hostConfig, err
 	}
 	hostConfig.Host.Listens = nextListenAddresses
+
+	if hostConfig.Host.Priv == nil {
+		conf.Host.Priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
+		if err != nil {
+			logger.Errorf("err generating private key:\n%v", err)
+			return hostConfig, err
+		}
+	}
 
 	return hostConfig, nil
 }
@@ -141,12 +144,10 @@ func nextListenAddresses(conf config.Config, currPubsubIP net.IP, pubsubNet *net
 	return addresses, nil
 }
 
-func parseSubnetConfig(conf config.Config) (hconf.Config, error) {
-	var (
-		hostConfig hconf.Config
-		err        error
-	)
+func parseSubnetConfig(conf config.Config) hconf.Config {
+	var hostConfig hconf.Config
 
+	hostConfig.Host.Priv = conf.Host.Priv
 	hostConfig.Host.Peers = []string{}
 	hostConfig.Host.Transports = conf.Host.Transports
 	hostConfig.Host.Muxers = conf.Host.Muxers
@@ -159,14 +160,7 @@ func parseSubnetConfig(conf config.Config) (hconf.Config, error) {
 	hostConfig.Host.OmitBootstrapPeers = conf.Host.OmitBootstrapPeers
 	hostConfig.Host.OmitRouting = conf.Host.OmitRouting
 
-	// TODO: parse PEM file...
-	hostConfig.Host.Priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
-	if err != nil {
-		logger.Errorf("err generating ecdsa key pair:\n%v", err)
-		return hostConfig, err
-	}
-
-	return hostConfig, nil
+	return hostConfig
 }
 
 // note: range through IP's from CIDR.

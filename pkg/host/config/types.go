@@ -9,7 +9,6 @@ import (
 const (
 	defaultsLoc       string = "./defaults"
 	defaultConfigName string = "config.default.json"
-	defaultPEMName    string = "private_key.pem"
 )
 
 // Config is a struct to hold the config options

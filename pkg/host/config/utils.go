@@ -2,16 +2,19 @@ package config
 
 import (
 	"bufio"
+	"crypto/rand"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
-	// TODO: wait for pr merge and go back to lcrypto
-	//acrypto "github.com/adam-hanna/go-libp2p-core/crypto"
 	"github.com/gobuffalo/packr/v2"
+	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/spf13/viper"
 )
 
@@ -40,19 +43,34 @@ func parsePeers(conf *Config, peers string) {
 }
 
 func parseConfigFile(conf *Config, confLoc string) error {
+	var err error
+
 	v := viper.New()
 
 	v.SetConfigName(trimExtension(confLoc))
 	v.AddConfigPath(".")
 
-	if err := v.ReadInConfig(); err != nil {
+	if err = v.ReadInConfig(); err != nil {
 		logger.Errorf("err reading configuration file: %s\n%v", confLoc, err)
 		return err
 	}
 
-	if err := v.Unmarshal(conf); err != nil {
+	if err = v.Unmarshal(conf); err != nil {
 		logger.Errorf("err unmarshaling config\n%v", err)
 		return err
+	}
+
+	if conf.Host.PrivPEM != "" {
+		if err = loadAndSavePriv(conf); err != nil {
+			logger.Errorf("could not load private key:\n%v", err)
+			return err
+		}
+	} else {
+		conf.Host.Priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
+		if err != nil {
+			logger.Errorf("err generating private key:\n%v", err)
+			return err
+		}
 	}
 
 	return nil
@@ -67,13 +85,6 @@ func loadDefaultConfig(box *packr.Box) ([]byte, error) {
 	return box.Find(defaultConfigName)
 }
 
-func loadDefaultPriv(box *packr.Box) ([]byte, error) {
-	// Get the string representation of a file, or an error if it doesn't exist:
-	return box.Find(defaultPEMName)
-}
-
-// TODO: wait for pr merge and go back to lcrypto
-/*
 func loadAndSavePriv(conf *Config) error {
 	privB, err := loadPriv(conf.Host.PrivPEM)
 	if err != nil {
@@ -91,7 +102,6 @@ func loadAndSavePriv(conf *Config) error {
 
 	return nil
 }
-*/
 
 func loadPriv(loc string) ([]byte, error) {
 	privateKeyFile, err := os.Open(loc)
@@ -114,21 +124,6 @@ func loadPriv(loc string) ([]byte, error) {
 	return []byte(pembytes), err
 }
 
-// TODO: waiting on PR merge to lcrypto
-/*
-func parseDefaultPriv(box *packr.Box) (lcrypto.PrivKey, error) {
-	defaultPriv, err := loadDefaultPriv(box)
-	if err != nil {
-		logger.Errorf("err loading default private key:\n%v", err)
-		return nil, err
-	}
-
-	return parsePrivateKey(defaultPriv)
-}
-*/
-
-// TODO: waiting on PR merge to lcrypto
-/*
 func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 	data, _ := pem.Decode(privB)
 	if data == nil {
@@ -142,8 +137,7 @@ func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 		return nil, err
 	}
 
-	// TODO: remove ASAP
-	priv, _, err := acrypto.KeyPairFromKey(cPriv)
+	priv, _, err := lcrypto.KeyPairFromStdKey(cPriv)
 	if err != nil {
 		logger.Errorf("err generating lcrypto priv key:\n%v", err)
 		return nil, err
@@ -151,7 +145,6 @@ func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 
 	return priv.(lcrypto.PrivKey), nil
 }
-*/
 
 // note: this could panic!
 func parseDefaults(conf *Config) error {
@@ -168,24 +161,11 @@ func parseDefaults(conf *Config) error {
 		return err
 	}
 
-	// TODO: waiting on PR merge to lcrypto
-	/*
-		priv, err := parseDefaultPriv(box)
-		if err != nil {
-			logger.Errorf("err parsing default private key:\n%v", err)
-			return err
-		}
-		conf.Host.Priv = priv
-	*/
-
 	return nil
 }
 
 // note: this could panic!
 func mergeDefaults(conf, defaults *Config) {
-	if conf.Host.Priv == nil {
-		conf.Host.Priv = defaults.Host.Priv
-	}
 	if len(conf.Host.Listens) == 0 {
 		conf.Host.Listens = defaults.Host.Listens
 	}
