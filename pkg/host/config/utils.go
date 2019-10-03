@@ -2,6 +2,7 @@ package config
 
 import (
 	"bufio"
+	"crypto/rand"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
@@ -42,19 +43,34 @@ func parsePeers(conf *Config, peers string) {
 }
 
 func parseConfigFile(conf *Config, confLoc string) error {
+	var err error
+
 	v := viper.New()
 
 	v.SetConfigName(trimExtension(confLoc))
 	v.AddConfigPath(".")
 
-	if err := v.ReadInConfig(); err != nil {
+	if err = v.ReadInConfig(); err != nil {
 		logger.Errorf("err reading configuration file: %s\n%v", confLoc, err)
 		return err
 	}
 
-	if err := v.Unmarshal(conf); err != nil {
+	if err = v.Unmarshal(conf); err != nil {
 		logger.Errorf("err unmarshaling config\n%v", err)
 		return err
+	}
+
+	if conf.Host.PrivPEM != "" {
+		if err = loadAndSavePriv(conf); err != nil {
+			logger.Errorf("could not load private key:\n%v", err)
+			return err
+		}
+	} else {
+		conf.Host.Priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
+		if err != nil {
+			logger.Errorf("err generating private key:\n%v", err)
+			return err
+		}
 	}
 
 	return nil
@@ -67,11 +83,6 @@ func loadDefaultBox() *packr.Box {
 func loadDefaultConfig(box *packr.Box) ([]byte, error) {
 	// Get the string representation of a file, or an error if it doesn't exist:
 	return box.Find(defaultConfigName)
-}
-
-func loadDefaultPriv(box *packr.Box) ([]byte, error) {
-	// Get the string representation of a file, or an error if it doesn't exist:
-	return box.Find(defaultPEMName)
 }
 
 func loadAndSavePriv(conf *Config) error {
@@ -113,16 +124,6 @@ func loadPriv(loc string) ([]byte, error) {
 	return []byte(pembytes), err
 }
 
-func parseDefaultPriv(box *packr.Box) (lcrypto.PrivKey, error) {
-	defaultPriv, err := loadDefaultPriv(box)
-	if err != nil {
-		logger.Errorf("err loading default private key:\n%v", err)
-		return nil, err
-	}
-
-	return parsePrivateKey(defaultPriv)
-}
-
 func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 	data, _ := pem.Decode(privB)
 	if data == nil {
@@ -160,21 +161,11 @@ func parseDefaults(conf *Config) error {
 		return err
 	}
 
-	priv, err := parseDefaultPriv(box)
-	if err != nil {
-		logger.Errorf("err parsing default private key:\n%v", err)
-		return err
-	}
-	conf.Host.Priv = priv
-
 	return nil
 }
 
 // note: this could panic!
 func mergeDefaults(conf, defaults *Config) {
-	if conf.Host.Priv == nil {
-		conf.Host.Priv = defaults.Host.Priv
-	}
 	if len(conf.Host.Listens) == 0 {
 		conf.Host.Listens = defaults.Host.Listens
 	}

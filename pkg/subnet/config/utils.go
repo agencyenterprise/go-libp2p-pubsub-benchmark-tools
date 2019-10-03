@@ -43,23 +43,25 @@ func loadPriv(loc string) ([]byte, error) {
 }
 
 func parseConfigFile(conf *Config, confLoc string) error {
+	var err error
+
 	v := viper.New()
 
 	v.SetConfigName(trimExtension(confLoc))
 	v.AddConfigPath(".")
 
-	if err := v.ReadInConfig(); err != nil {
+	if err = v.ReadInConfig(); err != nil {
 		logger.Errorf("err reading configuration file: %s\n%v", confLoc, err)
 		return err
 	}
 
-	if err := v.Unmarshal(conf); err != nil {
+	if err = v.Unmarshal(conf); err != nil {
 		logger.Errorf("err unmarshaling config\n%v", err)
 		return err
 	}
 
 	if conf.Host.PrivPEM != "" {
-		if err := loadAndSavePriv(conf); err != nil {
+		if err = loadAndSavePriv(conf); err != nil {
 			logger.Errorf("err loading pem file %s:\n%v", conf.Host.PrivPEM, err)
 			return err
 		}
@@ -113,22 +115,7 @@ func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 		return nil, err
 	}
 
-	return priv.(lcrypto.PrivKey), nil
-}
-
-func loadDefaultPriv(box *packr.Box) ([]byte, error) {
-	// Get the string representation of a file, or an error if it doesn't exist:
-	return box.Find(defaultPEMName)
-}
-
-func parseDefaultPriv(box *packr.Box) (lcrypto.PrivKey, error) {
-	defaultPriv, err := loadDefaultPriv(box)
-	if err != nil {
-		logger.Errorf("err loading default private key:\n%v", err)
-		return nil, err
-	}
-
-	return parsePrivateKey(defaultPriv)
+	return priv, nil
 }
 
 func parseDefaults(conf *Config) error {
@@ -144,13 +131,6 @@ func parseDefaults(conf *Config) error {
 		logger.Errorf("err unmarshaling config\n%v", err)
 		return err
 	}
-
-	priv, err := parseDefaultPriv(box)
-	if err != nil {
-		logger.Errorf("err parsing default private key:\n%v", err)
-		return err
-	}
-	conf.Host.Priv = priv
 
 	return nil
 }
@@ -178,9 +158,6 @@ func mergeDefaults(conf, defaults *Config) {
 	}
 
 	// host
-	if conf.Host.Priv == nil {
-		conf.Host.Priv = defaults.Host.Priv
-	}
 	if len(conf.Host.Transports) == 0 {
 		conf.Host.Transports = defaults.Host.Transports
 	}

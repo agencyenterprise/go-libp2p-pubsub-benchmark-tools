@@ -20,13 +20,6 @@ func Load(confLoc, listens, rpcListen, peers string) (Config, error) {
 		return conf, err
 	}
 
-	if conf.Host.PrivPEM != "" {
-		if err := loadAndSavePriv(&conf); err != nil {
-			logger.Errorf("could not load private key:\n%v", err)
-			return conf, err
-		}
-	}
-
 	mergeDefaults(&conf, &defaults)
 	parseListens(&conf, listens)
 	parsePeers(&conf, peers)
