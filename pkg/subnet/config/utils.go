@@ -1,18 +1,45 @@
 package config
 
 import (
+	"bufio"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
+	"errors"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
 	"github.com/gobuffalo/packr/v2"
+	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/spf13/viper"
 )
 
 func trimExtension(filename string) string {
 	return strings.TrimSuffix(filename, filepath.Ext(filename))
+}
+
+func loadPriv(loc string) ([]byte, error) {
+	privateKeyFile, err := os.Open(loc)
+	if err != nil {
+		logger.Errorf("err loading private key pem file: %s\n%v", loc, err)
+		return nil, err
+	}
+	defer privateKeyFile.Close()
+
+	pemfileinfo, err := privateKeyFile.Stat()
+	if err != nil {
+		logger.Errorf("err statting private key file:\n%v", err)
+		return nil, err
+	}
+	var size int64 = pemfileinfo.Size()
+	pembytes := make([]byte, size)
+
+	buffer := bufio.NewReader(privateKeyFile)
+	_, err = buffer.Read(pembytes)
+	return []byte(pembytes), err
 }
 
 func parseConfigFile(conf *Config, confLoc string) error {
@@ -31,9 +58,33 @@ func parseConfigFile(conf *Config, confLoc string) error {
 		return err
 	}
 
+	if conf.Host.PrivPEM != "" {
+		if err := loadAndSavePriv(conf); err != nil {
+			logger.Errorf("err loading pem file %s:\n%v", conf.Host.PrivPEM, err)
+			return err
+		}
+	}
+
 	return nil
 }
 
+func loadAndSavePriv(conf *Config) error {
+	privB, err := loadPriv(conf.Host.PrivPEM)
+	if err != nil {
+		logger.Errorf("err loading private key file:\n%v", err)
+		return err
+	}
+
+	priv, err := parsePrivateKey(privB)
+	if err != nil {
+		logger.Errorf("err parsing private key:\n%v", err)
+		return err
+	}
+
+	conf.Host.Priv = priv
+
+	return nil
+}
 func loadDefaultBox() *packr.Box {
 	return packr.New("defaults", defaultsLoc)
 }
@@ -41,6 +92,43 @@ func loadDefaultBox() *packr.Box {
 func loadDefaultConfig(box *packr.Box) ([]byte, error) {
 	// Get the string representation of a file, or an error if it doesn't exist:
 	return box.Find(defaultConfigName)
+}
+
+func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
+	data, _ := pem.Decode(privB)
+	if data == nil {
+		logger.Error("err decoding default PEM file. Nil data block")
+		return nil, errors.New("err decoding default PEM file")
+	}
+
+	cPriv, err := x509.ParsePKCS8PrivateKey(data.Bytes)
+	if err != nil {
+		logger.Errorf("err parsing private key bytes:\n%v", err)
+		return nil, err
+	}
+
+	priv, _, err := lcrypto.KeyPairFromStdKey(cPriv)
+	if err != nil {
+		logger.Errorf("err generating lcrypto priv key:\n%v", err)
+		return nil, err
+	}
+
+	return priv.(lcrypto.PrivKey), nil
+}
+
+func loadDefaultPriv(box *packr.Box) ([]byte, error) {
+	// Get the string representation of a file, or an error if it doesn't exist:
+	return box.Find(defaultPEMName)
+}
+
+func parseDefaultPriv(box *packr.Box) (lcrypto.PrivKey, error) {
+	defaultPriv, err := loadDefaultPriv(box)
+	if err != nil {
+		logger.Errorf("err loading default private key:\n%v", err)
+		return nil, err
+	}
+
+	return parsePrivateKey(defaultPriv)
 }
 
 func parseDefaults(conf *Config) error {
@@ -56,6 +144,13 @@ func parseDefaults(conf *Config) error {
 		logger.Errorf("err unmarshaling config\n%v", err)
 		return err
 	}
+
+	priv, err := parseDefaultPriv(box)
+	if err != nil {
+		logger.Errorf("err parsing default private key:\n%v", err)
+		return err
+	}
+	conf.Host.Priv = priv
 
 	return nil
 }
@@ -83,9 +178,9 @@ func mergeDefaults(conf, defaults *Config) {
 	}
 
 	// host
-	//if conf.Host.Priv == nil {
-	//conf.Host.Priv = defaults.Host.Priv
-	//}
+	if conf.Host.Priv == nil {
+		conf.Host.Priv = defaults.Host.Priv
+	}
 	if len(conf.Host.Transports) == 0 {
 		conf.Host.Transports = defaults.Host.Transports
 	}

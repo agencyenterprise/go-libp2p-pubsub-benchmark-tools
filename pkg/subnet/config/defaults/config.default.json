@@ -15,7 +15,7 @@
     "omitConnectionManager": false,
     "omitNATPortMap": false,
     "omitRPCServer": false,
-    "omitDiscoverService": false,
+    "omitDiscoveryService": false,
     "omitRouting": false
   },
   "general": {

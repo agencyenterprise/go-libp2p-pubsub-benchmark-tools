@@ -2,16 +2,18 @@ package config
 
 import (
 	"bufio"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 
-	// TODO: wait for pr merge and go back to lcrypto
-	//acrypto "github.com/adam-hanna/go-libp2p-core/crypto"
 	"github.com/gobuffalo/packr/v2"
+	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/spf13/viper"
 )
 
@@ -72,8 +74,6 @@ func loadDefaultPriv(box *packr.Box) ([]byte, error) {
 	return box.Find(defaultPEMName)
 }
 
-// TODO: wait for pr merge and go back to lcrypto
-/*
 func loadAndSavePriv(conf *Config) error {
 	privB, err := loadPriv(conf.Host.PrivPEM)
 	if err != nil {
@@ -91,7 +91,6 @@ func loadAndSavePriv(conf *Config) error {
 
 	return nil
 }
-*/
 
 func loadPriv(loc string) ([]byte, error) {
 	privateKeyFile, err := os.Open(loc)
@@ -114,8 +113,6 @@ func loadPriv(loc string) ([]byte, error) {
 	return []byte(pembytes), err
 }
 
-// TODO: waiting on PR merge to lcrypto
-/*
 func parseDefaultPriv(box *packr.Box) (lcrypto.PrivKey, error) {
 	defaultPriv, err := loadDefaultPriv(box)
 	if err != nil {
@@ -125,10 +122,7 @@ func parseDefaultPriv(box *packr.Box) (lcrypto.PrivKey, error) {
 
 	return parsePrivateKey(defaultPriv)
 }
-*/
 
-// TODO: waiting on PR merge to lcrypto
-/*
 func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 	data, _ := pem.Decode(privB)
 	if data == nil {
@@ -142,8 +136,7 @@ func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 		return nil, err
 	}
 
-	// TODO: remove ASAP
-	priv, _, err := acrypto.KeyPairFromKey(cPriv)
+	priv, _, err := lcrypto.KeyPairFromStdKey(cPriv)
 	if err != nil {
 		logger.Errorf("err generating lcrypto priv key:\n%v", err)
 		return nil, err
@@ -151,7 +144,6 @@ func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 
 	return priv.(lcrypto.PrivKey), nil
 }
-*/
 
 // note: this could panic!
 func parseDefaults(conf *Config) error {
@@ -168,15 +160,12 @@ func parseDefaults(conf *Config) error {
 		return err
 	}
 
-	// TODO: waiting on PR merge to lcrypto
-	/*
-		priv, err := parseDefaultPriv(box)
-		if err != nil {
-			logger.Errorf("err parsing default private key:\n%v", err)
-			return err
-		}
-		conf.Host.Priv = priv
-	*/
+	priv, err := parseDefaultPriv(box)
+	if err != nil {
+		logger.Errorf("err parsing default private key:\n%v", err)
+		return err
+	}
+	conf.Host.Priv = priv
 
 	return nil
 }
