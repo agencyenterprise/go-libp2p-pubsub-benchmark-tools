@@ -2,7 +2,9 @@ package host
 
 import (
 	"context"
+	"fmt"
 	"net"
+	"time"
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
@@ -64,7 +66,9 @@ func (h *Host) PublishMessage(ctx context.Context, in *pb.Message) (*pb.PublishR
 }
 
 // CloseAllPeerConnections closes all connections
+// note: is this working correctly?
 func (h *Host) CloseAllPeerConnections(ctx context.Context, _ *empty.Empty) (*pb.CloseAllPeerConnectionsReply, error) {
+	logger.Info("received close peers all connection signal on rpc")
 	peerIDs := h.props.Host.Network().Peers()
 	for _, peerID := range peerIDs {
 		if err := h.props.Host.Network().ClosePeer(peerID); err != nil {
@@ -81,6 +85,7 @@ func (h *Host) CloseAllPeerConnections(ctx context.Context, _ *empty.Empty) (*pb
 
 // ClosePeerConnections closes connections to listed peers
 func (h *Host) ClosePeerConnections(ctx context.Context, peersList *pb.PeersList) (*pb.ClosePeerConnectionsReply, error) {
+	logger.Info("received close peers connection signal on rpc")
 	// TODO: ...
 	//var results []*pb.OpenPeerConnectionReply
 	for _, peer := range peersList.Peers {
@@ -111,6 +116,7 @@ func (h *Host) ClosePeerConnections(ctx context.Context, peersList *pb.PeersList
 
 // OpenPeerConnections opens connections to listed peers
 func (h *Host) OpenPeersConnections(ctx context.Context, peersList *pb.PeersList) (*pb.OpenPeersConnectionsReplies, error) {
+	logger.Info("received open peers connection signal on rpc")
 	var results []*pb.OpenPeerConnectionReply
 
 	for _, p := range peersList.Peers {
@@ -148,6 +154,7 @@ func (h *Host) OpenPeersConnections(ctx context.Context, peersList *pb.PeersList
 
 // ListConnectedPeers lists the host's connected peers
 func (h *Host) ListConnectedPeers(ctx context.Context, _ *empty.Empty) (*pb.PeersList, error) {
+	logger.Info("received list connected peers signal on rpc")
 	var peers []string
 
 	// note: is this the correct method?
@@ -166,11 +173,18 @@ func (h *Host) ListConnectedPeers(ctx context.Context, _ *empty.Empty) (*pb.Peer
 
 // Shutdown shuts the host down
 func (h *Host) Shutdown(ctx context.Context, _ *empty.Empty) (*pb.ShutdownReply, error) {
+	logger.Info("received shutdown signal on rpc")
 	if err := h.props.Host.Close(); err != nil {
 		logger.Errorf("err shutting down server:\n%v", err)
 		h.props.CH <- err
 		return nil, err
 	}
+
+	defer func() {
+		// note: hacky...
+		time.Sleep(2 * time.Second)
+		h.props.Shutdown <- struct{}{}
+	}()
 
 	return &pb.ShutdownReply{
 		Success: true,
@@ -179,7 +193,7 @@ func (h *Host) Shutdown(ctx context.Context, _ *empty.Empty) (*pb.ShutdownReply,
 
 func (h *Host) ID(ctx context.Context, _ *empty.Empty) (*pb.IDReply, error) {
 	return &pb.IDReply{
-		ID: string(h.props.Host.ID()),
+		ID: fmt.Sprintf("%s", h.props.Host.ID()),
 	}, nil
 }
 
