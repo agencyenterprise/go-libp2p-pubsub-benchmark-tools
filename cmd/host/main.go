@@ -77,7 +77,8 @@ func setup() *cobra.Command {
 
 			// build rpc
 			ch := make(chan error)
-			if err = h.BuildRPC(ch, ps); err != nil {
+			shutdown := make(chan struct{})
+			if err = h.BuildRPC(ch, ps, shutdown); err != nil {
 				logger.Errorf("err building rpc:\n%v", err)
 				return err
 			}
@@ -100,7 +101,7 @@ func setup() *cobra.Command {
 
 			// start the server
 			// note: this is blocking
-			if err = h.Start(ch, stop); err != nil {
+			if err = h.Start(ch, stop, shutdown); err != nil {
 				logger.Errorf("err starting host\n%v", err)
 				return err
 			}
