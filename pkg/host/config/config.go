@@ -1,10 +1,7 @@
 package config
 
 import (
-	"crypto/rand"
-
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 )
 
 // Load reads the passed config file location and parses it into a config struct.
@@ -23,19 +20,11 @@ func Load(confLoc, listens, rpcListen, peers string) (Config, error) {
 		return conf, err
 	}
 
-	// TODO: wait for pr merge and go back to lcrypto
-	/*
-		if conf.Host.PrivPEM != "" {
-			if err := loadAndSavePriv(&conf); err != nil {
-				logger.Errorf("could not load private key:\n%v", err)
-				return nil, err
-			}
+	if conf.Host.PrivPEM != "" {
+		if err := loadAndSavePriv(&conf); err != nil {
+			logger.Errorf("could not load private key:\n%v", err)
+			return conf, err
 		}
-	*/
-	conf.Host.Priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
-	if err != nil {
-		logger.Errorf("err generating ecdsa key pair:\n%v", err)
-		return conf, err
 	}
 
 	mergeDefaults(&conf, &defaults)
