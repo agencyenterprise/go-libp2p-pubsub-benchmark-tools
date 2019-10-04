@@ -1,9 +1,5 @@
 package config
 
-import (
-	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
-)
-
 const (
 	defaultsLoc       string = "./defaults"
 	defaultConfigName string = "config.default.json"
@@ -16,6 +12,7 @@ type Config struct {
 	General General `json:"general,omitempty"`
 }
 
+// Subnet holds the configs for the subnet
 type Subnet struct {
 	// NumHosts is the number of hosts to spin up
 	NumHosts int `json:"numHosts,omitempty"`
@@ -31,11 +28,8 @@ type Subnet struct {
 	PeerTopology string `json:"peerTopology,omitempty"`
 }
 
+// Host holds the configs for the hosts
 type Host struct {
-	// PrivPEM is the host's private key location in PKCS#8, ASN.1 DER PEM format
-	PrivPEM string `json:"privPEM,omitempty"`
-	// Priv is the parsed, host's private key
-	Priv lcrypto.PrivKey
 	// Transports are the transport protocols which the host is to use (e.g. "tcp", "ws", etc)
 	Transports []string `json:"transports,omitempty"`
 	// Muxers are the transport muxers (e.g. yamux, mplex, etc.)

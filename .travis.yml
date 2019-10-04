@@ -1,0 +1,15 @@
+language: go
+go:
+  - 1.13.x
+sudo: false
+branches:
+  only:
+    - develop
+before_install:
+    - go get github.com/mattn/goveralls
+    - go get golang.org/x/tools/cmd/cover
+install:
+  - go get ./...
+script:
+  - go test -v -covermode=count -coverprofile=coverage.out -tags=unit,integration,e2e ./...
+  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken=$COVERALLS_TOKEN

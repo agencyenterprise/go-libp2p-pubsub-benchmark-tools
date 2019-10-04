@@ -8,11 +8,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/agencyenterprise/gossip-host/pkg/host"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 	"github.com/agencyenterprise/gossip-host/pkg/subnet/config"
 	"github.com/agencyenterprise/gossip-host/pkg/subnet/peertopology"
 )
 
+// Start begins the subnet
 func Start(ctx context.Context, conf config.Config) error {
 	// parse pubsub cidr
 	pubsubIP, pubsubNet, err := net.ParseCIDR(conf.Subnet.PubsubCIDR)
@@ -60,11 +62,11 @@ func Start(ctx context.Context, conf config.Config) error {
 
 	for _, h := range hosts {
 		// TODO: need to add ready signal when host has started
-		go func(ch chan error, stop chan os.Signal) {
-			if err = h.Start(ch, stop); err != nil {
-				logger.Errorf("host id %s err:\n%v", h.ID(), err)
+		go func(ch chan error, stop chan os.Signal, hst *host.Host) {
+			if err = hst.Start(ch, stop); err != nil {
+				logger.Errorf("host id %s err:\n%v", hst.ID(), err)
 			}
-		}(ch, stop)
+		}(ch, stop, h)
 	}
 
 	select {

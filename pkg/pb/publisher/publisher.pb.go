@@ -7,6 +7,7 @@ import (
 	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -126,29 +127,375 @@ func (m *PublishReply) GetSuccess() bool {
 	return false
 }
 
+type CloseAllPeerConnectionsReply struct {
+	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CloseAllPeerConnectionsReply) Reset()         { *m = CloseAllPeerConnectionsReply{} }
+func (m *CloseAllPeerConnectionsReply) String() string { return proto.CompactTextString(m) }
+func (*CloseAllPeerConnectionsReply) ProtoMessage()    {}
+func (*CloseAllPeerConnectionsReply) Descriptor() ([]byte, []int) {
+	return fileDescriptor_41489454d08668ce, []int{2}
+}
+
+func (m *CloseAllPeerConnectionsReply) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CloseAllPeerConnectionsReply.Unmarshal(m, b)
+}
+func (m *CloseAllPeerConnectionsReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CloseAllPeerConnectionsReply.Marshal(b, m, deterministic)
+}
+func (m *CloseAllPeerConnectionsReply) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CloseAllPeerConnectionsReply.Merge(m, src)
+}
+func (m *CloseAllPeerConnectionsReply) XXX_Size() int {
+	return xxx_messageInfo_CloseAllPeerConnectionsReply.Size(m)
+}
+func (m *CloseAllPeerConnectionsReply) XXX_DiscardUnknown() {
+	xxx_messageInfo_CloseAllPeerConnectionsReply.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CloseAllPeerConnectionsReply proto.InternalMessageInfo
+
+func (m *CloseAllPeerConnectionsReply) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+type ShutdownReply struct {
+	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ShutdownReply) Reset()         { *m = ShutdownReply{} }
+func (m *ShutdownReply) String() string { return proto.CompactTextString(m) }
+func (*ShutdownReply) ProtoMessage()    {}
+func (*ShutdownReply) Descriptor() ([]byte, []int) {
+	return fileDescriptor_41489454d08668ce, []int{3}
+}
+
+func (m *ShutdownReply) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ShutdownReply.Unmarshal(m, b)
+}
+func (m *ShutdownReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ShutdownReply.Marshal(b, m, deterministic)
+}
+func (m *ShutdownReply) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ShutdownReply.Merge(m, src)
+}
+func (m *ShutdownReply) XXX_Size() int {
+	return xxx_messageInfo_ShutdownReply.Size(m)
+}
+func (m *ShutdownReply) XXX_DiscardUnknown() {
+	xxx_messageInfo_ShutdownReply.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ShutdownReply proto.InternalMessageInfo
+
+func (m *ShutdownReply) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+type PeersList struct {
+	Peers                []string `protobuf:"bytes,1,rep,name=peers,proto3" json:"peers,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PeersList) Reset()         { *m = PeersList{} }
+func (m *PeersList) String() string { return proto.CompactTextString(m) }
+func (*PeersList) ProtoMessage()    {}
+func (*PeersList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_41489454d08668ce, []int{4}
+}
+
+func (m *PeersList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PeersList.Unmarshal(m, b)
+}
+func (m *PeersList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PeersList.Marshal(b, m, deterministic)
+}
+func (m *PeersList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PeersList.Merge(m, src)
+}
+func (m *PeersList) XXX_Size() int {
+	return xxx_messageInfo_PeersList.Size(m)
+}
+func (m *PeersList) XXX_DiscardUnknown() {
+	xxx_messageInfo_PeersList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PeersList proto.InternalMessageInfo
+
+func (m *PeersList) GetPeers() []string {
+	if m != nil {
+		return m.Peers
+	}
+	return nil
+}
+
+type ClosePeerConnectionsReply struct {
+	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ClosePeerConnectionsReply) Reset()         { *m = ClosePeerConnectionsReply{} }
+func (m *ClosePeerConnectionsReply) String() string { return proto.CompactTextString(m) }
+func (*ClosePeerConnectionsReply) ProtoMessage()    {}
+func (*ClosePeerConnectionsReply) Descriptor() ([]byte, []int) {
+	return fileDescriptor_41489454d08668ce, []int{5}
+}
+
+func (m *ClosePeerConnectionsReply) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ClosePeerConnectionsReply.Unmarshal(m, b)
+}
+func (m *ClosePeerConnectionsReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ClosePeerConnectionsReply.Marshal(b, m, deterministic)
+}
+func (m *ClosePeerConnectionsReply) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ClosePeerConnectionsReply.Merge(m, src)
+}
+func (m *ClosePeerConnectionsReply) XXX_Size() int {
+	return xxx_messageInfo_ClosePeerConnectionsReply.Size(m)
+}
+func (m *ClosePeerConnectionsReply) XXX_DiscardUnknown() {
+	xxx_messageInfo_ClosePeerConnectionsReply.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ClosePeerConnectionsReply proto.InternalMessageInfo
+
+func (m *ClosePeerConnectionsReply) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+type OpenPeerConnectionReply struct {
+	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Peer                 string   `protobuf:"bytes,2,opt,name=peer,proto3" json:"peer,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *OpenPeerConnectionReply) Reset()         { *m = OpenPeerConnectionReply{} }
+func (m *OpenPeerConnectionReply) String() string { return proto.CompactTextString(m) }
+func (*OpenPeerConnectionReply) ProtoMessage()    {}
+func (*OpenPeerConnectionReply) Descriptor() ([]byte, []int) {
+	return fileDescriptor_41489454d08668ce, []int{6}
+}
+
+func (m *OpenPeerConnectionReply) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_OpenPeerConnectionReply.Unmarshal(m, b)
+}
+func (m *OpenPeerConnectionReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_OpenPeerConnectionReply.Marshal(b, m, deterministic)
+}
+func (m *OpenPeerConnectionReply) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OpenPeerConnectionReply.Merge(m, src)
+}
+func (m *OpenPeerConnectionReply) XXX_Size() int {
+	return xxx_messageInfo_OpenPeerConnectionReply.Size(m)
+}
+func (m *OpenPeerConnectionReply) XXX_DiscardUnknown() {
+	xxx_messageInfo_OpenPeerConnectionReply.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OpenPeerConnectionReply proto.InternalMessageInfo
+
+func (m *OpenPeerConnectionReply) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+func (m *OpenPeerConnectionReply) GetPeer() string {
+	if m != nil {
+		return m.Peer
+	}
+	return ""
+}
+
+type OpenPeersConnectionsReplies struct {
+	PeerConnections      []*OpenPeerConnectionReply `protobuf:"bytes,1,rep,name=PeerConnections,proto3" json:"PeerConnections,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
+	XXX_unrecognized     []byte                     `json:"-"`
+	XXX_sizecache        int32                      `json:"-"`
+}
+
+func (m *OpenPeersConnectionsReplies) Reset()         { *m = OpenPeersConnectionsReplies{} }
+func (m *OpenPeersConnectionsReplies) String() string { return proto.CompactTextString(m) }
+func (*OpenPeersConnectionsReplies) ProtoMessage()    {}
+func (*OpenPeersConnectionsReplies) Descriptor() ([]byte, []int) {
+	return fileDescriptor_41489454d08668ce, []int{7}
+}
+
+func (m *OpenPeersConnectionsReplies) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_OpenPeersConnectionsReplies.Unmarshal(m, b)
+}
+func (m *OpenPeersConnectionsReplies) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_OpenPeersConnectionsReplies.Marshal(b, m, deterministic)
+}
+func (m *OpenPeersConnectionsReplies) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OpenPeersConnectionsReplies.Merge(m, src)
+}
+func (m *OpenPeersConnectionsReplies) XXX_Size() int {
+	return xxx_messageInfo_OpenPeersConnectionsReplies.Size(m)
+}
+func (m *OpenPeersConnectionsReplies) XXX_DiscardUnknown() {
+	xxx_messageInfo_OpenPeersConnectionsReplies.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_OpenPeersConnectionsReplies proto.InternalMessageInfo
+
+func (m *OpenPeersConnectionsReplies) GetPeerConnections() []*OpenPeerConnectionReply {
+	if m != nil {
+		return m.PeerConnections
+	}
+	return nil
+}
+
+type IDReply struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *IDReply) Reset()         { *m = IDReply{} }
+func (m *IDReply) String() string { return proto.CompactTextString(m) }
+func (*IDReply) ProtoMessage()    {}
+func (*IDReply) Descriptor() ([]byte, []int) {
+	return fileDescriptor_41489454d08668ce, []int{8}
+}
+
+func (m *IDReply) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IDReply.Unmarshal(m, b)
+}
+func (m *IDReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IDReply.Marshal(b, m, deterministic)
+}
+func (m *IDReply) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IDReply.Merge(m, src)
+}
+func (m *IDReply) XXX_Size() int {
+	return xxx_messageInfo_IDReply.Size(m)
+}
+func (m *IDReply) XXX_DiscardUnknown() {
+	xxx_messageInfo_IDReply.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_IDReply proto.InternalMessageInfo
+
+func (m *IDReply) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+type ListenAddressesReply struct {
+	Addresses            []string `protobuf:"bytes,1,rep,name=Addresses,proto3" json:"Addresses,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListenAddressesReply) Reset()         { *m = ListenAddressesReply{} }
+func (m *ListenAddressesReply) String() string { return proto.CompactTextString(m) }
+func (*ListenAddressesReply) ProtoMessage()    {}
+func (*ListenAddressesReply) Descriptor() ([]byte, []int) {
+	return fileDescriptor_41489454d08668ce, []int{9}
+}
+
+func (m *ListenAddressesReply) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListenAddressesReply.Unmarshal(m, b)
+}
+func (m *ListenAddressesReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListenAddressesReply.Marshal(b, m, deterministic)
+}
+func (m *ListenAddressesReply) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListenAddressesReply.Merge(m, src)
+}
+func (m *ListenAddressesReply) XXX_Size() int {
+	return xxx_messageInfo_ListenAddressesReply.Size(m)
+}
+func (m *ListenAddressesReply) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListenAddressesReply.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListenAddressesReply proto.InternalMessageInfo
+
+func (m *ListenAddressesReply) GetAddresses() []string {
+	if m != nil {
+		return m.Addresses
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Message)(nil), "pb.Message")
 	proto.RegisterType((*PublishReply)(nil), "pb.PublishReply")
+	proto.RegisterType((*CloseAllPeerConnectionsReply)(nil), "pb.CloseAllPeerConnectionsReply")
+	proto.RegisterType((*ShutdownReply)(nil), "pb.ShutdownReply")
+	proto.RegisterType((*PeersList)(nil), "pb.PeersList")
+	proto.RegisterType((*ClosePeerConnectionsReply)(nil), "pb.ClosePeerConnectionsReply")
+	proto.RegisterType((*OpenPeerConnectionReply)(nil), "pb.OpenPeerConnectionReply")
+	proto.RegisterType((*OpenPeersConnectionsReplies)(nil), "pb.OpenPeersConnectionsReplies")
+	proto.RegisterType((*IDReply)(nil), "pb.IDReply")
+	proto.RegisterType((*ListenAddressesReply)(nil), "pb.ListenAddressesReply")
 }
 
 func init() { proto.RegisterFile("publisher.proto", fileDescriptor_41489454d08668ce) }
 
 var fileDescriptor_41489454d08668ce = []byte{
-	// 221 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x4c, 0xd0, 0x31, 0x4f, 0xc3, 0x30,
-	0x10, 0x05, 0x60, 0x1c, 0x28, 0x6d, 0x8f, 0xaa, 0xc0, 0x89, 0x21, 0x2a, 0x4b, 0x94, 0x29, 0x93,
-	0x25, 0xca, 0xde, 0x21, 0x0b, 0xea, 0x80, 0x14, 0xf9, 0x1f, 0xc4, 0xce, 0x29, 0xb5, 0x68, 0x6b,
-	0xe3, 0xab, 0x07, 0xfe, 0x3d, 0x22, 0x89, 0x51, 0x37, 0x7f, 0x37, 0xbc, 0xf7, 0x64, 0x78, 0xf4,
-	0x51, 0x1f, 0x2d, 0x1f, 0x28, 0x48, 0x1f, 0xdc, 0xc5, 0x61, 0xe6, 0x75, 0xb9, 0x87, 0xf9, 0x27,
-	0x31, 0xb7, 0x3d, 0xe1, 0x1a, 0x32, 0xdb, 0xe5, 0xa2, 0x10, 0xd5, 0x52, 0x65, 0xb6, 0xc3, 0x0d,
-	0x2c, 0x98, 0xbe, 0x23, 0x9d, 0x0d, 0xe5, 0x59, 0x21, 0xaa, 0x99, 0xfa, 0x37, 0x22, 0xdc, 0x75,
-	0xed, 0xa5, 0xcd, 0x6f, 0x0b, 0x51, 0xad, 0xd4, 0xf0, 0x2e, 0x77, 0xb0, 0x6a, 0xc6, 0x06, 0x45,
-	0xfe, 0xf8, 0x83, 0x2f, 0x30, 0x3b, 0x71, 0xbf, 0x4f, 0x91, 0x23, 0x30, 0x87, 0x39, 0x47, 0x63,
-	0x88, 0x79, 0x08, 0x5d, 0xa8, 0xc4, 0xed, 0x0e, 0x96, 0x4d, 0x5a, 0x88, 0x6f, 0xb0, 0x9e, 0x90,
-	0xe6, 0x3d, 0x48, 0xaf, 0xe5, 0x84, 0xcd, 0xd3, 0x1f, 0xae, 0xdb, 0xca, 0x9b, 0x7a, 0x0b, 0xaf,
-	0xd6, 0xc9, 0x3e, 0x78, 0x23, 0x7b, 0xc7, 0x6c, 0x3d, 0x47, 0x2d, 0x35, 0x9d, 0xcd, 0xe1, 0xd4,
-	0x86, 0xaf, 0xfa, 0xf9, 0x23, 0x1d, 0xeb, 0xe9, 0xd6, 0x08, 0x7d, 0x3f, 0xfc, 0xc4, 0xfb, 0x6f,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0x0a, 0x88, 0x6c, 0x27, 0x1c, 0x01, 0x00, 0x00,
+	// 512 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x61, 0x6f, 0xd3, 0x30,
+	0x14, 0x4c, 0xba, 0x8d, 0x35, 0x6f, 0x5b, 0x07, 0x56, 0xc5, 0xb2, 0x74, 0x88, 0xe0, 0x4f, 0x45,
+	0x48, 0x99, 0xd8, 0x40, 0xf0, 0x05, 0xa4, 0x75, 0x1d, 0x23, 0x12, 0x88, 0x2a, 0x88, 0x1f, 0xd0,
+	0x24, 0x8f, 0x34, 0x22, 0x8d, 0x4d, 0x9c, 0x08, 0xed, 0x77, 0xf0, 0x87, 0x91, 0x9d, 0xb8, 0xb4,
+	0x51, 0xc3, 0xc4, 0xb7, 0xdc, 0xab, 0xef, 0x7c, 0x7e, 0x77, 0x85, 0x63, 0x5e, 0x85, 0x59, 0x2a,
+	0x16, 0x58, 0x78, 0xbc, 0x60, 0x25, 0x23, 0x3d, 0x1e, 0x3a, 0xa3, 0x84, 0xb1, 0x24, 0xc3, 0x73,
+	0x35, 0x09, 0xab, 0xef, 0xe7, 0xb8, 0xe4, 0xe5, 0x5d, 0x7d, 0x80, 0xfa, 0xb0, 0xff, 0x19, 0x85,
+	0x98, 0x27, 0x48, 0x06, 0xd0, 0x4b, 0x63, 0xdb, 0x74, 0xcd, 0xb1, 0x15, 0xf4, 0xd2, 0x98, 0x38,
+	0xd0, 0x17, 0xf8, 0xb3, 0xc2, 0x3c, 0x42, 0xbb, 0xe7, 0x9a, 0xe3, 0xbd, 0x60, 0x85, 0x09, 0x81,
+	0xdd, 0x78, 0x5e, 0xce, 0xed, 0x1d, 0xd7, 0x1c, 0x1f, 0x06, 0xea, 0x9b, 0xbe, 0x87, 0xc3, 0x59,
+	0x7d, 0x7d, 0x80, 0x3c, 0xbb, 0x23, 0x43, 0xd8, 0x5b, 0x8a, 0xc4, 0xd7, 0x92, 0x35, 0x20, 0x36,
+	0xec, 0x8b, 0x2a, 0x8a, 0x50, 0x08, 0x25, 0xda, 0x0f, 0x34, 0xa4, 0x6f, 0xe1, 0xec, 0x3a, 0x63,
+	0x02, 0xaf, 0xb2, 0x6c, 0x86, 0x58, 0x5c, 0xb3, 0x3c, 0xc7, 0xa8, 0x4c, 0x59, 0x2e, 0x6a, 0xbd,
+	0x35, 0xa6, 0xb9, 0xc9, 0x7c, 0x0e, 0x47, 0x5f, 0x17, 0x55, 0x19, 0xb3, 0x5f, 0xf9, 0x7d, 0x47,
+	0x9f, 0x81, 0x25, 0xc5, 0xc5, 0xa7, 0x54, 0x94, 0xd2, 0x21, 0x97, 0xc0, 0x36, 0xdd, 0x1d, 0xe9,
+	0x50, 0x01, 0xfa, 0x1a, 0x4e, 0x95, 0x8f, 0xff, 0x34, 0x71, 0x0b, 0x27, 0x5f, 0x38, 0xe6, 0x9b,
+	0xac, 0x7b, 0x48, 0x72, 0x8f, 0xf2, 0x52, 0xb5, 0x0a, 0x2b, 0x50, 0xdf, 0x34, 0x86, 0x91, 0x16,
+	0x12, 0xad, 0xfb, 0x53, 0x14, 0xe4, 0x06, 0x8e, 0x5b, 0xce, 0x94, 0xfd, 0x83, 0x8b, 0x91, 0xc7,
+	0x43, 0xaf, 0xc3, 0x42, 0xd0, 0xe6, 0xd0, 0x53, 0xd8, 0xf7, 0xa7, 0xb5, 0xbd, 0x01, 0xf4, 0xfc,
+	0xa9, 0x0e, 0xde, 0x9f, 0xd2, 0x57, 0x30, 0x94, 0xeb, 0xc1, 0xfc, 0x2a, 0x8e, 0x0b, 0x14, 0x02,
+	0x9b, 0xb7, 0x9f, 0x81, 0xb5, 0x9a, 0x34, 0x2b, 0xfb, 0x3b, 0xb8, 0xf8, 0xbd, 0x0b, 0xd6, 0x4c,
+	0xd7, 0x8f, 0xbc, 0x84, 0x41, 0x03, 0x74, 0xbd, 0x0e, 0xa4, 0xbd, 0x06, 0x38, 0x0f, 0x25, 0x58,
+	0x6f, 0x0b, 0x35, 0xc8, 0x37, 0x38, 0xe9, 0xc8, 0x9f, 0x3c, 0xf6, 0xea, 0x0e, 0x7b, 0xba, 0xc3,
+	0xde, 0x8d, 0xec, 0xb0, 0xe3, 0x4a, 0x99, 0x7f, 0x95, 0x86, 0x1a, 0xe4, 0x03, 0x0c, 0xb7, 0xc5,
+	0x49, 0x8e, 0x94, 0x05, 0xdd, 0x05, 0xe7, 0xc9, 0x4a, 0xaa, 0x43, 0xe7, 0x23, 0x0c, 0xb7, 0xc5,
+	0xd2, 0xd6, 0x79, 0xba, 0x9e, 0xc2, 0x96, 0xfc, 0xa8, 0x41, 0xde, 0x01, 0x91, 0x47, 0x9b, 0xdf,
+	0x30, 0x56, 0x27, 0x3b, 0xdf, 0xb8, 0xa9, 0x4f, 0x0d, 0xf2, 0x06, 0xfa, 0xba, 0xed, 0x9d, 0xa4,
+	0x47, 0x92, 0xb4, 0xf1, 0x9f, 0xa0, 0x06, 0x79, 0x21, 0x73, 0xee, 0xa4, 0xa8, 0x7c, 0x9a, 0x4a,
+	0x50, 0x43, 0xd6, 0xac, 0x55, 0x82, 0x4e, 0xa6, 0x2d, 0x99, 0xdb, 0x1a, 0x43, 0x8d, 0xc9, 0x25,
+	0x8c, 0x52, 0xe6, 0x25, 0x05, 0x8f, 0xbc, 0x84, 0x09, 0x91, 0x72, 0x51, 0x85, 0x5e, 0x88, 0x79,
+	0xb4, 0x58, 0xce, 0x8b, 0x1f, 0x13, 0x72, 0xab, 0x87, 0x13, 0x3d, 0x9b, 0x99, 0xe1, 0x03, 0x75,
+	0xc1, 0xe5, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xe0, 0x4e, 0x2e, 0xd5, 0xcf, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -165,6 +512,20 @@ const _ = grpc.SupportPackageIsVersion4
 type PublisherClient interface {
 	// Publishes a message on the pubsub channel
 	PublishMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*PublishReply, error)
+	// Closes all connections
+	CloseAllPeerConnections(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CloseAllPeerConnectionsReply, error)
+	// Closes connections to listed peers
+	ClosePeerConnections(ctx context.Context, in *PeersList, opts ...grpc.CallOption) (*ClosePeerConnectionsReply, error)
+	// Opens connections to listed peers
+	OpenPeersConnections(ctx context.Context, in *PeersList, opts ...grpc.CallOption) (*OpenPeersConnectionsReplies, error)
+	// Lists the host's connected peers
+	ListConnectedPeers(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*PeersList, error)
+	// Shuts the host down
+	Shutdown(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*ShutdownReply, error)
+	// ID returns the host's id
+	ID(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*IDReply, error)
+	// ListenAddresses returns the host's listen addresses
+	ListenAddresses(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*ListenAddressesReply, error)
 }
 
 type publisherClient struct {
@@ -184,10 +545,87 @@ func (c *publisherClient) PublishMessage(ctx context.Context, in *Message, opts 
 	return out, nil
 }
 
+func (c *publisherClient) CloseAllPeerConnections(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CloseAllPeerConnectionsReply, error) {
+	out := new(CloseAllPeerConnectionsReply)
+	err := c.cc.Invoke(ctx, "/pb.Publisher/CloseAllPeerConnections", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *publisherClient) ClosePeerConnections(ctx context.Context, in *PeersList, opts ...grpc.CallOption) (*ClosePeerConnectionsReply, error) {
+	out := new(ClosePeerConnectionsReply)
+	err := c.cc.Invoke(ctx, "/pb.Publisher/ClosePeerConnections", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *publisherClient) OpenPeersConnections(ctx context.Context, in *PeersList, opts ...grpc.CallOption) (*OpenPeersConnectionsReplies, error) {
+	out := new(OpenPeersConnectionsReplies)
+	err := c.cc.Invoke(ctx, "/pb.Publisher/OpenPeersConnections", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *publisherClient) ListConnectedPeers(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*PeersList, error) {
+	out := new(PeersList)
+	err := c.cc.Invoke(ctx, "/pb.Publisher/ListConnectedPeers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *publisherClient) Shutdown(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*ShutdownReply, error) {
+	out := new(ShutdownReply)
+	err := c.cc.Invoke(ctx, "/pb.Publisher/Shutdown", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *publisherClient) ID(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*IDReply, error) {
+	out := new(IDReply)
+	err := c.cc.Invoke(ctx, "/pb.Publisher/ID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *publisherClient) ListenAddresses(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*ListenAddressesReply, error) {
+	out := new(ListenAddressesReply)
+	err := c.cc.Invoke(ctx, "/pb.Publisher/ListenAddresses", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PublisherServer is the server API for Publisher service.
 type PublisherServer interface {
 	// Publishes a message on the pubsub channel
 	PublishMessage(context.Context, *Message) (*PublishReply, error)
+	// Closes all connections
+	CloseAllPeerConnections(context.Context, *empty.Empty) (*CloseAllPeerConnectionsReply, error)
+	// Closes connections to listed peers
+	ClosePeerConnections(context.Context, *PeersList) (*ClosePeerConnectionsReply, error)
+	// Opens connections to listed peers
+	OpenPeersConnections(context.Context, *PeersList) (*OpenPeersConnectionsReplies, error)
+	// Lists the host's connected peers
+	ListConnectedPeers(context.Context, *empty.Empty) (*PeersList, error)
+	// Shuts the host down
+	Shutdown(context.Context, *empty.Empty) (*ShutdownReply, error)
+	// ID returns the host's id
+	ID(context.Context, *empty.Empty) (*IDReply, error)
+	// ListenAddresses returns the host's listen addresses
+	ListenAddresses(context.Context, *empty.Empty) (*ListenAddressesReply, error)
 }
 
 // UnimplementedPublisherServer can be embedded to have forward compatible implementations.
@@ -196,6 +634,27 @@ type UnimplementedPublisherServer struct {
 
 func (*UnimplementedPublisherServer) PublishMessage(ctx context.Context, req *Message) (*PublishReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PublishMessage not implemented")
+}
+func (*UnimplementedPublisherServer) CloseAllPeerConnections(ctx context.Context, req *empty.Empty) (*CloseAllPeerConnectionsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CloseAllPeerConnections not implemented")
+}
+func (*UnimplementedPublisherServer) ClosePeerConnections(ctx context.Context, req *PeersList) (*ClosePeerConnectionsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClosePeerConnections not implemented")
+}
+func (*UnimplementedPublisherServer) OpenPeersConnections(ctx context.Context, req *PeersList) (*OpenPeersConnectionsReplies, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method OpenPeersConnections not implemented")
+}
+func (*UnimplementedPublisherServer) ListConnectedPeers(ctx context.Context, req *empty.Empty) (*PeersList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListConnectedPeers not implemented")
+}
+func (*UnimplementedPublisherServer) Shutdown(ctx context.Context, req *empty.Empty) (*ShutdownReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Shutdown not implemented")
+}
+func (*UnimplementedPublisherServer) ID(ctx context.Context, req *empty.Empty) (*IDReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ID not implemented")
+}
+func (*UnimplementedPublisherServer) ListenAddresses(ctx context.Context, req *empty.Empty) (*ListenAddressesReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListenAddresses not implemented")
 }
 
 func RegisterPublisherServer(s *grpc.Server, srv PublisherServer) {
@@ -220,6 +679,132 @@ func _Publisher_PublishMessage_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Publisher_CloseAllPeerConnections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublisherServer).CloseAllPeerConnections(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Publisher/CloseAllPeerConnections",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublisherServer).CloseAllPeerConnections(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Publisher_ClosePeerConnections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PeersList)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublisherServer).ClosePeerConnections(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Publisher/ClosePeerConnections",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublisherServer).ClosePeerConnections(ctx, req.(*PeersList))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Publisher_OpenPeersConnections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PeersList)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublisherServer).OpenPeersConnections(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Publisher/OpenPeersConnections",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublisherServer).OpenPeersConnections(ctx, req.(*PeersList))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Publisher_ListConnectedPeers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublisherServer).ListConnectedPeers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Publisher/ListConnectedPeers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublisherServer).ListConnectedPeers(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Publisher_Shutdown_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublisherServer).Shutdown(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Publisher/Shutdown",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublisherServer).Shutdown(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Publisher_ID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublisherServer).ID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Publisher/ID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublisherServer).ID(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Publisher_ListenAddresses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublisherServer).ListenAddresses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Publisher/ListenAddresses",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublisherServer).ListenAddresses(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Publisher_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.Publisher",
 	HandlerType: (*PublisherServer)(nil),
@@ -227,6 +812,34 @@ var _Publisher_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PublishMessage",
 			Handler:    _Publisher_PublishMessage_Handler,
+		},
+		{
+			MethodName: "CloseAllPeerConnections",
+			Handler:    _Publisher_CloseAllPeerConnections_Handler,
+		},
+		{
+			MethodName: "ClosePeerConnections",
+			Handler:    _Publisher_ClosePeerConnections_Handler,
+		},
+		{
+			MethodName: "OpenPeersConnections",
+			Handler:    _Publisher_OpenPeersConnections_Handler,
+		},
+		{
+			MethodName: "ListConnectedPeers",
+			Handler:    _Publisher_ListConnectedPeers_Handler,
+		},
+		{
+			MethodName: "Shutdown",
+			Handler:    _Publisher_Shutdown_Handler,
+		},
+		{
+			MethodName: "ID",
+			Handler:    _Publisher_ID_Handler,
+		},
+		{
+			MethodName: "ListenAddresses",
+			Handler:    _Publisher_ListenAddresses_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

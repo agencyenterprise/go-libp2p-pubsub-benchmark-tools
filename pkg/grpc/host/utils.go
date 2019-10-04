@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	"github.com/davecgh/go-spew/spew"
 
 	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
+	"github.com/davecgh/go-spew/spew"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )

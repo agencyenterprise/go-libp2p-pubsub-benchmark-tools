@@ -32,16 +32,18 @@ type mdnsNotifee struct {
 
 // HandlePeerFound...
 func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
-	logger.Infof("peer found: %v", pi)
-	m.h.Connect(m.ctx, pi)
+	if err := m.h.Connect(m.ctx, pi); err != nil {
+		logger.Warnf("mdns err connecting to peer with id %v:\n%v", pi.ID, err)
+	}
 }
 
 // New returns a new host
 // note: not passing reference to config because want it to be read only.
 func New(ctx context.Context, conf config.Config) (*Host, error) {
 	h := &Host{
-		ctx:  ctx,
-		conf: conf,
+		ctx:    ctx,
+		conf:   conf,
+		shtDwn: make(chan struct{}),
 	}
 
 	var lOpts []lconfig.Option
@@ -147,7 +149,7 @@ func (h *Host) Addresses() []string {
 }
 
 // IPFSAddresses returns the ipfs listening addresses of the host
-func (h *Host) IFPSAddresses() []string {
+func (h *Host) IPFSAddresses() []string {
 	var addresses []string
 	for _, addr := range h.host.Addrs() {
 		addresses = append(addresses, fmt.Sprintf("%s/ipfs/%s", addr, h.host.ID().Pretty()))
@@ -186,6 +188,7 @@ func (h *Host) Connect(peers []string) error {
 	return nil
 }
 
+// BuildPubSub returns a pubsub service
 func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 	// build the gossip pub/sub
 	ps, err := pubsub.NewGossipSub(h.ctx, h.host)
@@ -203,12 +206,18 @@ func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 	return ps, nil
 }
 
+// BuildRPC returns an rpc service
 func (h *Host) BuildRPC(ch chan error, ps *pubsub.PubSub) error {
 	// Start the RPC server
-	publisher := &Publisher{ps}
-	h.publisher = publisher
 	if !h.conf.Host.OmitRPCServer {
-		rHost := rpcHost.New(publisher.Publish)
+		rHost := rpcHost.New(&rpcHost.Props{
+			Host:        h.host,
+			CH:          ch,
+			PS:          ps,
+			PubsubTopic: pubsubTopic,
+			CTX:         h.ctx,
+			Shutdown:    h.shtDwn,
+		})
 		go func(rh *rpcHost.Host, c chan error) {
 			if err := rh.Listen(h.ctx, h.conf.Host.RPCAddress); err != nil {
 				logger.Errorf("err listening on rpc:\n%v", err)
@@ -251,12 +260,20 @@ func (h *Host) Start(ch chan error, stop chan os.Signal) error {
 	for i, addr := range h.host.Addrs() {
 		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, h.host.ID().Pretty())
 	}
+	defer func() {
+		if err := h.host.Close(); err != nil {
+			logger.Errorf("err closing host:\n%v", err)
+		}
+	}()
 
 	select {
 	case <-stop:
 		// note: I don't like '^C' showing up on the same line as the next logged line...
 		fmt.Println("")
 		logger.Info("Received stop signal from os. Shutting down...")
+
+	case <-h.shtDwn:
+		logger.Info("received shutdown signal on rpc")
 
 	case err := <-ch:
 		logger.Errorf("received err on rpc channel:\n%v", err)
