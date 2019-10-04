@@ -14,6 +14,7 @@ import (
 	"github.com/agencyenterprise/gossip-host/pkg/subnet/peertopology"
 )
 
+// Start begins the subnet
 func Start(ctx context.Context, conf config.Config) error {
 	// parse pubsub cidr
 	pubsubIP, pubsubNet, err := net.ParseCIDR(conf.Subnet.PubsubCIDR)

@@ -61,12 +61,10 @@ func buildHostConf(conf config.Config, currPubsubIP, currRPCIP net.IP, pubsubNet
 	}
 	hostConfig.Host.Listens = nextListenAddresses
 
-	if hostConfig.Host.Priv == nil {
-		conf.Host.Priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
-		if err != nil {
-			logger.Errorf("err generating private key:\n%v", err)
-			return hostConfig, err
-		}
+	hostConfig.Host.Priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
+	if err != nil {
+		logger.Errorf("err generating private key:\n%v", err)
+		return hostConfig, err
 	}
 
 	return hostConfig, nil
@@ -147,7 +145,6 @@ func nextListenAddresses(conf config.Config, currPubsubIP net.IP, pubsubNet *net
 func parseSubnetConfig(conf config.Config) hconf.Config {
 	var hostConfig hconf.Config
 
-	hostConfig.Host.Priv = conf.Host.Priv
 	hostConfig.Host.Peers = []string{}
 	hostConfig.Host.Transports = conf.Host.Transports
 	hostConfig.Host.Muxers = conf.Host.Muxers

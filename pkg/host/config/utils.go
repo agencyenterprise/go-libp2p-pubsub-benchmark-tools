@@ -143,7 +143,7 @@ func parsePrivateKey(privB []byte) (lcrypto.PrivKey, error) {
 		return nil, err
 	}
 
-	return priv.(lcrypto.PrivKey), nil
+	return priv, nil
 }
 
 // note: this could panic!

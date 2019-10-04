@@ -7,7 +7,10 @@ branches:
     - develop
 before_install:
     - go get github.com/mattn/goveralls
+    - go get golang.org/x/tools/cmd/cover
 install:
   - go get ./...
 script:
-  - $GOPATH/bin/goveralls -service=travis-ci
+  - go test -v -covermode=count -coverprofile=coverage.out
+  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken
+  - $COVERALLS_TOKEN
