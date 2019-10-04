@@ -41,8 +41,9 @@ func (m *mdnsNotifee) HandlePeerFound(pi peer.AddrInfo) {
 // note: not passing reference to config because want it to be read only.
 func New(ctx context.Context, conf config.Config) (*Host, error) {
 	h := &Host{
-		ctx:  ctx,
-		conf: conf,
+		ctx:    ctx,
+		conf:   conf,
+		shtDwn: make(chan struct{}),
 	}
 
 	var lOpts []lconfig.Option
@@ -206,7 +207,7 @@ func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 }
 
 // BuildRPC returns an rpc service
-func (h *Host) BuildRPC(ch chan error, ps *pubsub.PubSub, shutdown chan struct{}) error {
+func (h *Host) BuildRPC(ch chan error, ps *pubsub.PubSub) error {
 	// Start the RPC server
 	if !h.conf.Host.OmitRPCServer {
 		rHost := rpcHost.New(&rpcHost.Props{
@@ -215,7 +216,7 @@ func (h *Host) BuildRPC(ch chan error, ps *pubsub.PubSub, shutdown chan struct{}
 			PS:          ps,
 			PubsubTopic: pubsubTopic,
 			CTX:         h.ctx,
-			Shutdown:    shutdown,
+			Shutdown:    h.shtDwn,
 		})
 		go func(rh *rpcHost.Host, c chan error) {
 			if err := rh.Listen(h.ctx, h.conf.Host.RPCAddress); err != nil {
@@ -255,7 +256,7 @@ func (h *Host) BuildDiscoveryAndRouting() error {
 }
 
 // Start starts a new gossip host
-func (h *Host) Start(ch chan error, stop chan os.Signal, rpcShutdown chan struct{}) error {
+func (h *Host) Start(ch chan error, stop chan os.Signal) error {
 	for i, addr := range h.host.Addrs() {
 		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, h.host.ID().Pretty())
 	}
@@ -271,7 +272,7 @@ func (h *Host) Start(ch chan error, stop chan os.Signal, rpcShutdown chan struct
 		fmt.Println("")
 		logger.Info("Received stop signal from os. Shutting down...")
 
-	case <-rpcShutdown:
+	case <-h.shtDwn:
 		logger.Info("received shutdown signal on rpc")
 
 	case err := <-ch:
