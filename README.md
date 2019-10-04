@@ -1,6 +1,7 @@
 > libp2p/go-libp2p-pubsub gossip host
 
 # gossip-host
+[![Build Status](https://travis-ci.org/agencyenterprise/gossip-host.svg?branch=develop)](https://travis-ci.org/agencyenterprise/gossip-host) [![Coverage Status](https://coveralls.io/repos/github/agencyenterprise/gossip-host/badge.svg?branch=develop)](https://coveralls.io/github/agencyenterprise/gossip-host?branch=develop) [![Go Report Card](https://goreportcard.com/badge/github.com/agencyenterprise/gossip-host)](https://goreportcard.com/report/github.com/agencyenterprise/gossip-host) [![GoDoc](https://godoc.org/github.com/agencyenterprise/gossip-host?status.svg)](https://godoc.org/github.com/agencyenterprise/gossip-host)
 
 TODO
 

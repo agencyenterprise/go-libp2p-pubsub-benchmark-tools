@@ -1,0 +1,13 @@
+language: go
+go:
+  - 1.13.x
+sudo: false
+branches:
+  only:
+    - develop
+before_install:
+    - go get github.com/mattn/goveralls
+install:
+  - go get ./...
+script:
+  - $GOPATH/bin/goveralls -service=travis-ci

@@ -69,6 +69,4 @@ func resizeMessage(msg *pb.Message, size uint) {
 	for idx := 0; idx < diff; idx++ {
 		msg.Data = append(msg.Data, 0)
 	}
-
-	logger.Infof("old size: %v; new size: %v", msgSize, msg.XXX_Size())
 }
