@@ -29,9 +29,9 @@ If you'd like to manually spin up hosts, do the following:
 ## Commands
 
 Three command line programs are available in this module and are location in the `cmd/` directory:
-1. Client - this command is used to interact to hosts via the rpc.
+1. Client - this command is used to interact with hosts via the rpc.
 2. Host - this command is used to start a libp2p host.
-3. Subnet - this command is used to multiple libp2p hosts in one process.
+3. Subnet - this command is used to start multiple libp2p hosts in one process.
 
 ### Client
 
