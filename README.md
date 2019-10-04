@@ -28,6 +28,11 @@ If you'd like to manually spin up hosts, do the following:
 
 ## Commands
 
+Three command line programs are available in this module and are location in the `cmd/` directory:
+1. Client - this command is used to interact to hosts via the rpc.
+2. Host - this command is used to start a libp2p host.
+3. Subnet - this command is used to multiple libp2p hosts in one process.
+
 ### Client
 
 The client command is used to interact to hosts via the rpc. Multiple hosts can be messaged in a single command by separating each listen address with a comma using the `-p` flag.
@@ -168,7 +173,7 @@ type PeerTopology interface {
 
 The three provided topologies are:
 1. Whiteblocks
-   * This is the peering topology from the original Whiteblocks [gossip sub tests](github.com/whiteblock/p2p-tests). Essentially, each peer is randomly connected to a previously started peer. A more detailed description can be found in the topology [readme](./pkg/subnet/peertopology/whiteblocks/README.md).
+   * This is the peering topology from the original Whiteblocks [gossip sub tests](https://github.com/whiteblock/p2p-tests). Essentially, each peer is randomly connected to a previously started peer. A more detailed description can be found in the topology [readme](./pkg/subnet/peertopology/whiteblocks/README.md).
 2. Linear
    *  Each Nth host is connected to the N-1 host, starting with N=1.
 3. Full
