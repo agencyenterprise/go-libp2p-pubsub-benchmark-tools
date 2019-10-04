@@ -36,4 +36,5 @@ type Host struct {
 	conf   config.Config
 	router lrouter.Routing
 	ps     *pubsub.PubSub
+	shtDwn chan struct{}
 }
