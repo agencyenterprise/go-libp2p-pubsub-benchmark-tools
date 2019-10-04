@@ -12,6 +12,7 @@ import (
 	grpc "google.golang.org/grpc"
 )
 
+// Gossip requests the passed peers to gossip the passed message
 func Gossip(msgLoc, peers string, size uint, timeout int) error {
 	msg, err := parseMessageFile(msgLoc)
 	if err != nil || msg == nil {
@@ -71,6 +72,7 @@ func Gossip(msgLoc, peers string, size uint, timeout int) error {
 	return nil
 }
 
+// CloseAll requests the passed peers close all peer connections
 func CloseAll(peers string, timeout int) error {
 	peersArr := parsePeers(peers)
 	var failed = false
@@ -114,6 +116,7 @@ func CloseAll(peers string, timeout int) error {
 	return nil
 }
 
+// ClosePeers requests the passed hosts to close connections to passed peers
 func ClosePeers(peers string, closePeers string, timeout int) error {
 	peersArr := parsePeers(peers)
 	closePeersList := parsePeers(closePeers)
@@ -161,6 +164,7 @@ func ClosePeers(peers string, closePeers string, timeout int) error {
 	return nil
 }
 
+// OpenPeers requests the passed peers to open connections to passed peers
 func OpenPeers(peers string, openPeers string, timeout int) error {
 	peersArr := parsePeers(peers)
 	openPeersList := parsePeers(openPeers)
@@ -210,6 +214,7 @@ func OpenPeers(peers string, openPeers string, timeout int) error {
 	return nil
 }
 
+// ListPeers requests the passed peers to list their connected peers
 func ListPeers(peers string, timeout int) error {
 	peersArr := parsePeers(peers)
 	var failed = false
@@ -251,6 +256,7 @@ func ListPeers(peers string, timeout int) error {
 	return nil
 }
 
+// IDs requests the passed peers to return their IDs
 func IDs(peers string, timeout int) error {
 	peersArr := parsePeers(peers)
 	var failed = false
@@ -290,6 +296,7 @@ func IDs(peers string, timeout int) error {
 	return nil
 }
 
+// Listens requests the listen addresses of the passed peers
 func Listens(peers string, timeout int) error {
 	peersArr := parsePeers(peers)
 	var failed = false
@@ -329,6 +336,7 @@ func Listens(peers string, timeout int) error {
 	return nil
 }
 
+// Shutdown requests that past peers be shutdown
 func Shutdown(peers string, timeout int) error {
 	peersArr := parsePeers(peers)
 	var failed = false

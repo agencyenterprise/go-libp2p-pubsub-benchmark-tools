@@ -16,12 +16,14 @@ import (
 	"google.golang.org/grpc"
 )
 
+// New returns a new grpc host
 func New(props *Props) *Host {
 	return &Host{
 		props: props,
 	}
 }
 
+// Listen starts the grpc host
 func (h *Host) Listen(ctx context.Context, addr string) error {
 	var lstnCfg net.ListenConfig
 	lis, err := lstnCfg.Listen(ctx, "tcp", addr)
@@ -114,7 +116,7 @@ func (h *Host) ClosePeerConnections(ctx context.Context, peersList *pb.PeersList
 	}, nil
 }
 
-// OpenPeerConnections opens connections to listed peers
+// OpenPeersConnections opens connections to listed peers
 func (h *Host) OpenPeersConnections(ctx context.Context, peersList *pb.PeersList) (*pb.OpenPeersConnectionsReplies, error) {
 	logger.Info("received open peers connection signal on rpc")
 	var results []*pb.OpenPeerConnectionReply
@@ -191,12 +193,14 @@ func (h *Host) Shutdown(ctx context.Context, _ *empty.Empty) (*pb.ShutdownReply,
 	}, nil
 }
 
+// ID returns the libp2p host id
 func (h *Host) ID(ctx context.Context, _ *empty.Empty) (*pb.IDReply, error) {
 	return &pb.IDReply{
 		ID: fmt.Sprintf("%s", h.props.Host.ID()),
 	}, nil
 }
 
+// ListenAddresses returns the addresses on which the libp2p is listening
 func (h *Host) ListenAddresses(ctx context.Context, _ *empty.Empty) (*pb.ListenAddressesReply, error) {
 	var addresses []string
 

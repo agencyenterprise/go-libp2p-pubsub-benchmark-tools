@@ -60,33 +60,9 @@ func parseConfigFile(conf *Config, confLoc string) error {
 		return err
 	}
 
-	if conf.Host.PrivPEM != "" {
-		if err = loadAndSavePriv(conf); err != nil {
-			logger.Errorf("err loading pem file %s:\n%v", conf.Host.PrivPEM, err)
-			return err
-		}
-	}
-
 	return nil
 }
 
-func loadAndSavePriv(conf *Config) error {
-	privB, err := loadPriv(conf.Host.PrivPEM)
-	if err != nil {
-		logger.Errorf("err loading private key file:\n%v", err)
-		return err
-	}
-
-	priv, err := parsePrivateKey(privB)
-	if err != nil {
-		logger.Errorf("err parsing private key:\n%v", err)
-		return err
-	}
-
-	conf.Host.Priv = priv
-
-	return nil
-}
 func loadDefaultBox() *packr.Box {
 	return packr.New("defaults", defaultsLoc)
 }
