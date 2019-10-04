@@ -23,6 +23,7 @@ vendor/
 
 # testing
 coverage/
+coverage.out
 
 # production
 build/
