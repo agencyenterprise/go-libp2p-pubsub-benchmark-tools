@@ -14,6 +14,7 @@ func setup() (*cobra.Command, error) {
 	var (
 		msgLoc, peers, loggerLoc string
 		timeout                  int
+		size                     uint
 	)
 
 	rootCmd := &cobra.Command{Use: "client"}
@@ -28,12 +29,13 @@ func setup() (*cobra.Command, error) {
 			}
 
 			logger.Infof("sending message to peers for gossip")
-			if err := client.Gossip(msgLoc, peers, timeout); err != nil {
+			if err := client.Gossip(msgLoc, peers, size, timeout); err != nil {
 				logger.Fatalf("err sending messages\n%v", err)
 			}
 		},
 	}
 	publishCMD.Flags().StringVarP(&msgLoc, "message", "m", "client.message.json", "The message file to send to peers.")
+	publishCMD.Flags().UintVarP(&size, "size", "s", 0, "Dynamically size the message (in bytes). Zero, or not passed will default to the size in the json.")
 
 	closeAllPeerConnectionsCMD := &cobra.Command{
 		Use:   "close-all",

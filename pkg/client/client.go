@@ -12,16 +12,26 @@ import (
 	grpc "google.golang.org/grpc"
 )
 
-func Gossip(msgLoc, peers string, timeout int) error {
+func Gossip(msgLoc, peers string, size uint, timeout int) error {
 	msg, err := parseMessageFile(msgLoc)
 	if err != nil || msg == nil {
 		logger.Errorf("err parsing message file:\n%v", err)
 		return err
 	}
 	logger.Infof("message is %s", msg.String())
-	var failed = false
+
+	if size != 0 {
+		oldSize := msg.XXX_Size()
+		if err = sizeMessage(msg, size); err != nil {
+			logger.Errorf("err sizing message to %v:\n%v", size, err)
+			return err
+		}
+
+		logger.Infof("old message size: %v (bytes); new size: %v (bytes)", oldSize, msg.XXX_Size())
+	}
 
 	peersArr := parsePeers(peers)
+	var failed = false
 	for _, peer := range peersArr {
 		// Set up a connection to the server.
 		conn, err := grpc.Dial(peer, grpc.WithInsecure())
