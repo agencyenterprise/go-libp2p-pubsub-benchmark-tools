@@ -69,7 +69,17 @@ func parseLogLine(logLine []byte) (*types.MessageLog, error) {
 		return nil, nil
 	}
 
-	line := strings.ReplaceAll(string(logLine), types.LogLineLeader, "")
+	beginningOfLine := strings.Index(string(logLine), types.LogLineLeader)
+	if beginningOfLine == -1 {
+		logger.Errorf("could not find log line leader in log line %s", string(logLine))
+		return nil, errors.New("log line leader not in line")
+	}
+	line := string(logLine)[beginningOfLine+len(types.LogLineLeader):]
+
+	endOfData := strings.Index(line, `" `)
+	if endOfData != -1 {
+		line = line[:endOfData]
+	}
 
 	data := strings.Split(line, ",")
 	if len(data) != 6 {
@@ -140,25 +150,26 @@ func calcRMR(sortedMessageLogs []*types.MessageLog) (float32, error) {
 func calcLastDeliveryHop(sortedMessageLogs []*types.MessageLog) uint {
 	// note: map is senderID => recipientID
 	// note: assumes a host only ever sends a message to a recipient once!
-	m := make(map[string]map[string]*types.MessageLog)
+	m := make(map[string]map[string][]*types.MessageLog)
 	for _, msg := range sortedMessageLogs {
 		if _, ok := m[msg.SenderID]; !ok {
-			m[msg.SenderID] = make(map[string]*types.MessageLog)
+			m[msg.SenderID] = make(map[string][]*types.MessageLog)
 		}
 
-		m[msg.SenderID][msg.HostID] = msg
+		m[msg.SenderID][msg.HostID] = append(m[msg.SenderID][msg.HostID], msg)
 	}
 
 	// note: array length has already been checked, previously so this shouldn't panic... I hope :D
 	firstGossiperID := sortedMessageLogs[0].SenderID
+	firstGossipTime := sortedMessageLogs[0].NanoTime
 
 	// note: this assumes that a host never receives a message that it doesn't already have
-	paths := buildPathsForSenderID(firstGossiperID, m)
+	paths := buildPathsForSenderID(firstGossiperID, firstGossiperID, firstGossipTime, m)
 
 	// find the longest path
 	lastDeliveryHop := 0.0
 	for _, path := range paths {
-		lastDeliveryHop = math.Max(lastDeliveryHop, float64(len(path)))
+		lastDeliveryHop = math.Max(lastDeliveryHop, float64(len(path))-1.0)
 	}
 
 	return uint(lastDeliveryHop)
@@ -166,25 +177,38 @@ func calcLastDeliveryHop(sortedMessageLogs []*types.MessageLog) uint {
 
 // note: map is senderID => recipientID
 // note: return is a chain of recipient IDs starting with the original senderID
-func buildPathsForSenderID(senderID string, m map[string]map[string]*types.MessageLog) [][]string {
+func buildPathsForSenderID(senderID, originalSender string, ts int64, m map[string]map[string][]*types.MessageLog) [][]string {
 	var ret [][]string
 
-	for recipient := range m[senderID] {
-		paths := buildPathsForSenderID(recipient, m)
-		for _, path := range paths {
-			path = prependString(senderID, path)
-			ret = append(ret, path)
+	for recipient, msgs := range m[senderID] {
+		if recipient == originalSender {
+			continue
+		}
+
+		var tmpTs int64
+		for _, msg := range msgs {
+			if msg.NanoTime < ts {
+				continue
+			}
+
+			tmpTs = msg.NanoTime
+			paths := buildPathsForSenderID(recipient, originalSender, tmpTs, m)
+			for _, path := range paths {
+				path = prependString(senderID, path)
+				ret = append(ret, path)
+			}
+
+			if len(paths) == 0 {
+				ret = append(ret, []string{senderID, recipient})
+			}
 		}
 	}
 
 	return ret
 }
 
-// TODO: is there a more efficient method?
 func prependString(s string, arr []string) []string {
-	tmp := []string{s}
-	tmp = append(tmp, arr...)
-	return tmp
+	return append([]string{s}, arr...)
 }
 
 func countUniqueHosts(sortedMessageLogs []*types.MessageLog) uint {

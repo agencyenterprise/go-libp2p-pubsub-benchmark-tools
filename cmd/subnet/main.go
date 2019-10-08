@@ -25,7 +25,7 @@ func setup() *cobra.Command {
 		Short: "Start subnet",
 		Long:  `Start a subnet of interconnected gossipsub hosts`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := logger.Set(logger.ContextHook{}, "", false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
 				logrus.Errorf("err initiating logger:\n%v", err)
 				return err
 			}
