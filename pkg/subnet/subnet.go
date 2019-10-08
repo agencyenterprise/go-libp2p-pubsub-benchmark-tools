@@ -19,7 +19,7 @@ func New(props *Props) (*Subnet, error) {
 }
 
 // Start begins the subnet
-func (s *Subnet) Start() error {
+func (s *Subnet) Start(started chan struct{}) error {
 	// parse pubsub cidr
 	pubsubIP, pubsubNet, err := net.ParseCIDR(s.props.Conf.Subnet.PubsubCIDR)
 	if err != nil {
@@ -74,6 +74,7 @@ func (s *Subnet) Start() error {
 		}(ch, stop, h)
 	}
 
+	started <- struct{}{}
 	select {
 	case <-stop:
 		// note: I don't like '^C' showing up on the same line as the next logged line...
@@ -100,6 +101,17 @@ func (s *Subnet) Addresses() []string {
 
 	for _, host := range s.hosts {
 		addresses = append(addresses, host.IPFSAddresses()...)
+	}
+
+	return addresses
+}
+
+// RPCAddresses returns the host rpc addresses
+func (s *Subnet) RPCAddresses() []string {
+	var addresses []string
+
+	for _, host := range s.hosts {
+		addresses = append(addresses, host.RPCAddress())
 	}
 
 	return addresses
