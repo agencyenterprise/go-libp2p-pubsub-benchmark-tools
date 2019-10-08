@@ -29,10 +29,49 @@ If you'd like to manually spin up hosts, do the following:
 ## Commands
 
 Three command line programs are available in this module and are location in the `cmd/` directory:
-1. Client - this command is used to interact with hosts via the rpc.
-2. Host - this command is used to start a libp2p host.
-3. Orchestrate - this command spins up a client and optionally a subnet and and sends the hosts messages at the specified interval.
-4. Subnet - this command is used to start multiple libp2p hosts in one process.
+1. Analysis - this command is used to analyze log files and compute metrics.
+2. Client - this command is used to interact with hosts via the rpc.
+3. Host - this command is used to start a libp2p host.
+4. Orchestrate - this command spins up a client and optionally a subnet and and sends the hosts messages at the specified interval.
+5. Subnet - this command is used to start multiple libp2p hosts in one process.
+
+### Analysis
+
+The analysis tool computes performance metrics. These metrics were taken from the research paper:
+
+```
+Leito, J., Pereira, J., Rodrigues, L.: Epidemic broadcast trees.
+In: Proceedings of the 26th IEEE International Symposium on Reliable Distributed Systems (SRDS’2007),
+Beijing, China (2007) 301 – 310
+```
+
+The metrics computed are:
+1. TotalNanoTime - the time (in nano seconds) for the message to propogate the network
+2. LastDeliveryHop - the hop count of the last message that is delivered by a gossip protocol or, in other words, is the maximum number of hops that a message must be forwarded in the overlay before it is delivered.
+3. RelativeMessageRedundancy - RelativeMessageRedundancy (RMR) this metric measures the messages overhead in a gossip protocol. It is defined as: (m / (n - 1)) - 1. where m is the total number of payload messages exchanged during the broadcast procedure and n is the total number of nodes that received that broadcast. This metric is only applicable when at least 2 nodes receive the message. A RMR value of zero means that there is exactly one payload message exchange for each node in the system, which is clearly the optimal value. By opposition, high values of RMR are indicative of a broadcast strategy that promotes a poor network usage. Note that it is possible to achieve a very low RMR by failing to be reliable. Thus the aim is to combine low RMR values with high reliability. Furthermore, RMR values are only comparable for protocols that exhibit similar reliability. Finally, note that in pure gossip approaches, RMR is closely related with the protocol fanout, as it tends to fanout−1.
+
+The commands availabe are:
+
+```bash
+$ go run ./cmd/analysis/main.go --help
+Analyzes a log file and outputs the metrics to standard out or the specified log file
+
+Usage:
+  analyze [log file] [flags]
+
+Flags:
+  -h, --help         help for analyze
+      --log string   Log file location. Defaults to standard out.
+```
+
+An example output is:
+
+```bash
+$ go run ./cmd/analysis/main.go log.txt
+INFO[0000] analyzing log file at log.txt                                                          source="main.go:29:main.setup.func1"
+INFO[0000] {"TotalNanoTime":2426076,"LastDeliveryHop":1,"RelativeMessageRedundancy":0.111111164}  source="main.go:42:main.setup.func1"
+INFO[0000] done
+```
 
 ### Client
 
