@@ -17,10 +17,10 @@ const (
 // https://drive.google.com/file/d/1_evRQujY28K7LBqhuiefiml3QgmWafe-/view
 type Metric struct {
 	// TotalNanoTime is the time (in nano seconds) for the message to propogate the network
-	TotalNanoTime uint64
+	TotalNanoTime uint64 `json:"totalNanoTime,omitempty"`
 	// LastDeliveryHop is the hop count of the last message that is delivered by a gossip protocol or,\
 	// in other words, is the maximum number of hops that a message must be forwarded in the overlay before it is delivered.
-	LastDeliveryHop uint
+	LastDeliveryHop uint `json:"lastDeliveryHop,omitempty"`
 	// Reliability is defined as the percentage of active nodes that deliver a gossip broadcast.\
 	// A reliability of 100% (i.e. 1.0) means that the protocol was able to deliver a given message to all active nodes or, in other \
 	// words, that the message resulted in an atomic broadcast
@@ -37,7 +37,7 @@ type Metric struct {
 	// the aim is to combine low RMR values with high reliability. Furthermore, RMR values are only comparable for \
 	// protocols that exhibit similar reliability. Finally, note that in pure gossip approaches, RMR is closely related with \
 	// the protocol fanout, as it tends to fanout−1.
-	RelativeMessageRedundancy float32
+	RelativeMessageRedundancy float32 `json:"relativeMessageRedundancy,omitempty"`
 }
 
 // MessageLog is a log output by the host that contains important pubsub metric data
