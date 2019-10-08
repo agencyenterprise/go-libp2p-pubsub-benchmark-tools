@@ -158,7 +158,7 @@ func setup() *cobra.Command {
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "configs/subnet/config.json", "The configuration file.")
+	rootCmd.PersistentFlags().StringVarP(&confLoc, "config", "c", "configs/orchestrate/config.json", "The configuration file.")
 	rootCmd.PersistentFlags().StringVarP(&loggerLoc, "log", "", "", "Log file location. Defaults to standard out.")
 	rootCmd.Flags().StringVarP(&msgLoc, "message", "m", "client.message.json", "The message file to send to peers.")
 
