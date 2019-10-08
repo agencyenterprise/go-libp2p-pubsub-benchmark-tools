@@ -77,6 +77,8 @@ func setup() *cobra.Command {
 			defer cancel()
 
 			var hostAddrs []string
+			eChan := make(chan error)
+			started := make(chan struct{})
 			if !conf.Orchestra.OmitSubnet {
 				sConf := config.BuildSubnetConfig(conf)
 
@@ -92,13 +94,20 @@ func setup() *cobra.Command {
 
 				// start the subnet
 				if !conf.Orchestra.OmitSubnet {
-					if err = snet.Start(); err != nil {
-						logger.Errorf("err starting subnet\n%v", err)
-						return err
-					}
+					go func(s *subnet.Subnet, e chan error) {
+						if err = s.Start(started); err != nil {
+							logger.Errorf("err starting subnet\n%v", err)
+							e <- err
+						}
+					}(snet, eChan)
 				}
 
-				hostAddrs = snet.Addresses()
+				select {
+				case <-started:
+					logger.Info("subnet started")
+				}
+
+				hostAddrs = snet.RPCAddresses()
 			}
 
 			if conf.Orchestra.OmitSubnet {
@@ -113,37 +122,39 @@ func setup() *cobra.Command {
 			ticker := time.NewTicker(time.Duration(conf.Orchestra.MessageNanoSecondInterval) * time.Nanosecond)
 			defer ticker.Stop()
 
-			eChan := make(chan error)
-			select {
-			case <-stop:
-				// note: I don't like '^C' showing up on the same line as the next logged line...
-				fmt.Println("")
-				logger.Info("Received stop signal from os. Shutting down...")
+			logger.Warnf("peers: %v\ninterval: %d", hostAddrs, conf.Orchestra.MessageNanoSecondInterval)
 
-			case <-ticker.C:
-				go func() {
-					id, err := uuid.NewRandom()
-					if err != nil {
-						logger.Errorf("err generating uuid:\n%v", err)
-						eChan <- err
-					}
+			for {
+				select {
+				case <-stop:
+					// note: I don't like '^C' showing up on the same line as the next logged line...
+					fmt.Println("")
+					logger.Info("Received stop signal from os. Shutting down...")
+					return nil
 
-					peerIdx := randBetween(0, len(hostAddrs)-1)
-					peer := hostAddrs[peerIdx]
+				case <-ticker.C:
+					go func(peers []string, c config.Config, e chan error) {
+						id, err := uuid.NewRandom()
+						if err != nil {
+							logger.Errorf("err generating uuid:\n%v", err)
+							eChan <- err
+						}
 
-					logger.Infof("sending message to %s for gossip", peer)
-					if err := client.Gossip(id[:], conf.Orchestra.MessageLocation, peer, conf.Orchestra.MessageByteSize, conf.Orchestra.ClientTimeoutSeconds); err != nil {
-						logger.Fatalf("err sending messages\n%v", err)
-						eChan <- err
-					}
-				}()
+						peerIdx := randBetween(0, len(peers)-1)
+						peer := peers[peerIdx]
 
-			case err := <-eChan:
-				logger.Errorf("received err on channel:\n%v", err)
-				return err
+						logger.Infof("sending message to %s for gossip", peer)
+						if err := client.Gossip([]byte(id.String()), c.Orchestra.MessageLocation, peer, c.Orchestra.MessageByteSize, c.Orchestra.ClientTimeoutSeconds); err != nil {
+							logger.Fatalf("err sending messages\n%v", err)
+							e <- err
+						}
+					}(hostAddrs, conf, eChan)
+
+				case err := <-eChan:
+					logger.Errorf("received err on channel:\n%v", err)
+					return err
+				}
 			}
-
-			return nil
 		},
 	}
 

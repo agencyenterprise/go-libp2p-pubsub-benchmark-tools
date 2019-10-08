@@ -9,7 +9,6 @@ import (
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
 	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes/empty"
 	ipfsaddr "github.com/ipfs/go-ipfs-addr"
 	peerstore "github.com/libp2p/go-libp2p-peerstore"
@@ -46,7 +45,7 @@ func (h *Host) Listen(ctx context.Context, addr string) error {
 // PublishMessage implements
 func (h *Host) PublishMessage(ctx context.Context, in *pb.Message) (*pb.PublishReply, error) {
 	logger.Info("received rpc message; will now publish to subscribers")
-	spew.Dump(in)
+	//spew.Dump(in)
 
 	bs, err := in.XXX_Marshal(nil, true)
 	if err != nil {
