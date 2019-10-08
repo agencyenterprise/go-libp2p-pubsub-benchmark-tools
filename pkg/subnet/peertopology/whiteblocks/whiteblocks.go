@@ -1,8 +1,8 @@
 package whiteblocks
 
 import (
-	"github.com/agencyenterprise/gossip-host/pkg/host"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 )
 
 // Build connects the hosts using the whiteblocks topology

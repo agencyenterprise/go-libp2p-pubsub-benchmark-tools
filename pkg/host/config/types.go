@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/agencyenterprise/gossip-host/pkg/cerr"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/cerr"
 
 	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 )
@@ -35,6 +35,8 @@ type Host struct {
 	Muxers [][]string `json:"muxers,omitempty"`
 	// Security specifies the security to use
 	Security string `json:"security,omitempty"`
+	// PubsubAlgorithm is the pubsub method to use; available are: gossip, flood and random
+	PubsubAlgorithm string `json:"pubsubAlgorith,omitempty"`
 	// OmitRelay disables the relay
 	OmitRelay bool `json:"omitRelay,omitempty"`
 	// OmitConnectionManager disables the connection manager

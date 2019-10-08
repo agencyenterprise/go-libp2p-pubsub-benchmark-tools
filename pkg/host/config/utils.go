@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 
 	"github.com/gobuffalo/packr/v2"
 	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
@@ -177,6 +177,9 @@ func mergeDefaults(conf, defaults *Config) {
 	}
 	if conf.Host.Security == "" {
 		conf.Host.Security = defaults.Host.Security
+	}
+	if conf.Host.PubsubAlgorithm == "" {
+		conf.Host.PubsubAlgorithm = defaults.Host.PubsubAlgorithm
 	}
 	if conf.Host.RPCAddress == "" {
 		conf.Host.RPCAddress = defaults.Host.RPCAddress

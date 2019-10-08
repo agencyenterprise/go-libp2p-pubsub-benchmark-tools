@@ -1,6 +1,6 @@
 package types
 
-import "github.com/agencyenterprise/gossip-host/pkg/cerr"
+import "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/cerr"
 
 const (
 	// ErrImproperlyFormattedLogLine is returned when the log line is not in the expected format
@@ -16,7 +16,7 @@ const (
 // Beijing, China (2007) 301 – 310
 // https://drive.google.com/file/d/1_evRQujY28K7LBqhuiefiml3QgmWafe-/view
 type Metric struct {
-	// TotalNanoTime is the time (in nano seconds) for the message to propogate the network
+	// TotalNanoTime is the time (in nano seconds) for the message to propagate the network
 	TotalNanoTime uint64 `json:"totalNanoTime,omitempty"`
 	// LastDeliveryHop is the hop count of the last message that is delivered by a gossip protocol or,\
 	// in other words, is the maximum number of hops that a message must be forwarded in the overlay before it is delivered.

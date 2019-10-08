@@ -126,11 +126,11 @@ kill/gopls:
 
 .PHONY: docker/host
 docker/host:
-	@docker build -t gossip-host -f ./docker/dockerfiles/host/Dockerfile .
+	@docker build -t go-libp2p-pubsub-benchmark-tools -f ./docker/dockerfiles/host/Dockerfile .
 
 .PHONY: docker/client
 docker/client:
-	@docker build -t gossip-client -f ./docker/dockerfiles/client/Dockerfile .
+	@docker build -t go-libp2p-pubsub-benchmark-tools -f ./docker/dockerfiles/client/Dockerfile .
 
 .PHONY: help
 help: Makefile

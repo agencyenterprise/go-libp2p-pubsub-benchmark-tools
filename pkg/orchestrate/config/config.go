@@ -1,6 +1,6 @@
 package config
 
-import "github.com/agencyenterprise/gossip-host/pkg/logger"
+import "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 
 // Load reads the passed config file location and parses it into a config struct.
 func Load(confLoc string) (Config, error) {

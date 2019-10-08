@@ -3,8 +3,8 @@ package host
 import (
 	"context"
 
-	"github.com/agencyenterprise/gossip-host/pkg/cerr"
-	"github.com/agencyenterprise/gossip-host/pkg/host/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/cerr"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host/config"
 
 	lhost "github.com/libp2p/go-libp2p-core/host"
 	lrouter "github.com/libp2p/go-libp2p-core/routing"
@@ -22,13 +22,15 @@ const (
 	ErrImproperMuxerOption = cerr.Error("improper muxer option")
 	// ErrUnknownSecurityOption is returned when an unknown security option has been specified
 	ErrUnknownSecurityOption = cerr.Error("unknown security option")
+	// ErrUnknownPubsubAlgorithm is thrown with the pubsub algorithm passed is not recognized
+	ErrUnknownPubsubAlgorithm = cerr.Error("unknown pubsub algorithm")
 	// ErrNilRouter is returned when a router is needed but not found
 	ErrNilRouter = cerr.Error("nil router")
 
 	pubsubTopic = "/libp2p/test/1.0.0"
 )
 
-// Host is the gossipsub host
+// Host is the go-libp2p host
 // note: lhost.Host and lrouter.Routing are interfaces
 type Host struct {
 	host   lhost.Host

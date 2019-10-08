@@ -5,11 +5,12 @@ import (
 	"crypto/rand"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
-	rpcHost "github.com/agencyenterprise/gossip-host/pkg/grpc/host"
-	"github.com/agencyenterprise/gossip-host/pkg/host/config"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	rpcHost "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/grpc/host"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 
 	ipfsaddr "github.com/ipfs/go-ipfs-addr"
 	"github.com/libp2p/go-libp2p"
@@ -195,17 +196,42 @@ func (h *Host) Connect(peers []string) error {
 
 // BuildPubSub returns a pubsub service
 func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
+	var (
+		ps  *pubsub.PubSub
+		err error
+	)
+
 	// build the gossip pub/sub
-	ps, err := pubsub.NewGossipSub(h.ctx, h.host)
+	switch strings.ToLower(h.conf.Host.PubsubAlgorithm) {
+	case "gossip":
+		logger.Info("building gossip pubsub")
+		ps, err = pubsub.NewGossipSub(h.ctx, h.host)
+
+	case "flood":
+		logger.Info("building flood pubsub")
+		ps, err = pubsub.NewFloodSub(h.ctx, h.host)
+
+	case "random":
+		logger.Info("building random pubsub")
+		ps, err = pubsub.NewRandomSub(h.ctx, h.host)
+
+	default:
+		logger.Errorf("err, the pubsub algorithm %s is not recognized", h.conf.Host.PubsubAlgorithm)
+		return nil, ErrUnknownPubsubAlgorithm
+	}
 	if err != nil {
-		logger.Errorf("err creating new gossip sub\n%v", err)
+		logger.Errorf("err creating new pub sub\n%v", err)
 		return nil, err
 	}
+
+	// subscribe to the topic
 	sub, err := ps.Subscribe(pubsubTopic)
 	if err != nil {
 		logger.Errorf("err subscribing\n%v", err)
 		return nil, err
 	}
+
+	// attach the handler
 	go pubsubHandler(h.ctx, h.host.ID(), sub)
 
 	return ps, nil
@@ -258,7 +284,7 @@ func (h *Host) BuildDiscoveryAndRouting() error {
 	return nil
 }
 
-// Start starts a new gossip host
+// Start starts a new pubsub host
 func (h *Host) Start(ch chan error, stop chan os.Signal) error {
 	for i, addr := range h.host.Addrs() {
 		logger.Infof("listening #%d on: %s/ipfs/%s\n", i, addr, h.host.ID().Pretty())

@@ -3,7 +3,7 @@ package sorter
 import (
 	"sort"
 
-	"github.com/agencyenterprise/gossip-host/pkg/analysis/types"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/analysis/types"
 )
 
 // By is the type of a "less" function that defines the ordering of its Planet arguments.
@@ -18,7 +18,7 @@ func (by By) Sort(messageLogs []*types.MessageLog) {
 	sort.Sort(ms)
 }
 
-// MessageLogSorter joins a By function and a slice of messageLogs to be sorted.
+// MessageLogsSorter joins a By function and a slice of messageLogs to be sorted.
 type MessageLogsSorter struct {
 	messageLogs []*types.MessageLog
 	by          func(m1, m2 *types.MessageLog) bool // Closure used in the Less method.

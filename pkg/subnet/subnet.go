@@ -7,11 +7,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/agencyenterprise/gossip-host/pkg/host"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	"github.com/agencyenterprise/gossip-host/pkg/subnet/peertopology"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/subnet/peertopology"
 )
 
+// New returns a subnet
 func New(props *Props) (*Subnet, error) {
 	return &Subnet{
 		props: props,

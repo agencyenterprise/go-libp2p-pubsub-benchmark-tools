@@ -41,3 +41,6 @@ build/
 log.txt
 logs.txt
 *.log
+
+# data
+*.csv

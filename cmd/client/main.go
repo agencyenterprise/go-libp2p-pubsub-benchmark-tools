@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/agencyenterprise/gossip-host/pkg/client"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/client"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -20,16 +20,16 @@ func setup() (*cobra.Command, error) {
 	rootCmd := &cobra.Command{Use: "client"}
 
 	publishCMD := &cobra.Command{
-		Use:   "gossip",
-		Short: "Gossip a message in the pubsub",
-		Long:  "Request that the passed hosts gossip the passed message",
+		Use:   "publish",
+		Short: "Publish a message in the pubsub",
+		Long:  "Request that the passed hosts publish the passed message",
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
 				logrus.Fatalf("err initiating logger:\n%v", err)
 			}
 
-			logger.Infof("sending message to peers for gossip")
-			if err := client.Gossip(nil, msgLoc, peers, size, timeout); err != nil {
+			logger.Infof("sending message to peers for publish")
+			if err := client.Publish(nil, msgLoc, peers, size, timeout); err != nil {
 				logger.Fatalf("err sending messages\n%v", err)
 			}
 		},

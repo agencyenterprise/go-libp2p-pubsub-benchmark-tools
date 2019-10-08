@@ -1,14 +1,14 @@
-> libp2p/go-libp2p-pubsub gossip host
+> libp2p/go-libp2p-pubsub benchmark tools
 
-# gossip-host
-[![Build Status](https://travis-ci.org/agencyenterprise/gossip-host.svg?branch=develop)](https://travis-ci.org/agencyenterprise/gossip-host) [![Coverage Status](https://coveralls.io/repos/github/agencyenterprise/gossip-host/badge.svg?branch=develop)](https://coveralls.io/github/agencyenterprise/gossip-host?branch=develop) [![Go Report Card](https://goreportcard.com/badge/github.com/agencyenterprise/gossip-host)](https://goreportcard.com/report/github.com/agencyenterprise/gossip-host) [![GoDoc](https://godoc.org/github.com/agencyenterprise/gossip-host?status.svg)](https://godoc.org/github.com/agencyenterprise/gossip-host)
+# go-libp2p-pubsub-benchmark-tools
+[![Build Status](https://travis-ci.org/agencyenterprise/go-libp2p-pubsub-benchmark-tools.svg?branch=develop)](https://travis-ci.org/agencyenterprise/go-libp2p-pubsub-benchmark-tools) [![Coverage Status](https://coveralls.io/repos/github/agencyenterprise/go-libp2p-pubsub-benchmark-tools/badge.svg?branch=develop)](https://coveralls.io/github/agencyenterprise/go-libp2p-pubsub-benchmark-tools?branch=develop) [![Go Report Card](https://goreportcard.com/badge/github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools)](https://goreportcard.com/report/github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools) [![GoDoc](https://godoc.org/github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools?status.svg)](https://godoc.org/github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools)
 
-This module provides tools for benchmarking the [libp2p gossip pubsub protocol](https://github.com/libp2p/go-libp2p-pubsub); however, it can be easily extended to other pubsub protocols or even beyond pubsub.
+This module provides tools for benchmarking the [go-libp2p pubsub protocols](https://github.com/libp2p/go-libp2p-pubsub); however, it can be easily extended to other pubsub protocols or even beyond pubsub.
 
 
 ## Architecture
 
-Hosts are connected to each other via the protocols defined in the config file. Each host also runs an rpc host and can receive messages from clients. Via rpc, clients can request hosts connect and disconnect with peers, gossip a message, shutdown, and more.
+Hosts are connected to each other via the protocols defined in the config file. Each host also runs an rpc host and can receive messages from clients. Via rpc, clients can request hosts connect and disconnect with peers, publish a message, shutdown, and more.
 
 
 ## Usage
@@ -16,24 +16,24 @@ Hosts are connected to each other via the protocols defined in the config file. 
 The simplest way to use the tool is via `cmd/subnet/main.go`:
 
 1. Spin up a subnet of hosts: `$ go run ./cmd/subnet/main.go`
-2. In another terminal, pass a message into the subnet and watch the hosts start gossiping: `$ go run ./cmd/client/main.go gossip`
+2. In another terminal, pass a message into the subnet and watch the hosts start publishing: `$ go run ./cmd/client/main.go publish`
 
 If you'd like to manually spin up hosts, do the following:
 1. `$ go run ./cmd/host/main.go`
 2. In another terminal, spin up a second host and connect it to the first: `$ go run ./cmd/host/main.go -l /ip4/127.0.0.2/tcp/3002,/ip4/127.0.0.2/tcp/3003/ws -r :8081 -p <prev. host listen addrs>`. 
    * Note, the `-l` flag are the listen addresses. Notice how we've incremented standard local host from `127.0.0.1` to `127.0.0.2`. We could have also simply changed the port address.
-    * Also, `-r` is the rpc listen address and needs to be different for this host than the default `:8080`.
-3. In a third terminal, pass a message into the subnet and watch the hosts start gossiping: `$ go run ./cmd/client/main.go gossip`
+    * Further note that `-r` is the rpc listen address and needs to be different for this host than the default `:8080`.
+3. In a third terminal, pass a message into the subnet and watch the hosts start publishing: `$ go run ./cmd/client/main.go publish`
 
 
 ## Commands
 
 Three command line programs are available in this module and are location in the `cmd/` directory:
-1. Analysis - this command is used to analyze log files and compute metrics.
-2. Client - this command is used to interact with hosts via the rpc.
-3. Host - this command is used to start a libp2p host.
-4. Orchestrate - this command spins up a client and optionally a subnet and and sends the hosts messages at the specified interval.
-5. Subnet - this command is used to start multiple libp2p hosts in one process.
+1. **Analysis** - this command is used to analyze log files and compute metrics.
+2. **Client** - this command is used to interact with hosts via the rpc.
+3. **Host** - this command is used to start a libp2p host.
+4. **Orchestrate** - this command spins up a client and optionally a subnet and and sends the hosts messages at the specified interval.
+5. **Subnet** - this command is used to start multiple libp2p hosts in one process.
 
 ### Analysis
 
@@ -61,7 +61,7 @@ Usage:
 
 Flags:
   -h, --help         help for analyze
-      --log string   Log file location. Defaults to standard out.
+  -o, --out  string  Output json location. Defaults to standard out.
 ```
 
 An example output is:
@@ -87,7 +87,7 @@ Usage:
 Available Commands:
   close-all   Close all peer connections
   close-peers Close connections to peers
-  gossip      Gossip a message in the pubsub
+  publish     Publish a message in the pubsub
   help        Help about any command
   id          Get peer ids
   list-peers  List connected peers
@@ -138,6 +138,7 @@ The host has many configuration options which can be set between a combination o
     "peers": [],
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
+    "pubsubAlgorithm": "gossip",
     "omitRelay": false,
     "omitConnectionManager": false,
     "omitNATPortMap": false,
@@ -196,6 +197,7 @@ The orchestration can be configured via a json file. The default configuration l
     "transports": ["tcp", "ws"],
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
+    "pubsubAlgorithm": "gossip",
     "omitRelay": false,
     "omitConnectionManager": false,
     "omitNATPortMap": false,
@@ -218,7 +220,7 @@ The available commands and flags are shown below.
 
 ```bash
 $ go run ./cmd/subnet/main.go --help
-Start a subnet of interconnected gossipsub hosts
+Start a subnet of interconnected libp2p pubsub hosts
 
  Usage:
    start [flags]
@@ -247,6 +249,7 @@ The subnet can be configured via a json file. The default configuration location
     "transports": ["tcp", "ws"],
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
+    "pubsubAlgorithm": "gossip",
     "omitRelay": false,
     "omitConnectionManager": false,
     "omitNATPortMap": false,
@@ -290,8 +293,8 @@ syntax = "proto3";
 package pb;
 
 option java_multiple_files = true;
-option java_package = "io.grpc.gossipsub.benchmark";
-option java_outer_classname = "GossipsubBenchmark";
+option java_package = "io.grpc.pubsub.benchmark";
+option java_outer_classname = "PubsubBenchmark";
 
 import "google/protobuf/empty.proto";
 
@@ -364,7 +367,7 @@ service Publisher {
 
 [**MIT**](LICENSE).
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fagencyenterprise%2Fgossip-host.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fagencyenterprise%2Fgossip-host?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fagencyenterprise%2Fgo-libp2p-pubsub-benchmark-tools.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fagencyenterprise%2Fgo-libp2p-pubsub-benchmark-tools?ref=badge_large)
 
 ```
 MIT License

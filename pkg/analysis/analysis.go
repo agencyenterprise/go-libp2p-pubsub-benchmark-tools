@@ -1,8 +1,8 @@
 package analysis
 
 import (
-	"github.com/agencyenterprise/gossip-host/pkg/analysis/types"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/analysis/types"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 )
 
 // Analyze parses a log file and returns performance metrics

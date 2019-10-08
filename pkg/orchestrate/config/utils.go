@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	sconf "github.com/agencyenterprise/gossip-host/pkg/subnet/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
+	sconf "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/subnet/config"
 	"github.com/gobuffalo/packr/v2"
 
 	"github.com/spf13/viper"
@@ -30,6 +30,7 @@ func BuildSubnetConfig(conf Config) sconf.Config {
 	sConf.Host.Transports = conf.Host.Transports
 	sConf.Host.Muxers = conf.Host.Muxers
 	sConf.Host.Security = conf.Host.Security
+	sConf.Host.PubsubAlgorithm = conf.Host.PubsubAlgorithm
 	sConf.Host.OmitRelay = conf.Host.OmitRelay
 	sConf.Host.OmitConnectionManager = conf.Host.OmitConnectionManager
 	sConf.Host.OmitNATPortMap = conf.Host.OmitNATPortMap
@@ -138,5 +139,8 @@ func mergeDefaults(conf, defaults *Config) {
 	}
 	if conf.Host.Security == "" {
 		conf.Host.Security = defaults.Host.Security
+	}
+	if conf.Host.PubsubAlgorithm == "" {
+		conf.Host.PubsubAlgorithm = defaults.Host.PubsubAlgorithm
 	}
 }

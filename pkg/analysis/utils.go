@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/agencyenterprise/gossip-host/pkg/analysis/sorter"
-	"github.com/agencyenterprise/gossip-host/pkg/analysis/types"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/analysis/sorter"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/analysis/types"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 )
 
 func loadLogFile(logLoc string) (*bufio.Scanner, func() error, error) {
