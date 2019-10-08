@@ -47,8 +47,8 @@ Beijing, China (2007) 301 – 310
 
 The metrics computed are:
 1. **TotalNanoTime** - the time (in nano seconds) for the message to propogate the network
-2. **LastDeliveryHop** - the hop count of the last message that is delivered by a gossip protocol or, in other words, is the maximum number of hops that a message must be forwarded in the overlay before it is delivered.
-3. **RelativeMessageRedundancy** - RelativeMessageRedundancy (RMR) this metric measures the messages overhead in a gossip protocol. It is defined as: (m / (n - 1)) - 1. where m is the total number of payload messages exchanged during the broadcast procedure and n is the total number of nodes that received that broadcast. This metric is only applicable when at least 2 nodes receive the message. A RMR value of zero means that there is exactly one payload message exchange for each node in the system, which is clearly the optimal value. By opposition, high values of RMR are indicative of a broadcast strategy that promotes a poor network usage. Note that it is possible to achieve a very low RMR by failing to be reliable. Thus the aim is to combine low RMR values with high reliability. Furthermore, RMR values are only comparable for protocols that exhibit similar reliability. Finally, note that in pure gossip approaches, RMR is closely related with the protocol fanout, as it tends to fanout−1.
+2. **LastDeliveryHop** - the hop count of the last message that is delivered by a [pubsub] protocol or, in other words, is the maximum number of hops that a message must be forwarded in the overlay before it is delivered.
+3. **RelativeMessageRedundancy** - RelativeMessageRedundancy (RMR) this metric measures the messages overhead in a [pubsub] protocol. It is defined as: (m / (n - 1)) - 1. where m is the total number of payload messages exchanged during the broadcast procedure and n is the total number of nodes that received that broadcast. This metric is only applicable when at least 2 nodes receive the message. A RMR value of zero means that there is exactly one payload message exchange for each node in the system, which is clearly the optimal value. By opposition, high values of RMR are indicative of a broadcast strategy that promotes a poor network usage. Note that it is possible to achieve a very low RMR by failing to be reliable. Thus the aim is to combine low RMR values with high reliability. Furthermore, RMR values are only comparable for protocols that exhibit similar reliability. Finally, note that in pure [pubsub] approaches, RMR is closely related with the protocol fanout, as it tends to fanout−1.
 
 The commands availabe are:
 
@@ -110,7 +110,7 @@ The host command spins up a libp2p host, an RPC host and opens a pubsub channel.
 
 ```bash
 $ go run ./cmd/host/main.go --help
-Starts the gossip pub/sub node
+Starts the go-libp2p pub/sub host
 
 Usage:
   start [flags]
