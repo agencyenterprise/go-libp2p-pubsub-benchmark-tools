@@ -12,6 +12,7 @@ import (
 	"github.com/agencyenterprise/gossip-host/pkg/subnet/peertopology"
 )
 
+// New returns a subnet
 func New(props *Props) (*Subnet, error) {
 	return &Subnet{
 		props: props,
