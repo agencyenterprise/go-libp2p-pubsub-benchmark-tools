@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/agencyenterprise/gossip-host/pkg/analysis"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/analysis"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

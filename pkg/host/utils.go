@@ -3,7 +3,7 @@ package host
 import (
 	"strings"
 
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 
 	libp2p "github.com/libp2p/go-libp2p"
 	mplex "github.com/libp2p/go-libp2p-mplex"

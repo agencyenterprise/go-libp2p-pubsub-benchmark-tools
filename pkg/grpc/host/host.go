@@ -6,8 +6,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
+	pb "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/pb/publisher"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	ipfsaddr "github.com/ipfs/go-ipfs-addr"

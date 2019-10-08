@@ -9,10 +9,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/agencyenterprise/gossip-host/pkg/client"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	"github.com/agencyenterprise/gossip-host/pkg/orchestrate/config"
-	"github.com/agencyenterprise/gossip-host/pkg/subnet"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/client"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/orchestrate/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/subnet"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -143,8 +143,8 @@ func setup() *cobra.Command {
 						peerIdx := randBetween(0, len(peers)-1)
 						peer := peers[peerIdx]
 
-						logger.Infof("sending message to %s for gossip", peer)
-						if err := client.Gossip([]byte(id.String()), c.Orchestra.MessageLocation, peer, c.Orchestra.MessageByteSize, c.Orchestra.ClientTimeoutSeconds); err != nil {
+						logger.Infof("sending message to %s for publish", peer)
+						if err := client.Publish([]byte(id.String()), c.Orchestra.MessageLocation, peer, c.Orchestra.MessageByteSize, c.Orchestra.ClientTimeoutSeconds); err != nil {
 							logger.Fatalf("err sending messages\n%v", err)
 							e <- err
 						}

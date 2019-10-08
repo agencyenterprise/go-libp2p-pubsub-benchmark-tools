@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	sconf "github.com/agencyenterprise/gossip-host/pkg/subnet/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
+	sconf "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/subnet/config"
 	"github.com/gobuffalo/packr/v2"
 
 	"github.com/spf13/viper"
