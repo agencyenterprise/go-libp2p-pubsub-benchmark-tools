@@ -35,11 +35,12 @@ func setup() *cobra.Command {
 
 			// get the output ready if writing to file
 			if out != "" {
-				f, err = os.Create(out)
+				f, err = os.OpenFile(out, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 				if err != nil {
 					logger.Errorf("err creating file at %s:\n%v", out, err)
 					return err
 				}
+				defer f.Close()
 			}
 
 			// run the analyzer

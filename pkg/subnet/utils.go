@@ -149,6 +149,7 @@ func parseSubnetConfig(conf config.Config) hconf.Config {
 	hostConfig.Host.Transports = conf.Host.Transports
 	hostConfig.Host.Muxers = conf.Host.Muxers
 	hostConfig.Host.Security = conf.Host.Security
+	hostConfig.Host.PubsubAlgorithm = conf.Host.PubsubAlgorithm
 	hostConfig.Host.OmitRelay = conf.Host.OmitRelay
 	hostConfig.Host.OmitConnectionManager = conf.Host.OmitConnectionManager
 	hostConfig.Host.OmitNATPortMap = conf.Host.OmitNATPortMap

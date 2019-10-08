@@ -22,6 +22,8 @@ const (
 	ErrImproperMuxerOption = cerr.Error("improper muxer option")
 	// ErrUnknownSecurityOption is returned when an unknown security option has been specified
 	ErrUnknownSecurityOption = cerr.Error("unknown security option")
+	// ErrUnknownPubsubAlgorithm is thrown with the pubsub algorithm passed is not recognized
+	ErrUnknownPubsubAlgorithm = cerr.Error("unknown pubsub algorithm")
 	// ErrNilRouter is returned when a router is needed but not found
 	ErrNilRouter = cerr.Error("nil router")
 
