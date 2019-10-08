@@ -29,7 +29,7 @@ func setup() (*cobra.Command, error) {
 			}
 
 			logger.Infof("sending message to peers for gossip")
-			if err := client.Gossip(msgLoc, peers, size, timeout); err != nil {
+			if err := client.Gossip(nil, msgLoc, peers, size, timeout); err != nil {
 				logger.Fatalf("err sending messages\n%v", err)
 			}
 		},

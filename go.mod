@@ -6,6 +6,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/gobuffalo/packr/v2 v2.6.0
 	github.com/golang/protobuf v1.3.2
+	github.com/google/uuid v1.1.1
 	github.com/ipfs/go-ipfs-addr v0.0.1
 	github.com/libp2p/go-libp2p v0.4.0
 	github.com/libp2p/go-libp2p-connmgr v0.1.1

@@ -28,6 +28,51 @@ If you'd like to manually spin up hosts, do the following:
 
 ## Commands
 
+Three command line programs are available in this module and are location in the `cmd/` directory:
+1. Analysis - this command is used to analyze log files and compute metrics.
+2. Client - this command is used to interact with hosts via the rpc.
+3. Host - this command is used to start a libp2p host.
+4. Orchestrate - this command spins up a client and optionally a subnet and and sends the hosts messages at the specified interval.
+5. Subnet - this command is used to start multiple libp2p hosts in one process.
+
+### Analysis
+
+The analysis tool computes performance metrics. These metrics were taken from the research paper:
+
+```
+Leito, J., Pereira, J., Rodrigues, L.: Epidemic broadcast trees.
+In: Proceedings of the 26th IEEE International Symposium on Reliable Distributed Systems (SRDS’2007),
+Beijing, China (2007) 301 – 310
+```
+
+The metrics computed are:
+1. TotalNanoTime - the time (in nano seconds) for the message to propogate the network
+2. LastDeliveryHop - the hop count of the last message that is delivered by a gossip protocol or, in other words, is the maximum number of hops that a message must be forwarded in the overlay before it is delivered.
+3. RelativeMessageRedundancy - RelativeMessageRedundancy (RMR) this metric measures the messages overhead in a gossip protocol. It is defined as: (m / (n - 1)) - 1. where m is the total number of payload messages exchanged during the broadcast procedure and n is the total number of nodes that received that broadcast. This metric is only applicable when at least 2 nodes receive the message. A RMR value of zero means that there is exactly one payload message exchange for each node in the system, which is clearly the optimal value. By opposition, high values of RMR are indicative of a broadcast strategy that promotes a poor network usage. Note that it is possible to achieve a very low RMR by failing to be reliable. Thus the aim is to combine low RMR values with high reliability. Furthermore, RMR values are only comparable for protocols that exhibit similar reliability. Finally, note that in pure gossip approaches, RMR is closely related with the protocol fanout, as it tends to fanout−1.
+
+The commands availabe are:
+
+```bash
+$ go run ./cmd/analysis/main.go --help
+Analyzes a log file and outputs the metrics to standard out or the specified log file
+
+Usage:
+  analyze [log file] [flags]
+
+Flags:
+  -h, --help         help for analyze
+      --log string   Log file location. Defaults to standard out.
+```
+
+An example output is:
+
+```bash
+$ go run ./cmd/analysis/main.go log.txt
+INFO[0000] analyzing log file at log.txt                                                          source="main.go:29:main.setup.func1"
+INFO[0000] {"TotalNanoTime":2426076,"LastDeliveryHop":1,"RelativeMessageRedundancy":0.111111164}  source="main.go:42:main.setup.func1"
+INFO[0000] done
+```
+
 ### Client
 
 The client command is used to interact to hosts via the rpc. Multiple hosts can be messaged in a single command by separating each listen address with a comma using the `-p` flag.
@@ -105,6 +150,66 @@ The host has many configuration options which can be set between a combination o
 ```
 
 
+### Orchestrate
+
+Orchestrate is a command whis spins up a client, and optionally a subnet, and pings the hosts at regularly defined intervals. The client creates a new message id for each new message that it sends.
+
+The available commands and flags are shown below.
+
+```bash
+$ go run ./cmd/orchestrate/main.go --help
+Spins up clients and optionally hosts and sends the hosts messages at the specified interval.
+
+Usage:
+  start [flags]
+
+Flags:
+  -c, --config  string   The configuration file. (default "configs/subnet/config.json")
+  -h, --help             help for start
+      --log     string   Log file location. Defaults to standard out.
+  -m, --message string   The message file to send to peers. (default "client.message.json")
+```
+
+#### Configuration
+
+The orchestration can be configured via a json file. The default configuration location is `configs/orchestrate/config.json` but can be modified with the `-c` flag. The default config file is shown, below. If any option is not present in the passed config file, the subnet will default to the below.
+
+```json
+{
+  "orchestra": {
+    "omitSubnet": false,
+    "hostsIfOmitSubnet": [],
+    "messageNanoSecondInterval": 100000,
+    "clientTimeoutSeconds": 20,
+    "messageLocation": "client.message.json",
+    "messageByteSize": 1000
+  },
+  "subnet": {
+    "numHosts": 10,
+    "pubsubCIDR": "127.0.0.1/8",
+    "pubsubPortRange": [3000, 4000],
+    "rpcCIDR": "127.0.0.1/8",
+    "rpcPortRange": [8080, 9080],
+    "peerTopology": "whiteblocks"
+  },
+  "host": {
+    "transports": ["tcp", "ws"],
+    "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
+    "security": "secio",
+    "omitRelay": false,
+    "omitConnectionManager": false,
+    "omitNATPortMap": false,
+    "omitRPCServer": false,
+    "omitDiscoveryService": false,
+    "omitRouting": false
+  },
+  "general": {
+    "loggerLocation": ""
+  }
+}
+
+```
+
 ### Subnet
 
 Subnet is a command which simplifies the creation and peering of hosts. Using this command, dozens, hundreds or possibly even thousands of hosts can been started and peered on a single machine in a single process. In order to start a large number of hosts, you may need to increase the max open files limit on your machine.
@@ -168,7 +273,7 @@ type PeerTopology interface {
 
 The three provided topologies are:
 1. Whiteblocks
-   * This is the peering topology from the original Whiteblocks [gossip sub tests](github.com/whiteblock/p2p-tests). Essentially, each peer is randomly connected to a previously started peer. A more detailed description can be found in the topology [readme](./pkg/subnet/peertopology/whiteblocks/README.md).
+   * This is the peering topology from the original Whiteblocks [gossip sub tests](https://github.com/whiteblock/p2p-tests). Essentially, each peer is randomly connected to a previously started peer. A more detailed description can be found in the topology [readme](./pkg/subnet/peertopology/whiteblocks/README.md).
 2. Linear
    *  Each Nth host is connected to the N-1 host, starting with N=1.
 3. Full

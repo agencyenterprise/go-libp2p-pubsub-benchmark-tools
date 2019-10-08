@@ -13,7 +13,7 @@ import (
 )
 
 // Gossip requests the passed peers to gossip the passed message
-func Gossip(msgLoc, peers string, size uint, timeout int) error {
+func Gossip(msgID []byte, msgLoc, peers string, size uint, timeout int) error {
 	msg, err := parseMessageFile(msgLoc)
 	if err != nil || msg == nil {
 		logger.Errorf("err parsing message file:\n%v", err)
@@ -29,6 +29,10 @@ func Gossip(msgLoc, peers string, size uint, timeout int) error {
 		}
 
 		logger.Infof("old message size: %v (bytes); new size: %v (bytes)", oldSize, msg.XXX_Size())
+	}
+
+	if msgID != nil {
+		msg.Id = string(msgID)
 	}
 
 	peersArr := parsePeers(peers)
