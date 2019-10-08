@@ -68,8 +68,15 @@ An example output is:
 
 ```bash
 $ go run ./cmd/analysis/main.go log.txt
-INFO[0000] analyzing log file at log.txt                                                          source="main.go:29:main.setup.func1"
-INFO[0000] {"TotalNanoTime":2426076,"LastDeliveryHop":1,"RelativeMessageRedundancy":0.111111164}  source="main.go:42:main.setup.func1"
+
+INFO[0000] analyzing log file at log.txt         source="main.go:29:main.setup.func1"
+INFO[0000] [
+  {
+    "totalNanoTime": 2426076,
+    "lastDeliveryHop": 1,
+    "relativeMessageRedundancy": 0.111111164
+  }
+]  source="main.go:61:main.setup.func1"
 INFO[0000] done
 ```
 
