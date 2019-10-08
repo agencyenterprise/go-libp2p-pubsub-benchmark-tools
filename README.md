@@ -22,18 +22,18 @@ If you'd like to manually spin up hosts, do the following:
 1. `$ go run ./cmd/host/main.go`
 2. In another terminal, spin up a second host and connect it to the first: `$ go run ./cmd/host/main.go -l /ip4/127.0.0.2/tcp/3002,/ip4/127.0.0.2/tcp/3003/ws -r :8081 -p <prev. host listen addrs>`. 
    * Note, the `-l` flag are the listen addresses. Notice how we've incremented standard local host from `127.0.0.1` to `127.0.0.2`. We could have also simply changed the port address.
-    * Also, `-r` is the rpc listen address and needs to be different for this host than the default `:8080`.
+    * Further note that `-r` is the rpc listen address and needs to be different for this host than the default `:8080`.
 3. In a third terminal, pass a message into the subnet and watch the hosts start gossiping: `$ go run ./cmd/client/main.go gossip`
 
 
 ## Commands
 
 Three command line programs are available in this module and are location in the `cmd/` directory:
-1. Analysis - this command is used to analyze log files and compute metrics.
-2. Client - this command is used to interact with hosts via the rpc.
-3. Host - this command is used to start a libp2p host.
-4. Orchestrate - this command spins up a client and optionally a subnet and and sends the hosts messages at the specified interval.
-5. Subnet - this command is used to start multiple libp2p hosts in one process.
+1. **Analysis** - this command is used to analyze log files and compute metrics.
+2. **Client** - this command is used to interact with hosts via the rpc.
+3. **Host** - this command is used to start a libp2p host.
+4. **Orchestrate** - this command spins up a client and optionally a subnet and and sends the hosts messages at the specified interval.
+5. **Subnet** - this command is used to start multiple libp2p hosts in one process.
 
 ### Analysis
 
