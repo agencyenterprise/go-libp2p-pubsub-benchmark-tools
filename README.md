@@ -82,7 +82,7 @@ INFO[0000] done
 
 ### Client
 
-The client command is used to interact to hosts via the rpc. Multiple hosts can be messaged in a single command by separating each listen address with a comma using the `-p` flag.
+The client command is used to interact with hosts via the rpc. Multiple hosts can be messaged in a single command by separating each listen address with a comma using the `-p` flag.
 
 The output of `--help` is shown, below. Each command has its own `--help` as well.
 
