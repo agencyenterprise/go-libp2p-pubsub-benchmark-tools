@@ -77,9 +77,15 @@ func setup() *cobra.Command {
 			}
 
 			// start the subnet
-			if err = snet.Start(); err != nil {
+			start := make(chan struct{})
+			if err = snet.Start(start); err != nil {
 				logger.Errorf("err starting subnet\n%v", err)
 				return err
+			}
+
+			select {
+			case <-start:
+				logger.Infof("subnet did start")
 			}
 
 			select {
