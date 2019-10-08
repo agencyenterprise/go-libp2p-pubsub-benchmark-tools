@@ -127,6 +127,7 @@ Flags:
   -h, --help                help for start
   -l, --listens    string   Addresses on which to listen. Comma separated. Overides config.json.
       --log        string   Log file location. Defaults to standard out.
+      --pem        string   PEM file location. Overrides the config.json.
   -p, --peers      string   Peers to connect. Comma separated. Overides config.json.
   -r, --rpc-listen string   RPC listen address. Overides config.json.
 ```

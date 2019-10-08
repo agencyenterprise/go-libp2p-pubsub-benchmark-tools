@@ -5,7 +5,7 @@ import (
 )
 
 // Load reads the passed config file location and parses it into a config struct.
-func Load(confLoc, listens, rpcListen, peers string) (Config, error) {
+func Load(confLoc, listens, rpcListen, peers, pemLoc string) (Config, error) {
 	var (
 		conf, defaults Config
 		err            error
@@ -15,7 +15,7 @@ func Load(confLoc, listens, rpcListen, peers string) (Config, error) {
 		logger.Errorf("err parsing defaults:\n%v", err)
 	}
 
-	if err = parseConfigFile(&conf, confLoc); err != nil {
+	if err = parseConfigFile(&conf, confLoc, pemLoc); err != nil {
 		logger.Errorf("err parsing config file:\n%v", err)
 		return conf, err
 	}

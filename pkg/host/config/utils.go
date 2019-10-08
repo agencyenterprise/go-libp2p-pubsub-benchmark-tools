@@ -42,7 +42,7 @@ func parsePeers(conf *Config, peers string) {
 	}
 }
 
-func parseConfigFile(conf *Config, confLoc string) error {
+func parseConfigFile(conf *Config, confLoc, pemLoc string) error {
 	var err error
 
 	v := viper.New()
@@ -58,6 +58,10 @@ func parseConfigFile(conf *Config, confLoc string) error {
 	if err = v.Unmarshal(conf); err != nil {
 		logger.Errorf("err unmarshaling config\n%v", err)
 		return err
+	}
+
+	if pemLoc != "" {
+		conf.Host.PrivPEM = pemLoc
 	}
 
 	if conf.Host.PrivPEM != "" {

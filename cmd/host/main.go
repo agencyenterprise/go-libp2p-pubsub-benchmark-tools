@@ -16,7 +16,7 @@ import (
 
 func setup() *cobra.Command {
 	var (
-		confLoc, listens, rpcListen, peers, loggerLoc string
+		confLoc, listens, rpcListen, peers, loggerLoc, pemLoc string
 	)
 
 	rootCmd := &cobra.Command{
@@ -30,7 +30,7 @@ func setup() *cobra.Command {
 			}
 
 			logger.Infof("Loading config: %s", confLoc)
-			conf, err := config.Load(confLoc, listens, rpcListen, peers)
+			conf, err := config.Load(confLoc, listens, rpcListen, peers, pemLoc)
 			if err != nil {
 				logger.Errorf("error loading config\n%v", err)
 				return err
@@ -114,6 +114,7 @@ func setup() *cobra.Command {
 	rootCmd.PersistentFlags().StringVarP(&peers, "peers", "p", "", "Peers to connect. Comma separated. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&rpcListen, "rpc-listen", "r", "", "RPC listen address. Overides config.json.")
 	rootCmd.PersistentFlags().StringVarP(&loggerLoc, "log", "", "", "Log file location. Defaults to standard out.")
+	rootCmd.PersistentFlags().StringVarP(&pemLoc, "pem", "", "", "PEM file location. Overrides the config.json.")
 
 	return rootCmd
 }
