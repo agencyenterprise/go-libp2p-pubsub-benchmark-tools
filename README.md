@@ -31,7 +31,8 @@ If you'd like to manually spin up hosts, do the following:
 Three command line programs are available in this module and are location in the `cmd/` directory:
 1. Client - this command is used to interact with hosts via the rpc.
 2. Host - this command is used to start a libp2p host.
-3. Subnet - this command is used to start multiple libp2p hosts in one process.
+3. Orchestrate - this command spins up a client and optionally a subnet and and sends the hosts messages at the specified interval.
+4. Subnet - this command is used to start multiple libp2p hosts in one process.
 
 ### Client
 
@@ -109,6 +110,66 @@ The host has many configuration options which can be set between a combination o
 }
 ```
 
+
+### Orchestrate
+
+Orchestrate is a command whis spins up a client, and optionally a subnet, and pings the hosts at regularly defined intervals. The client creates a new message id for each new message that it sends.
+
+The available commands and flags are shown below.
+
+```bash
+$ go run ./cmd/orchestrate/main.go --help
+Spins up clients and optionally hosts and sends the hosts messages at the specified interval.
+
+Usage:
+  start [flags]
+
+Flags:
+  -c, --config  string   The configuration file. (default "configs/subnet/config.json")
+  -h, --help             help for start
+      --log     string   Log file location. Defaults to standard out.
+  -m, --message string   The message file to send to peers. (default "client.message.json")
+```
+
+#### Configuration
+
+The orchestration can be configured via a json file. The default configuration location is `configs/orchestrate/config.json` but can be modified with the `-c` flag. The default config file is shown, below. If any option is not present in the passed config file, the subnet will default to the below.
+
+```json
+{
+  "orchestra": {
+    "omitSubnet": false,
+    "hostsIfOmitSubnet": [],
+    "messageNanoSecondInterval": 100000,
+    "clientTimeoutSeconds": 20,
+    "messageLocation": "client.message.json",
+    "messageByteSize": 1000
+  },
+  "subnet": {
+    "numHosts": 10,
+    "pubsubCIDR": "127.0.0.1/8",
+    "pubsubPortRange": [3000, 4000],
+    "rpcCIDR": "127.0.0.1/8",
+    "rpcPortRange": [8080, 9080],
+    "peerTopology": "whiteblocks"
+  },
+  "host": {
+    "transports": ["tcp", "ws"],
+    "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
+    "security": "secio",
+    "omitRelay": false,
+    "omitConnectionManager": false,
+    "omitNATPortMap": false,
+    "omitRPCServer": false,
+    "omitDiscoveryService": false,
+    "omitRouting": false
+  },
+  "general": {
+    "loggerLocation": ""
+  }
+}
+
+```
 
 ### Subnet
 

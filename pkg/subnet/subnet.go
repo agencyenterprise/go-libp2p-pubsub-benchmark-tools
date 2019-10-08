@@ -1,7 +1,6 @@
 package subnet
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"os"
@@ -10,32 +9,38 @@ import (
 
 	"github.com/agencyenterprise/gossip-host/pkg/host"
 	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	"github.com/agencyenterprise/gossip-host/pkg/subnet/config"
 	"github.com/agencyenterprise/gossip-host/pkg/subnet/peertopology"
 )
 
+func New(props *Props) (*Subnet, error) {
+	return &Subnet{
+		props: props,
+	}, nil
+}
+
 // Start begins the subnet
-func Start(ctx context.Context, conf config.Config) error {
+func (s *Subnet) Start() error {
 	// parse pubsub cidr
-	pubsubIP, pubsubNet, err := net.ParseCIDR(conf.Subnet.PubsubCIDR)
+	pubsubIP, pubsubNet, err := net.ParseCIDR(s.props.Conf.Subnet.PubsubCIDR)
 	if err != nil {
-		logger.Errorf("err parsing pubsub CIDRs %s:\n%v", conf.Subnet.PubsubCIDR, err)
+		logger.Errorf("err parsing pubsub CIDRs %s:\n%v", s.props.Conf.Subnet.PubsubCIDR, err)
 		return err
 	}
 
 	// parse RPC cidr
-	rpcIP, rpcNet, err := net.ParseCIDR(conf.Subnet.RPCCIDR)
+	rpcIP, rpcNet, err := net.ParseCIDR(s.props.Conf.Subnet.RPCCIDR)
 	if err != nil {
-		logger.Errorf("err parsing rpc CIDRs %s:\n%v", conf.Subnet.RPCCIDR, err)
+		logger.Errorf("err parsing rpc CIDRs %s:\n%v", s.props.Conf.Subnet.RPCCIDR, err)
 		return err
 	}
 
 	// build hosts
-	hosts, err := buildHosts(ctx, conf, pubsubIP, rpcIP, pubsubNet, rpcNet, conf.Subnet.PubsubPortRange, conf.Subnet.RPCPortRange)
+	hosts, err := buildHosts(s.props.CTX, s.props.Conf, pubsubIP, rpcIP, pubsubNet, rpcNet, s.props.Conf.Subnet.PubsubPortRange, s.props.Conf.Subnet.RPCPortRange)
 	if err != nil {
 		logger.Errorf("err bulding hosts:\n%v", err)
 		return err
 	}
+	s.hosts = hosts
 
 	// build the host pubsubs and rpc
 	ch := make(chan error)
@@ -45,8 +50,8 @@ func Start(ctx context.Context, conf config.Config) error {
 	}
 
 	// build network topology
-	if err = peertopology.ConnectPeersForTopology(conf.Subnet.PeerTopology, hosts); err != nil {
-		logger.Errorf("err building topology for %s:\n%v", conf.Subnet.PeerTopology, err)
+	if err = peertopology.ConnectPeersForTopology(s.props.Conf.Subnet.PeerTopology, hosts); err != nil {
+		logger.Errorf("err building topology for %s:\n%v", s.props.Conf.Subnet.PeerTopology, err)
 		return err
 	}
 
@@ -79,12 +84,23 @@ func Start(ctx context.Context, conf config.Config) error {
 		logger.Errorf("received err on rpc channel:\n%v", err)
 		return err
 
-	case <-ctx.Done():
-		if err := ctx.Err(); err != nil {
+	case <-s.props.CTX.Done():
+		if err := s.props.CTX.Err(); err != nil {
 			logger.Errorf("err on the context:\n%v", err)
 			return err
 		}
 	}
 
 	return nil
+}
+
+// Addresses returns the host addresses
+func (s *Subnet) Addresses() []string {
+	var addresses []string
+
+	for _, host := range s.hosts {
+		addresses = append(addresses, host.IPFSAddresses()...)
+	}
+
+	return addresses
 }
