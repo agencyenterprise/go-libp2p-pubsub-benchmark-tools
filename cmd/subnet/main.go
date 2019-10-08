@@ -78,10 +78,13 @@ func setup() *cobra.Command {
 
 			// start the subnet
 			start := make(chan struct{})
-			if err = snet.Start(start); err != nil {
-				logger.Errorf("err starting subnet\n%v", err)
-				return err
-			}
+			cErr := make(chan error)
+			go func(s *subnet.Subnet, strt chan struct{}, e chan error) {
+				if err = s.Start(strt); err != nil {
+					logger.Errorf("err starting subnet\n%v", err)
+					e <- err
+				}
+			}(snet, start, cErr)
 
 			select {
 			case <-start:
@@ -93,9 +96,12 @@ func setup() *cobra.Command {
 				// note: I don't like '^C' showing up on the same line as the next logged line...
 				fmt.Println("")
 				logger.Info("Received stop signal from os. Shutting down...")
-			}
+				return nil
 
-			return nil
+			case <-cErr:
+				logger.Errorf("received an error from the subnet:\n%v", err)
+				return err
+			}
 		},
 	}
 
