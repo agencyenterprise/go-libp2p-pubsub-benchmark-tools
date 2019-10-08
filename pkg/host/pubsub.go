@@ -5,9 +5,9 @@ import (
 	"encoding/binary"
 	"time"
 
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 
-	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
+	pb "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/pb/publisher"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )

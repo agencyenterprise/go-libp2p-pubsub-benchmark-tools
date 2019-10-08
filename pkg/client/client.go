@@ -5,15 +5,15 @@ import (
 	"errors"
 	"time"
 
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	pb "github.com/agencyenterprise/gossip-host/pkg/pb/publisher"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
+	pb "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/pb/publisher"
 	"github.com/golang/protobuf/ptypes/empty"
 
 	grpc "google.golang.org/grpc"
 )
 
-// Gossip requests the passed peers to gossip the passed message
-func Gossip(msgID []byte, msgLoc, peers string, size uint, timeout int) error {
+// Publish requests the passed peers to publish the passed message
+func Publish(msgID []byte, msgLoc, peers string, size uint, timeout int) error {
 	msg, err := parseMessageFile(msgLoc)
 	if err != nil || msg == nil {
 		logger.Errorf("err parsing message file:\n%v", err)
@@ -53,7 +53,7 @@ func Gossip(msgID []byte, msgLoc, peers string, size uint, timeout int) error {
 
 		r, err := c.PublishMessage(ctx, msg)
 		if err != nil {
-			logger.Errorf("could not gossip message to %s:\n %v", peer, err)
+			logger.Errorf("could not publish message to %s:\n %v", peer, err)
 			failed = true
 			conn.Close()
 			cancel()
@@ -70,7 +70,7 @@ func Gossip(msgID []byte, msgLoc, peers string, size uint, timeout int) error {
 	}
 
 	if failed {
-		return errors.New("gossip failed")
+		return errors.New("publish failed")
 	}
 
 	return nil

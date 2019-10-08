@@ -1,6 +1,6 @@
 package types
 
-import "github.com/agencyenterprise/gossip-host/pkg/cerr"
+import "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/cerr"
 
 const (
 	// ErrImproperlyFormattedLogLine is returned when the log line is not in the expected format

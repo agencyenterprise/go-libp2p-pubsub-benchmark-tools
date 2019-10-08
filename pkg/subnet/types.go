@@ -3,9 +3,9 @@ package subnet
 import (
 	"context"
 
-	"github.com/agencyenterprise/gossip-host/pkg/cerr"
-	"github.com/agencyenterprise/gossip-host/pkg/host"
-	"github.com/agencyenterprise/gossip-host/pkg/subnet/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/cerr"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/subnet/config"
 )
 
 const (

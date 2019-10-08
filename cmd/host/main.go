@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/agencyenterprise/gossip-host/pkg/host"
-	"github.com/agencyenterprise/gossip-host/pkg/host/config"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -22,7 +22,7 @@ func setup() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "start",
 		Short: "Start node",
-		Long:  `Starts the gossip pub/sub node`,
+		Long:  `Starts the go-libp2p pub/sub host`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
 				logrus.Errorf("err initiating logger:\n%v", err)

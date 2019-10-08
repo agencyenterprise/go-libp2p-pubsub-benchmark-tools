@@ -3,7 +3,7 @@ package sorter
 import (
 	"sort"
 
-	"github.com/agencyenterprise/gossip-host/pkg/analysis/types"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/analysis/types"
 )
 
 // By is the type of a "less" function that defines the ordering of its Planet arguments.

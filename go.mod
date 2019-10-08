@@ -1,4 +1,4 @@
-module github.com/agencyenterprise/gossip-host
+module github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools
 
 go 1.13
 

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/agencyenterprise/gossip-host/pkg/cerr"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/cerr"
 
 	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 )

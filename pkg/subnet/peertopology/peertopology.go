@@ -3,11 +3,11 @@ package peertopology
 import (
 	"strings"
 
-	"github.com/agencyenterprise/gossip-host/pkg/host"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	"github.com/agencyenterprise/gossip-host/pkg/subnet/peertopology/full"
-	"github.com/agencyenterprise/gossip-host/pkg/subnet/peertopology/linear"
-	"github.com/agencyenterprise/gossip-host/pkg/subnet/peertopology/whiteblocks"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/subnet/peertopology/full"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/subnet/peertopology/linear"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/subnet/peertopology/whiteblocks"
 )
 
 // ConnectPeersForTopology builds the specified topology

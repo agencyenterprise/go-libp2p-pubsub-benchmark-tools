@@ -3,8 +3,8 @@ package host
 import (
 	"context"
 
-	"github.com/agencyenterprise/gossip-host/pkg/cerr"
-	"github.com/agencyenterprise/gossip-host/pkg/host/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/cerr"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host/config"
 
 	lhost "github.com/libp2p/go-libp2p-core/host"
 	lrouter "github.com/libp2p/go-libp2p-core/routing"
@@ -30,7 +30,7 @@ const (
 	pubsubTopic = "/libp2p/test/1.0.0"
 )
 
-// Host is the gossipsub host
+// Host is the go-libp2p host
 // note: lhost.Host and lrouter.Routing are interfaces
 type Host struct {
 	host   lhost.Host

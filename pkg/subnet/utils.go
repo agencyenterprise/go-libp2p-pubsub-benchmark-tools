@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/agencyenterprise/gossip-host/pkg/host"
-	hconf "github.com/agencyenterprise/gossip-host/pkg/host/config"
-	"github.com/agencyenterprise/gossip-host/pkg/logger"
-	"github.com/agencyenterprise/gossip-host/pkg/subnet/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host"
+	hconf "github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/host/config"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
+	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/subnet/config"
 	lcrypto "github.com/libp2p/go-libp2p-core/crypto"
 )
 
