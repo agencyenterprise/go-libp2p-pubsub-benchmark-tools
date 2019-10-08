@@ -158,6 +158,11 @@ func (h *Host) IPFSAddresses() []string {
 	return addresses
 }
 
+// RPCAddress returns the host rpc address
+func (h *Host) RPCAddress() string {
+	return h.conf.Host.RPCAddress
+}
+
 // Connect connects the host to the list of peers
 // note: it expects the peers to be in IPFS form
 func (h *Host) Connect(peers []string) error {
@@ -209,22 +214,20 @@ func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 // BuildRPC returns an rpc service
 func (h *Host) BuildRPC(ch chan error, ps *pubsub.PubSub) error {
 	// Start the RPC server
-	if !h.conf.Host.OmitRPCServer {
-		rHost := rpcHost.New(&rpcHost.Props{
-			Host:        h.host,
-			CH:          ch,
-			PS:          ps,
-			PubsubTopic: pubsubTopic,
-			CTX:         h.ctx,
-			Shutdown:    h.shtDwn,
-		})
-		go func(rh *rpcHost.Host, c chan error) {
-			if err := rh.Listen(h.ctx, h.conf.Host.RPCAddress); err != nil {
-				logger.Errorf("err listening on rpc:\n%v", err)
-				c <- err
-			}
-		}(rHost, ch)
-	}
+	rHost := rpcHost.New(&rpcHost.Props{
+		Host:        h.host,
+		CH:          ch,
+		PS:          ps,
+		PubsubTopic: pubsubTopic,
+		CTX:         h.ctx,
+		Shutdown:    h.shtDwn,
+	})
+	go func(rh *rpcHost.Host, c chan error) {
+		if err := rh.Listen(h.ctx, h.conf.Host.RPCAddress); err != nil {
+			logger.Errorf("err listening on rpc:\n%v", err)
+			c <- err
+		}
+	}(rHost, ch)
 
 	return nil
 }
