@@ -28,7 +28,7 @@ If you'd like to manually spin up hosts, do the following:
 
 ## Commands
 
-Three command line programs are available in this module and are location in the `cmd/` directory:
+Five command line programs are available in this module and are location in the `cmd/` directory:
 1. **Analysis** - this command is used to analyze log files and compute metrics.
 2. **Client** - this command is used to interact with hosts via the rpc.
 3. **Host** - this command is used to start a libp2p host.
