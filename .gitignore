@@ -44,3 +44,8 @@ logs.txt
 
 # data
 *.csv
+
+# custom configs, analyses, etc
+./*.txt
+./*config.json
+./*analysis.json

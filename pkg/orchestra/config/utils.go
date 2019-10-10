@@ -94,8 +94,8 @@ func parseDefaults(conf *Config) error {
 // note: this could panic!
 func mergeDefaults(conf, defaults *Config) {
 	// orchestra
-	if len(conf.Orchestra.HostsIfOmitSubnet) == 0 {
-		conf.Orchestra.HostsIfOmitSubnet = defaults.Orchestra.HostsIfOmitSubnet
+	if len(conf.Orchestra.HostRPCAddressesIfOmitSubnet) == 0 {
+		conf.Orchestra.HostRPCAddressesIfOmitSubnet = defaults.Orchestra.HostRPCAddressesIfOmitSubnet
 	}
 	if conf.Orchestra.MessageNanoSecondInterval == 0 {
 		conf.Orchestra.MessageNanoSecondInterval = defaults.Orchestra.MessageNanoSecondInterval
@@ -108,6 +108,15 @@ func mergeDefaults(conf, defaults *Config) {
 	}
 	if conf.Orchestra.MessageByteSize == 0 {
 		conf.Orchestra.MessageByteSize = defaults.Orchestra.MessageByteSize
+	}
+	if conf.Orchestra.TestDurationSeconds == 0 {
+		conf.Orchestra.TestDurationSeconds = defaults.Orchestra.TestDurationSeconds
+	}
+	if conf.Orchestra.TestWarmUpSeconds == 0 {
+		conf.Orchestra.TestWarmUpSeconds = defaults.Orchestra.TestWarmUpSeconds
+	}
+	if conf.Orchestra.TestCoolDownSeconds == 0 {
+		conf.Orchestra.TestCoolDownSeconds = defaults.Orchestra.TestCoolDownSeconds
 	}
 
 	// subnet

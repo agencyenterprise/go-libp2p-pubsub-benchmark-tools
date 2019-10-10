@@ -32,7 +32,7 @@ Five command line programs are available in this module and are located in the `
 1. **Analysis** - this command is used to analyze log files and compute metrics.
 2. **Client** - this command is used to interact with hosts via the rpc.
 3. **Host** - this command is used to start a libp2p host.
-4. **Orchestrate** - this command spins up a client and optionally a subnet and and sends the hosts messages at the specified interval.
+4. **Orchestra** - this command spins up an "orchestra" of clients and optionally a subnet and and sends the hosts messages at the specified interval.
 5. **Subnet** - this command is used to start multiple libp2p hosts in one process.
 
 ### Analysis
@@ -159,14 +159,14 @@ The host has many configuration options which can be set between a combination o
 ```
 
 
-### Orchestrate
+### Orchestra
 
-Orchestrate is a command whis spins up a client, and optionally a subnet, and pings the hosts at regularly defined intervals. The client creates a new message id for each new message that it sends.
+Orchestra is a command whis spins up a client, and optionally a subnet, and pings the hosts at regularly defined intervals. The client creates a new message id for each new message that it sends.
 
 The available commands and flags are shown below.
 
 ```bash
-$ go run ./cmd/orchestrate/main.go --help
+$ go run ./cmd/orchestra/main.go --help
 Spins up clients and optionally hosts and sends the hosts messages at the specified interval.
 
 Usage:
@@ -181,7 +181,7 @@ Flags:
 
 #### Configuration
 
-The orchestration can be configured via a json file. The default configuration location is `configs/orchestrate/config.json` but can be modified with the `-c` flag. The default config file is shown, below. If any option is not present in the passed config file, the subnet will default to the below.
+The orchestration can be configured via a json file. The default configuration location is `configs/orchestra/config.json` but can be modified with the `-c` flag. The default config file is shown, below. If any option is not present in the passed config file, the subnet will default to the below.
 
 ```json
 {

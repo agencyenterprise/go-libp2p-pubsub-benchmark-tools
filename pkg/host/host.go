@@ -225,14 +225,16 @@ func (h *Host) BuildPubSub() (*pubsub.PubSub, error) {
 	}
 
 	// subscribe to the topic
-	sub, err := ps.Subscribe(pubsubTopic)
+	_, err = ps.Subscribe(pubsubTopic)
 	if err != nil {
 		logger.Errorf("err subscribing\n%v", err)
 		return nil, err
 	}
 
-	// attach the handler
-	go pubsubHandler(h.ctx, h.host.ID(), sub)
+	if err = ps.RegisterTopicValidator(pubsubTopic, buildValidator(h.host.ID())); err != nil {
+		logger.Errorf("err registering valudator:\n%v", err)
+		return nil, err
+	}
 
 	return ps, nil
 }

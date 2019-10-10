@@ -12,23 +12,18 @@ import (
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 )
 
-func pubsubHandler(ctx context.Context, hostID peer.ID, sub *pubsub.Subscription) {
-	for {
-		nxt, err := sub.Next(ctx)
-		if err != nil {
-			logger.Errorf("err reading next:\n%v", err)
-			continue
-		}
+func buildValidator(hostID peer.ID) pubsub.Validator {
+	return func(ctx context.Context, peerID peer.ID, pMSG *pubsub.Message) bool {
 		logger.Info("msg received on pubsub channel")
 
 		msg := pb.Message{}
-		if err = msg.XXX_Unmarshal(nxt.GetData()); err != nil {
+		if err := msg.XXX_Unmarshal(pMSG.GetData()); err != nil {
 			logger.Errorf("err unmarshaling next message:\n%v", err)
-			continue
+			return true
 		}
-		//spew.Dump(msg)
 
-		// TODO: how to increment sequence before sending out?
-		logger.Infof("Pubsub message received: %v,%v,%v,%v,%d,%d", hostID, nxt.GetFrom(), msg.GetId(), binary.BigEndian.Uint64(nxt.GetSeqno()), time.Now().UnixNano(), msg.GetSequence())
+		logger.Infof("Pubsub message received: %v,%v,%v,%v,%d,%d", hostID, peerID, msg.GetId(), binary.BigEndian.Uint64(pMSG.GetSeqno()), time.Now().UnixNano(), msg.GetSequence())
+
+		return true
 	}
 }

@@ -17,8 +17,8 @@ type Config struct {
 type Orchestra struct {
 	// OmitSubnet omits building the subnet
 	OmitSubnet bool `json:"omitSubnet,omitempty"`
-	// HostsIfOmitSubnet are the host addresses if the subnet is omitted
-	HostsIfOmitSubnet []string `json:"hostsIfOmitSubnet,omitempty"`
+	// HostRPCAddressesIfOmitSubnet are the host rpc addresses if the subnet is omitted
+	HostRPCAddressesIfOmitSubnet []string `json:"hostsIfOmitSubnet,omitempty"`
 	// MessageNanoSecondInterval is the amount of nano seconds between each message send
 	MessageNanoSecondInterval uint `json:"messageNanoSecondInterval,omitempty"`
 	// ClientTimeoutSeconds is the time to wait to receive a response on the rpc channel
@@ -32,6 +32,12 @@ type Orchestra struct {
 	//MessageIntervalStdDev uint
 	//// MessageIntervalRampUpSeconds is the amount of time in seconds to ramp up to full send
 	//MessageIntervalRampUpSeconds uint
+	// TestDurationSeconds is the seconds to run the test
+	TestDurationSeconds uint `json:"testDurationSeconds,omitempty"`
+	// TestWarmUpSeconds is the seconds to wait before sending messages to the host
+	TestWarmUpSeconds uint `json:"testWarmUpSeconds,omitempty"`
+	// TestCoolDownSeconds is the seconds to wait after sending the messages before shutting the hosts down
+	TestCoolDownSeconds uint `json:"testCoolDownSeconds,omitempty"`
 }
 
 // Subnet holds the configs for the subnet

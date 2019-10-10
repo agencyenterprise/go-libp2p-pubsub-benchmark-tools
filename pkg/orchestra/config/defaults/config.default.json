@@ -1,11 +1,14 @@
 {
   "orchestra": {
     "omitSubnet": false,
-    "hostsIfOmitSubnet": [],
-    "messageNanoSecondInterval": 1000000000000,
+    "hostRPCAddressesIfOmitSubnet": [],
+    "messageNanoSecondInterval": 100000,
     "clientTimeoutSeconds": 20,
     "messageLocation": "client.message.json",
-    "messageByteSize": 1000
+    "messageByteSize": 1000,
+    "testDurationSeconds": 900,
+    "testWarmupSeconds": 60,
+    "testCooldownSeconds": 60
   },
   "subnet": {
     "numHosts": 10,
@@ -19,7 +22,7 @@
     "transports": ["tcp", "ws"],
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
-    "pubsubAlgorithm": "flood",
+    "pubsubAlgorithm": "gossip",
     "omitRelay": false,
     "omitConnectionManager": false,
     "omitNATPortMap": false,
