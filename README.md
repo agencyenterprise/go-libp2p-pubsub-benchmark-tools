@@ -191,7 +191,10 @@ The orchestration can be configured via a json file. The default configuration l
     "messageNanoSecondInterval": 100000,
     "clientTimeoutSeconds": 20,
     "messageLocation": "client.message.json",
-    "messageByteSize": 1000
+    "messageByteSize": 1000,
+    "testDurationSeconds": 900,
+    "testWarmupSeconds": 60,
+    "testCooldownSeconds": 60
   },
   "subnet": {
     "numHosts": 10,
