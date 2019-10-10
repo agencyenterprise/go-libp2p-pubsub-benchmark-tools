@@ -13,6 +13,7 @@ import (
 	"github.com/agencyenterprise/go-libp2p-pubsub-benchmark-tools/pkg/logger"
 )
 
+// TODO @adam-hanna: to test
 func loadLogFile(logLoc string) (*bufio.Scanner, func() error, error) {
 	file, err := os.Open(logLoc)
 	if err != nil {
@@ -23,6 +24,7 @@ func loadLogFile(logLoc string) (*bufio.Scanner, func() error, error) {
 	return bufio.NewScanner(file), file.Close, nil
 }
 
+// TODO @adam-hanna: to test
 func buildMetricsFromScanner(scanner *bufio.Scanner) ([]*types.Metric, error) {
 	messageLogs, err := buildMessageLogsFromScanner(scanner)
 	if err != nil {
@@ -33,6 +35,7 @@ func buildMetricsFromScanner(scanner *bufio.Scanner) ([]*types.Metric, error) {
 	return buildMetricsFromMessageLogs(messageLogs)
 }
 
+// TODO @adam-hanna: to test
 func buildMessageLogsFromScanner(scanner *bufio.Scanner) ([]*types.MessageLog, error) {
 	var messageLogs []*types.MessageLog
 
@@ -91,6 +94,7 @@ func parseLogLine(logLine []byte) (*types.MessageLog, error) {
 	return buildMessageLogFromStrings(data)
 }
 
+// TODO @adam-hanna: to test
 func buildMetricsFromMessageLogs(messageLogs []*types.MessageLog) ([]*types.Metric, error) {
 	messageLogsGroups := groupMessageLogsByID(messageLogs)
 
@@ -99,6 +103,7 @@ func buildMetricsFromMessageLogs(messageLogs []*types.MessageLog) ([]*types.Metr
 	return buildMetricsFromSortedMessageLogsGroups(messageLogsGroups)
 }
 
+// TODO @adam-hanna: to test
 func buildMetricsFromSortedMessageLogsGroups(messageLogsGroups [][]*types.MessageLog) ([]*types.Metric, error) {
 	var metrics []*types.Metric
 	for _, sortedMessageLogs := range messageLogsGroups {
@@ -124,25 +129,35 @@ func buildMetricsFromSortedMessageLogs(sortedMessageLogs []*types.MessageLog) (*
 		return nil, errors.New("no message logs")
 	}
 
-	metric.TotalNanoTime = calcTotalNanoTime(sortedMessageLogs)
+	metric.TotalNanoTime, err = calcTotalNanoTime(sortedMessageLogs)
+	if err != nil {
+		logger.Errorf("err calculating nano time:\n%v", err)
+		return nil, err
+	}
+
 	metric.RelativeMessageRedundancy, err = calcRMR(sortedMessageLogs)
 	if err != nil {
 		logger.Errorf("err calculating rmr:\n%v", err)
 		return nil, err
 	}
+
 	metric.LastDeliveryHop = calcLastDeliveryHop(sortedMessageLogs)
 
 	return &metric, nil
 }
 
-func calcTotalNanoTime(sortedMessageLogs []*types.MessageLog) uint64 {
-	return uint64(sortedMessageLogs[len(sortedMessageLogs)-1].NanoTime - sortedMessageLogs[0].NanoTime)
+func calcTotalNanoTime(sortedMessageLogs []*types.MessageLog) (uint64, error) {
+	if sortedMessageLogs[len(sortedMessageLogs)-1].NanoTime < sortedMessageLogs[0].NanoTime {
+		return 0, errors.New("message logs are not sorted ascending")
+	}
+
+	return uint64(sortedMessageLogs[len(sortedMessageLogs)-1].NanoTime - sortedMessageLogs[0].NanoTime), nil
 }
 
 func calcRMR(sortedMessageLogs []*types.MessageLog) (float32, error) {
 	uniqueHosts := countUniqueHosts(sortedMessageLogs)
-	if uniqueHosts == 0 {
-		return 0.0, errors.New("cannot calculate RMR with one host")
+	if uniqueHosts == 0 || uniqueHosts == 1 {
+		return 0.0, errors.New("cannot calculate RMR with none or one host")
 	}
 
 	return (float32(len(sortedMessageLogs)) / (float32(uniqueHosts - 1))) - 1.0, nil
@@ -151,6 +166,7 @@ func calcRMR(sortedMessageLogs []*types.MessageLog) (float32, error) {
 func calcLastDeliveryHop(sortedMessageLogs []*types.MessageLog) uint {
 	// note: map is senderID => recipientID
 	// note: assumes a host only ever sends a message to a recipient once!
+	// TODO: put this into a seprate function for easier unit testing
 	m := make(map[string]map[string][]*types.MessageLog)
 	for _, msg := range sortedMessageLogs {
 		if _, ok := m[msg.SenderID]; !ok {

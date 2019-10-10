@@ -30,6 +30,7 @@ func (s *MessageLogsSorter) Len() int {
 }
 
 // Swap is part of sort.Interface.
+// note: this could panic!
 func (s *MessageLogsSorter) Swap(i, j int) {
 	s.messageLogs[i], s.messageLogs[j] = s.messageLogs[j], s.messageLogs[i]
 }
