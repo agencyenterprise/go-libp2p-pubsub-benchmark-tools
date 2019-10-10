@@ -94,7 +94,6 @@ func parseLogLine(logLine []byte) (*types.MessageLog, error) {
 	return buildMessageLogFromStrings(data)
 }
 
-// TODO @adam-hanna: to test
 func buildMetricsFromMessageLogs(messageLogs []*types.MessageLog) ([]*types.Metric, error) {
 	messageLogsGroups := groupMessageLogsByID(messageLogs)
 
@@ -103,7 +102,6 @@ func buildMetricsFromMessageLogs(messageLogs []*types.MessageLog) ([]*types.Metr
 	return buildMetricsFromSortedMessageLogsGroups(messageLogsGroups)
 }
 
-// TODO @adam-hanna: to test
 func buildMetricsFromSortedMessageLogsGroups(messageLogsGroups [][]*types.MessageLog) ([]*types.Metric, error) {
 	var metrics []*types.Metric
 	for _, sortedMessageLogs := range messageLogsGroups {

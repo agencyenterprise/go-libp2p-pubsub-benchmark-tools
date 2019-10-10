@@ -1041,3 +1041,313 @@ func TestBuildMetricsFromSortedMessageLogs(t *testing.T) {
 		})
 	}
 }
+
+func TestBuildMetricsFromMessageLogs(t *testing.T) {
+	var (
+		results []*types.Metric
+		result  *types.Metric
+		idx     int
+		err     error
+	)
+
+	for i, tt := range []struct {
+		in    []*types.MessageLog
+		toErr []bool
+		out   []*types.Metric
+	}{
+		{
+			in: []*types.MessageLog{
+				&types.MessageLog{
+					MessageID: "1",
+					HostID:    "2",
+					SenderID:  "1",
+					NanoTime:  1,
+				},
+				&types.MessageLog{
+					MessageID: "2",
+					HostID:    "4",
+					SenderID:  "3",
+					NanoTime:  3,
+				},
+				&types.MessageLog{
+					MessageID: "2",
+					HostID:    "3",
+					SenderID:  "2",
+					NanoTime:  2,
+				},
+				&types.MessageLog{
+					MessageID: "2",
+					HostID:    "5",
+					SenderID:  "4",
+					NanoTime:  4,
+				},
+				&types.MessageLog{
+					MessageID: "2",
+					HostID:    "1",
+					SenderID:  "1",
+					NanoTime:  5,
+				},
+				&types.MessageLog{
+					MessageID: "2",
+					HostID:    "2",
+					SenderID:  "1",
+					NanoTime:  1,
+				},
+				&types.MessageLog{
+					MessageID: "3",
+					HostID:    "9",
+					SenderID:  "1",
+					NanoTime:  1,
+				},
+				&types.MessageLog{
+					MessageID: "3",
+					HostID:    "2",
+					SenderID:  "1",
+					NanoTime:  1,
+				},
+				&types.MessageLog{
+					MessageID: "3",
+					HostID:    "4",
+					SenderID:  "2",
+					NanoTime:  3,
+				},
+				&types.MessageLog{
+					MessageID: "3",
+					HostID:    "1",
+					SenderID:  "1",
+					NanoTime:  8,
+				},
+				&types.MessageLog{
+					MessageID: "3",
+					HostID:    "5",
+					SenderID:  "3",
+					NanoTime:  4,
+				},
+				&types.MessageLog{
+					MessageID: "3",
+					HostID:    "6",
+					SenderID:  "5",
+					NanoTime:  5,
+				},
+				&types.MessageLog{
+					MessageID: "3",
+					HostID:    "7",
+					SenderID:  "6",
+					NanoTime:  6,
+				},
+				&types.MessageLog{
+					MessageID: "3",
+					HostID:    "3",
+					SenderID:  "2",
+					NanoTime:  2,
+				},
+				&types.MessageLog{
+					MessageID: "3",
+					HostID:    "8",
+					SenderID:  "4",
+					NanoTime:  7,
+				},
+			},
+			toErr: []bool{
+				false,
+				false,
+				false,
+			},
+			out: []*types.Metric{
+				&types.Metric{
+					TotalNanoTime:             0,
+					LastDeliveryHop:           1,
+					RelativeMessageRedundancy: 0,
+				},
+				&types.Metric{
+					TotalNanoTime:             4,
+					LastDeliveryHop:           4,
+					RelativeMessageRedundancy: (5.0 / (5.0 - 1.0)) - 1.0,
+				},
+				&types.Metric{
+					TotalNanoTime:             7,
+					LastDeliveryHop:           5,
+					RelativeMessageRedundancy: (9.0 / (9.0 - 1.0)) - 1.0,
+				},
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			results, err = buildMetricsFromMessageLogs(tt.in)
+
+			for idx, result = range results {
+				if err != nil {
+					if !tt.toErr[idx] {
+						t.Fatalf("received %v but expected no err", err)
+					}
+				} else {
+					if tt.toErr[idx] {
+						t.Fatal("expected err but received none")
+					}
+				}
+
+				if !reflect.DeepEqual(result, tt.out[idx]) {
+					t.Errorf("want %v; got %v", tt.out[idx], result)
+				}
+			}
+		})
+	}
+}
+
+func TestBuildMetricsFromMessageLogsGroups(t *testing.T) {
+	var (
+		results []*types.Metric
+		result  *types.Metric
+		idx     int
+		err     error
+	)
+
+	for i, tt := range []struct {
+		in    [][]*types.MessageLog
+		toErr []bool
+		out   []*types.Metric
+	}{
+		{
+			in: [][]*types.MessageLog{
+				[]*types.MessageLog{
+					&types.MessageLog{
+						MessageID: "1",
+						HostID:    "2",
+						SenderID:  "1",
+						NanoTime:  1,
+					},
+				},
+				[]*types.MessageLog{
+					&types.MessageLog{
+						MessageID: "2",
+						HostID:    "2",
+						SenderID:  "1",
+						NanoTime:  1,
+					},
+					&types.MessageLog{
+						MessageID: "2",
+						HostID:    "3",
+						SenderID:  "2",
+						NanoTime:  2,
+					},
+					&types.MessageLog{
+						MessageID: "2",
+						HostID:    "4",
+						SenderID:  "3",
+						NanoTime:  3,
+					},
+					&types.MessageLog{
+						MessageID: "2",
+						HostID:    "5",
+						SenderID:  "4",
+						NanoTime:  4,
+					},
+					&types.MessageLog{
+						MessageID: "2",
+						HostID:    "1",
+						SenderID:  "1",
+						NanoTime:  5,
+					},
+				},
+				[]*types.MessageLog{
+					&types.MessageLog{
+						MessageID: "3",
+						HostID:    "9",
+						SenderID:  "1",
+						NanoTime:  1,
+					},
+					&types.MessageLog{
+						MessageID: "3",
+						HostID:    "2",
+						SenderID:  "1",
+						NanoTime:  1,
+					},
+					&types.MessageLog{
+						MessageID: "3",
+						HostID:    "3",
+						SenderID:  "2",
+						NanoTime:  2,
+					},
+					&types.MessageLog{
+						MessageID: "3",
+						HostID:    "4",
+						SenderID:  "2",
+						NanoTime:  3,
+					},
+					&types.MessageLog{
+						MessageID: "3",
+						HostID:    "5",
+						SenderID:  "3",
+						NanoTime:  4,
+					},
+					&types.MessageLog{
+						MessageID: "3",
+						HostID:    "6",
+						SenderID:  "5",
+						NanoTime:  5,
+					},
+					&types.MessageLog{
+						MessageID: "3",
+						HostID:    "7",
+						SenderID:  "6",
+						NanoTime:  6,
+					},
+					&types.MessageLog{
+						MessageID: "3",
+						HostID:    "8",
+						SenderID:  "4",
+						NanoTime:  7,
+					},
+					&types.MessageLog{
+						MessageID: "3",
+						HostID:    "1",
+						SenderID:  "1",
+						NanoTime:  8,
+					},
+				},
+			},
+			toErr: []bool{
+				false,
+				false,
+				false,
+			},
+			out: []*types.Metric{
+				&types.Metric{
+					TotalNanoTime:             0,
+					LastDeliveryHop:           1,
+					RelativeMessageRedundancy: 0,
+				},
+				&types.Metric{
+					TotalNanoTime:             4,
+					LastDeliveryHop:           4,
+					RelativeMessageRedundancy: (5.0 / (5.0 - 1.0)) - 1.0,
+				},
+				&types.Metric{
+					TotalNanoTime:             7,
+					LastDeliveryHop:           5,
+					RelativeMessageRedundancy: (9.0 / (9.0 - 1.0)) - 1.0,
+				},
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			results, err = buildMetricsFromSortedMessageLogsGroups(tt.in)
+
+			for idx, result = range results {
+				if err != nil {
+					if !tt.toErr[idx] {
+						t.Fatalf("received %v but expected no err", err)
+					}
+				} else {
+					if tt.toErr[idx] {
+						t.Fatal("expected err but received none")
+					}
+				}
+
+				if !reflect.DeepEqual(result, tt.out[idx]) {
+					t.Errorf("want %v; got %v", tt.out[idx], result)
+				}
+			}
+		})
+	}
+}
