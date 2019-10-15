@@ -124,13 +124,21 @@ func (h *Host) OpenPeersConnections(ctx context.Context, peersList *pb.PeersList
 		addr, err := ipfsaddr.ParseString(p)
 		if err != nil || addr == nil {
 			logger.Errorf("err parsing peer: %s\n%v", p, err)
-			continue
+			results = append(results, &pb.OpenPeerConnectionReply{
+				Success: false,
+				Peer:    p,
+			})
+			return nil, err
 		}
 
 		pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
 		if err != nil || pinfo == nil {
 			logger.Errorf("err getting info from peerstore\n%v", err)
-			continue
+			results = append(results, &pb.OpenPeerConnectionReply{
+				Success: false,
+				Peer:    p,
+			})
+			return nil, err
 		}
 
 		logger.Infof("full peer addr: %s", addr.String())
@@ -138,7 +146,11 @@ func (h *Host) OpenPeersConnections(ctx context.Context, peersList *pb.PeersList
 
 		if err := h.props.Host.Connect(h.props.CTX, *pinfo); err != nil {
 			logger.Errorf("connecting to peer failed\n%v", err)
-			continue
+			results = append(results, &pb.OpenPeerConnectionReply{
+				Success: false,
+				Peer:    p,
+			})
+			return nil, err
 		}
 
 		logger.Infof("Connected to peer: %v", pinfo.ID)
