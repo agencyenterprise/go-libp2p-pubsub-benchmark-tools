@@ -24,7 +24,7 @@ func setup() *cobra.Command {
 		Short: "Orchestrate a test run of clients and optionally a subnet",
 		Long:  `Spins up clients and optionally a subnet and sends the hosts messages at the specified interval.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := logger.Set(logger.ContextHook{}, "", false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
 				logrus.Errorf("err initiating logger:\n%v", err)
 				return err
 			}

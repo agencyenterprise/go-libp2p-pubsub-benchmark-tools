@@ -6,9 +6,9 @@
     "clientTimeoutSeconds": 20,
     "messageLocation": "client.message.json",
     "messageByteSize": 1000,
-    "testDurationSeconds": 900,
-    "testWarmupSeconds": 60,
-    "testCooldownSeconds": 60
+    "testDurationSeconds": 90,
+    "testWarmupSeconds": 10,
+    "testCooldownSeconds": 10
   },
   "subnet": {
     "numHosts": 10,
@@ -31,6 +31,6 @@
     "omitRouting": false
   },
   "general": {
-    "loggerLocation": "orchestra-log-1.txt"
+    "loggerLocation": ""
   }
 }
