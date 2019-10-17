@@ -571,7 +571,7 @@ func TestParseLogLine(t *testing.T) {
 			out:   nil,
 		},
 		{
-			in:    []byte(`time="2019-10-08T03:33:35Z" level=info msg="Pubsub message received: QmYBvjm9qTc1bYkm6KsrprraVA4Y8NiBVjK751dijyS4t1,QmW5V3oyFASqxobsmY3vyYsL1kSu7B6nDbVAUAivC5rXmU,foo,1570505610507484693,1570505615043912938,1 source="pubsub.go:33:host.pubsubHandler"`),
+			in:    []byte(`time="2019-10-08T03:33:35Z" level=info msg="Pubsub message received: QmYBvjm9qTc1bYkm6KsrprraVA4Y8NiBVjK751dijyS4t1,QmW5V3oyFASqxobsmY3vyYsL1kSu7B6nDbVAUAivC5rXmU,foo,1570505610507484693,1570505615043912938,1" source="pubsub.go:33:host.pubsubHandler"`),
 			toErr: false,
 			out: &types.MessageLog{
 				HostID:    "QmYBvjm9qTc1bYkm6KsrprraVA4Y8NiBVjK751dijyS4t1",

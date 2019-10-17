@@ -79,7 +79,7 @@ func parseLogLine(logLine []byte) (*types.MessageLog, error) {
 	}
 	line := string(logLine)[beginningOfLine+len(types.LogLineLeader):]
 
-	endOfData := strings.Index(line, " ")
+	endOfData := strings.Index(line, `" `)
 	if endOfData != -1 {
 		line = line[:endOfData]
 	}
