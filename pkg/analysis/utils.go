@@ -108,7 +108,8 @@ func buildMetricsFromSortedMessageLogsGroups(messageLogsGroups [][]*types.Messag
 		metric, err := buildMetricsFromSortedMessageLogs(sortedMessageLogs)
 		if err != nil {
 			logger.Errorf("err building metrics:\n%v", err)
-			return nil, err
+			continue
+			//return nil, err
 		}
 
 		metrics = append(metrics, metric)
@@ -127,15 +128,18 @@ func buildMetricsFromSortedMessageLogs(sortedMessageLogs []*types.MessageLog) (*
 		return nil, errors.New("no message logs")
 	}
 
+	metric.MessageID = sortedMessageLogs[0].MessageID
+	metric.OriginatorHostID = sortedMessageLogs[0].SenderID
+
 	metric.TotalNanoTime, err = calcTotalNanoTime(sortedMessageLogs)
 	if err != nil {
-		logger.Errorf("err calculating nano time:\n%v", err)
+		logger.Errorf("err calculating nano time fro msg %s:\n%v", metric.MessageID, err)
 		return nil, err
 	}
 
 	metric.RelativeMessageRedundancy, err = calcRMR(sortedMessageLogs)
 	if err != nil {
-		logger.Errorf("err calculating rmr:\n%v", err)
+		logger.Errorf("err calculating rmr for msg %s:\n%v", metric.MessageID, err)
 		return nil, err
 	}
 
