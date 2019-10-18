@@ -51,6 +51,13 @@ examples/benchmark-tests/data/random/analyses/*.json
 !examples/benchmark-tests/data/gossip/analyses/.gitkeep
 !examples/benchmark-tests/data/random/analyses/.gitkeep
 
+examples/benchmark-tests-2/data/flood/analyses/*.json
+examples/benchmark-tests-2/data/gossip/analyses/*.json
+examples/benchmark-tests-2/data/random/analyses/*.json
+!examples/benchmark-tests-2/data/flood/analyses/.gitkeep
+!examples/benchmark-tests-2/data/gossip/analyses/.gitkeep
+!examples/benchmark-tests-2/data/random/analyses/.gitkeep
+
 # custom configs, analyses, etc
 ./*.txt
 ./*config.json

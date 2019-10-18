@@ -4,7 +4,7 @@ This example benchmark test was carried out on 17 Oct. 2019 on an Amazon AWS EC2
 
 The benchmark consisted of roughly two and one half hours of publishing messages of 1kb between fifty nodes. Nodes were started sequentiall, and were randomly peered with previously started nodes. Nodes in the subnet were then randomly selected every 100ms and told to publish a message on their pubsub channel.
 
-Three libp2p pubsub protocols were tested: gossip, flood and random.
+Three libp2p pubsub protocols tested were: gossip, flood and random.
 
 These tests were performed without any routing, peer discovery or relays.
 
