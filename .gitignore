@@ -44,8 +44,17 @@ logs.txt
 
 # data
 *.csv
+examples/benchmark-tests/data/flood/analyses/*.json
+examples/benchmark-tests/data/gossip/analyses/*.json
+examples/benchmark-tests/data/random/analyses/*.json
+!examples/benchmark-tests/data/flood/analyses/.gitkeep
+!examples/benchmark-tests/data/gossip/analyses/.gitkeep
+!examples/benchmark-tests/data/random/analyses/.gitkeep
 
 # custom configs, analyses, etc
 ./*.txt
 ./*config.json
 ./*analysis.json
+
+examples/benchmark-tests/.venv/
+!examples/benchmark-tests/.venv/.gitkeep
