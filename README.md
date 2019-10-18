@@ -161,7 +161,7 @@ The host has many configuration options which can be set between a combination o
 
 ### Orchestra
 
-Orchestra is a command whis spins up a client, and optionally a subnet, and pings the hosts at regularly defined intervals. The client creates a new message id for each new message that it sends.
+Orchestra is a command which spins up a client, and optionally a subnet, and pings the hosts at regularly defined intervals. The client creates a new message id for each new message that it sends.
 
 The available commands and flags are shown below.
 
