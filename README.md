@@ -173,7 +173,7 @@ Usage:
   start [flags]
 
 Flags:
-  -c, --config  string   The configuration file. (default "configs/subnet/config.json")
+  -c, --config  string   The configuration file. (default "configs/orchestra/config.json")
   -h, --help             help for start
       --log     string   Log file location. Defaults to standard out.
   -m, --message string   The message file to send to peers. (default "client.message.json")
