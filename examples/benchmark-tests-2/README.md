@@ -1,4 +1,6 @@
-# Benchmark Tests
+# Benchmark Tests v2
+
+These tests are the same as v1, except they were performed **WITH** routind, discovery and relays.
 
 This example benchmark test was carried out on 17 Oct. 2019 on an Amazon AWS EC2 t2.xlarge instance running Red Hat Enterprise Linux.
 
@@ -6,7 +8,7 @@ The benchmark consisted of roughly two and one half hours of publishing messages
 
 Three libp2p pubsub protocols tested were: gossip, flood and random.
 
-These tests were performed without any routing, peer discovery or relays.
+These tests were performed **WITH** any routing, peer discovery or relays.
 
 Compiled versions of `orchestra` and `analysis` were used.
 
@@ -69,12 +71,12 @@ The [config](./data/gossip/orchestra.config.json) file used in this test is:
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
     "pubsubAlgorithm": "gossip",
-    "omitRelay": true,
+    "omitRelay": false,
     "omitConnectionManager": false,
     "omitNATPortMap": false,
     "omitRPCServer": false,
-    "omitDiscoveryService": true,
-    "omitRouting": true
+    "omitDiscoveryService": false,
+    "omitRouting": false
   },
   "general": {
     "loggerLocation": ""
@@ -86,8 +88,8 @@ The results of these tests are:
 
 ```
 Messages published: 90000
-Total Nano Times - mean: 26263571.375944443, median: 5174269.0, std: 224268172.2281729
-Last Delivery Hop - mean: 9.067222222222222, median: 9.0, std: 1.788448444743704
+Total Nano Times - mean: 8191669.008444444, median: 7424747.5, std: 4402639.37232589
+Last Delivery Hop - mean: 3.9183, median: 4.0, std: 0.5033251643928716
 Relative Message Redundancy - mean: 0.020408154000000008, median: 0.020408154, std: 6.938893903907228e-18
 ```
 
@@ -121,12 +123,12 @@ The [config](./data/flood/orchestra.config.json) file used in this test is:
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
     "pubsubAlgorithm": "flood",
-    "omitRelay": true,
+    "omitRelay": false,
     "omitConnectionManager": false,
     "omitNATPortMap": false,
     "omitRPCServer": false,
-    "omitDiscoveryService": true,
-    "omitRouting": true
+    "omitDiscoveryService": false,
+    "omitRouting": false
   },
   "general": {
     "loggerLocation": ""
@@ -138,8 +140,8 @@ The results of these tests are:
 
 ```
 Messages published: 90000
-Total Nano Times - mean: 5401697.526744445, median: 5063028.5, std: 1606625.824702993
-Last Delivery Hop - mean: 9.058477777777778, median: 9.0, std: 1.7084015643465469
+Total Nano Times - mean: 22066784.235055555, median: 19746521.5, std: 8976580.811157353
+Last Delivery Hop - mean: 1.815688888888889, median: 2.0, std: 0.5298914699035484
 Relative Message Redundancy - mean: 0.020408154000000008, median: 0.020408154, std: 6.938893903907228e-18
 ```
 
@@ -173,12 +175,12 @@ The [config](./data/random/orchestra.config.json) file used in this test is:
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
     "pubsubAlgorithm": "random",
-    "omitRelay": true,
+    "omitRelay": false,
     "omitConnectionManager": false,
     "omitNATPortMap": false,
     "omitRPCServer": false,
-    "omitDiscoveryService": true,
-    "omitRouting": true
+    "omitDiscoveryService": false,
+    "omitRouting": false
   },
   "general": {
     "loggerLocation": ""
@@ -190,7 +192,7 @@ The results of these tests are:
 
 ```
 Messages published: 90000
-Total Nano Times - mean: 5345632.971422222, median: 5041622.5, std: 1618816.94873532
-Last Delivery Hop - mean: 9.105344444444444, median: 9.0, std: 1.745120910558674
-Relative Message Redundancy - mean: 0.021059074959888895, median: 0.020408154, std: 0.0044073976014634845
+Total Nano Times - mean: 8510964.002966667, median: 7818402.0, std: 4103939.5076013603
+Last Delivery Hop - mean: 4.311455555555556, median: 4.0, std: 0.5017811532954073
+Relative Message Redundancy - mean: 0.02043496377342223, median: 0.020408154, std: 0.00010740186739806513
 ```
