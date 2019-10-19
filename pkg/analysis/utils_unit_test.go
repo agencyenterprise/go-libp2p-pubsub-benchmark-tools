@@ -1376,9 +1376,16 @@ func TestBuildMetricsFromMessageLogsGroups(t *testing.T) {
 						t.Fatal("expected err but received none")
 					}
 				}
+				var expected *types.Metric
+				for _, metric := range tt.out {
+					if result.MessageID == metric.MessageID {
+						expected = metric
+						break
+					}
+				}
 
-				if !reflect.DeepEqual(result, tt.out[idx]) {
-					t.Errorf("want %v; got %v", tt.out[idx], result)
+				if !reflect.DeepEqual(result, expected) {
+					t.Errorf("want %v; got %v", expected, result)
 				}
 			}
 		})
