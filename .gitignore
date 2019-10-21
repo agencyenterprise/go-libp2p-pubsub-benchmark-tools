@@ -58,6 +58,11 @@ examples/benchmark-tests-2/data/random/analyses/*.json
 !examples/benchmark-tests-2/data/gossip/analyses/.gitkeep
 !examples/benchmark-tests-2/data/random/analyses/.gitkeep
 
+examples/benchmark-tests-3/data/gossip/discovery/analyses/*.json
+examples/benchmark-tests-3/data/gossip/non-discovery/analyses/*.json
+!examples/benchmark-tests-3/data/gossip/discovery/analyses/.gitkeep
+!examples/benchmark-tests-3/data/gossip/non-discovery/analyses/.gitkeep
+
 # custom configs, analyses, etc
 ./*.txt
 ./*config.json
@@ -65,3 +70,9 @@ examples/benchmark-tests-2/data/random/analyses/*.json
 
 examples/benchmark-tests/.venv/
 !examples/benchmark-tests/.venv/.gitkeep
+
+examples/benchmark-tests-2/.venv/
+!examples/benchmark-tests-3/.venv/.gitkeep
+
+examples/benchmark-tests-3/.venv/
+!examples/benchmark-tests-3/.venv/.gitkeep
