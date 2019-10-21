@@ -8,11 +8,11 @@ The benchmark consisted of roughly two and one half hours of publishing messages
 
 Only the gossip pubsub algorithm was tested.
 
-These tests were performed both with and without routing, peer discovery or relays.
+These tests were performed both with and without routing, peer discovery and relays.
 
 Compiled versions of `orchestra` and `analysis` were used.
 
-The shell script used in these tests were the same in all three tests:
+The shell script used in these tests were the same in both tests:
 
 ```sh
 #!/bin/sh
@@ -33,6 +33,7 @@ done
 $ python3 -m venv ./.venv
 $ . ./.venv/bin/activate
 $ pip3 install -r requirements.txt
+$ jupyter notebook
 ```
 
 ### Data
