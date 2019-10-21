@@ -59,7 +59,7 @@ examples/benchmark-tests-2/data/random/analyses/*.json
 !examples/benchmark-tests-2/data/random/analyses/.gitkeep
 
 examples/benchmark-tests-3/data/gossip/discovery/analyses/*.json
-examples/benchmark-tests-3/data/gossip/non-discovery/analyses/*.json
+examples/benchmark-tests-3/data/gossip/no-discovery/analyses/*.json
 !examples/benchmark-tests-3/data/gossip/discovery/analyses/.gitkeep
 !examples/benchmark-tests-3/data/gossip/non-discovery/analyses/.gitkeep
 
