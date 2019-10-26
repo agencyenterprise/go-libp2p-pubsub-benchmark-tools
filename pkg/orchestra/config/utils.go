@@ -27,6 +27,8 @@ func BuildSubnetConfig(conf Config) sconf.Config {
 	sConf.Subnet.RPCPortRange = conf.Subnet.RPCPortRange
 	sConf.Subnet.PeerTopology = conf.Subnet.PeerTopology
 
+	sconf.Host.KeyType = conf.Host.KeyType
+	sconf.Host.RSABits = conf.Host.RSABits
 	sConf.Host.Transports = conf.Host.Transports
 	sConf.Host.Muxers = conf.Host.Muxers
 	sConf.Host.Security = conf.Host.Security
@@ -140,6 +142,12 @@ func mergeDefaults(conf, defaults *Config) {
 	}
 
 	// host
+	if conf.Host.KeyType == "" {
+		conf.Host.KeyType = defaults.Host.KeyType
+	}
+	if conf.Host.RSABits <= 0 {
+		conf.Host.RSABits = defaults.Host.RSABits
+	}
 	if len(conf.Host.Transports) == 0 {
 		conf.Host.Transports = defaults.Host.Transports
 	}

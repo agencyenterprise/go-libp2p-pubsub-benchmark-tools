@@ -145,6 +145,8 @@ func nextListenAddresses(conf config.Config, currPubsubIP net.IP, pubsubNet *net
 func parseSubnetConfig(conf config.Config) hconf.Config {
 	var hostConfig hconf.Config
 
+	hostConfig.Host.KeyType = conf.Host.KeyType
+	hostConfig.Host.RSABits = conf.Host.RSABits
 	hostConfig.Host.Peers = []string{}
 	hostConfig.Host.Transports = conf.Host.Transports
 	hostConfig.Host.Muxers = conf.Host.Muxers

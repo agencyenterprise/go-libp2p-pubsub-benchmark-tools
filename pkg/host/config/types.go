@@ -23,6 +23,10 @@ type Host struct {
 	PrivPEM string `json:"privPEM,omitempty"`
 	// Priv is the parsed, host's private key
 	Priv lcrypto.PrivKey
+	// KeyType sets the key from one of the following supported types: ecdsa, ed25519, rsa and secp256k1
+	KeyType string `json:"keyType,omitempty"`
+	// RSABits is used to set the entropy level only when KeyType == "RSA"
+	RSABits int `json:"rsaBits,omitempty"`
 	// Listen are addresses on which to listen
 	Listens []string `json:"listens,omitempty"`
 	// RPCAddress is the address to listen on for RPC
@@ -68,3 +72,6 @@ const ErrNilConfig = cerr.Error("unknown nil config")
 
 // ErrIncorrectKeyType is returned when the private key is not of the correct type
 const ErrIncorrectKeyType = cerr.Error("incorrect private key type")
+
+// ErrUnsupportedKeyType is returned when the specified private key type is not supported
+const ErrUnsupportedKeyType = cerr.Error("unsupported key type")
