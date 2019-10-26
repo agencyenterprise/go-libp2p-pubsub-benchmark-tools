@@ -20,6 +20,7 @@
     "omitRouting": true
   },
   "general": {
-    "loggerLocation": "log.txt"
+    "loggerLocation": "",
+    "debug": true
   }
 }

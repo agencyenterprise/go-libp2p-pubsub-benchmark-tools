@@ -59,4 +59,6 @@ type Host struct {
 type General struct {
 	// LogerLocation points to the log file. One will be create if not exists. Default is std out.
 	LoggerLocation string `json:"loggerLocation,omitempty"`
+	// Debug sets the log level; true logs everything; false sets logger to warn, error and fatal
+	Debug bool `json:"debug,omitempty"`
 }

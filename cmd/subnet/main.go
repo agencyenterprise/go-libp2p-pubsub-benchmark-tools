@@ -25,7 +25,7 @@ func setup() *cobra.Command {
 		Short: "Start subnet",
 		Long:  `Start a subnet of interconnected libp2p pubsub hosts`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Errorf("err initiating logger:\n%v", err)
 				return err
 			}
@@ -57,6 +57,8 @@ func setup() *cobra.Command {
 					logger.Warnf("log location confliction between flag (%s) and config file (%s); defering to flag (%s)", loggerLoc, conf.General.LoggerLocation, loggerLoc)
 				}
 			}
+
+			logger.SetLoggerLevel(conf.General.Debug)
 
 			// capture the ctrl+c signal
 			stop := make(chan os.Signal, 1)

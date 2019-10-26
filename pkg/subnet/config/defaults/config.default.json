@@ -20,6 +20,7 @@
     "omitRouting": false
   },
   "general": {
-    "loggerLocation": ""
+    "loggerLocation": "",
+    "debug": true
   }
 }
