@@ -188,7 +188,7 @@ func mergeDefaults(conf, defaults *Config) {
 	if conf.Host.RPCAddress == "" {
 		conf.Host.RPCAddress = defaults.Host.RPCAddress
 	}
-	if conf.Host.LoggerLocation == "" {
-		conf.Host.LoggerLocation = defaults.Host.LoggerLocation
+	if conf.General.LoggerLocation == "" {
+		conf.General.LoggerLocation = defaults.General.LoggerLocation
 	}
 }

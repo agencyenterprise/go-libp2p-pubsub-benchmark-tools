@@ -13,7 +13,8 @@ const (
 
 // Config is a struct to hold the config options
 type Config struct {
-	Host Host `json:"host,omitempty"`
+	Host    Host    `json:"host,omitempty"`
+	General General `json:"general,omitempty"`
 }
 
 // Host contains configs for the host
@@ -52,8 +53,14 @@ type Host struct {
 	// OmitRouting disables ipfs routing (e.g. dht);
 	// note: DHT is the only router supported, for now...
 	OmitRouting bool `json:"omitRouting,omitempty"`
+}
+
+// General store general config directives
+type General struct {
 	// LogerLocation points to the log file. One will be create if not exists. Default is std out.
 	LoggerLocation string `json:"loggerLocation,omitempty"`
+	// Debug sets the log level; true logs everything; false sets logger to warn, error and fatal
+	Debug bool `json:"debug,omitempty"`
 }
 
 // ErrNilConfig is returned when a config is expected but none is given

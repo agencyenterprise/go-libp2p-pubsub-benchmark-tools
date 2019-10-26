@@ -24,7 +24,7 @@ func setup() (*cobra.Command, error) {
 		Short: "Publish a message in the pubsub",
 		Long:  "Request that the passed hosts publish the passed message",
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Fatalf("err initiating logger:\n%v", err)
 			}
 
@@ -42,7 +42,7 @@ func setup() (*cobra.Command, error) {
 		Short: "Close all peer connections",
 		Long:  "Request the host to close all connected peer connections",
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Fatalf("err initiating logger:\n%v", err)
 			}
 
@@ -59,7 +59,7 @@ func setup() (*cobra.Command, error) {
 		Long:  "Request the host(s) to close connections to passed peers",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Fatalf("err initiating logger:\n%v", err)
 			}
 
@@ -76,7 +76,7 @@ func setup() (*cobra.Command, error) {
 		Long:  "Request the host(s) to open connections to passed peers",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Fatalf("err initiating logger:\n%v", err)
 			}
 
@@ -92,7 +92,7 @@ func setup() (*cobra.Command, error) {
 		Short: "List connected peers",
 		Long:  "Ask the host(s) to which peers it is connected",
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Fatalf("err initiating logger:\n%v", err)
 			}
 
@@ -108,7 +108,7 @@ func setup() (*cobra.Command, error) {
 		Short: "Get peer ids",
 		Long:  "Ask the host(s) for their peer ids",
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Fatalf("err initiating logger:\n%v", err)
 			}
 
@@ -124,7 +124,7 @@ func setup() (*cobra.Command, error) {
 		Short: "Shutsdown the host(s)",
 		Long:  "Ask the host(s) to shutdown",
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Fatalf("err initiating logger:\n%v", err)
 			}
 
@@ -140,7 +140,7 @@ func setup() (*cobra.Command, error) {
 		Short: "Get listen addresses",
 		Long:  "Ask the host(s) for their listen addresses",
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Fatalf("err initiating logger:\n%v", err)
 			}
 

@@ -22,7 +22,7 @@ func buildValidator(hostID peer.ID) pubsub.Validator {
 			return true
 		}
 
-		logger.Infof("Pubsub message received: %v,%v,%v,%v,%d,%d", hostID, peerID, msg.GetId(), binary.BigEndian.Uint64(pMSG.GetSeqno()), time.Now().UnixNano(), msg.GetSequence())
+		logger.Warnf("Pubsub message received: %v,%v,%v,%v,%d,%d", hostID, peerID, msg.GetId(), binary.BigEndian.Uint64(pMSG.GetSeqno()), time.Now().UnixNano(), msg.GetSequence())
 
 		return true
 	}

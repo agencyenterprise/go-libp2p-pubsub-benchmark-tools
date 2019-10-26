@@ -28,7 +28,7 @@ func setup() *cobra.Command {
 			)
 
 			// set the logger
-			if err := logger.Set(logger.ContextHook{}, "", false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, "", true, false); err != nil {
 				logrus.Errorf("err initiating logger:\n%v", err)
 				return err
 			}

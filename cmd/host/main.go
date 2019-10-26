@@ -24,7 +24,7 @@ func setup() *cobra.Command {
 		Short: "Start node",
 		Long:  `Starts the go-libp2p pub/sub host`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := logger.Set(logger.ContextHook{}, loggerLoc, false); err != nil {
+			if err := logger.Set(logger.ContextHook{}, loggerLoc, true, false); err != nil {
 				logrus.Errorf("err initiating logger:\n%v", err)
 				return err
 			}
@@ -38,24 +38,26 @@ func setup() *cobra.Command {
 			logger.Infof("Loaded configuration. Starting host.\n%v", conf)
 
 			// check the logger location in the conf file
-			if conf.Host.LoggerLocation != "" {
+			if conf.General.LoggerLocation != "" {
 				switch loggerLoc {
-				case conf.Host.LoggerLocation:
+				case conf.General.LoggerLocation:
 					break
 
 				case "":
-					logger.Warnf("logs will now be written to %s", conf.Host.LoggerLocation)
-					if err = logger.SetLoggerLoc(conf.Host.LoggerLocation); err != nil {
-						logger.Errorf("err setting log location to %s:\n%v", conf.Host.LoggerLocation, err)
+					logger.Warnf("logs will now be written to %s", conf.General.LoggerLocation)
+					if err = logger.SetLoggerLoc(conf.General.LoggerLocation); err != nil {
+						logger.Errorf("err setting log location to %s:\n%v", conf.General.LoggerLocation, err)
 						return err
 					}
 
 					break
 
 				default:
-					logger.Warnf("log location confliction between flag (%s) and config file (%s); defering to flag (%s)", loggerLoc, conf.Host.LoggerLocation, loggerLoc)
+					logger.Warnf("log location confliction between flag (%s) and config file (%s); defering to flag (%s)", loggerLoc, conf.General.LoggerLocation, loggerLoc)
 				}
 			}
+
+			logger.SetLoggerLevel(conf.General.Debug)
 
 			// create a context
 			ctx, cancel := context.WithCancel(context.Background())
