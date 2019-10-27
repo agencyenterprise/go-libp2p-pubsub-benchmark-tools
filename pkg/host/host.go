@@ -51,7 +51,33 @@ func New(ctx context.Context, conf config.Config) (*Host, error) {
 
 	// add private key
 	if conf.Host.Priv == nil {
-		priv, _, err := lcrypto.GenerateECDSAKeyPair(rand.Reader)
+		var (
+			priv lcrypto.PrivKey
+			err  error
+		)
+
+		switch strings.ToLower(conf.Host.KeyType) {
+		case "ecdsa":
+			logger.Info("host priv key type is ECDSA")
+			priv, _, err = lcrypto.GenerateECDSAKeyPair(rand.Reader)
+
+		case "ed255199":
+			logger.Info("host priv key type is Ed25519")
+			priv, _, err = lcrypto.GenerateEd25519Key(rand.Reader)
+
+		case "rsa":
+			logger.Infof("host priv key type is RSA with %d bits", conf.Host.RSABits)
+			priv, _, err = lcrypto.GenerateRSAKeyPair(conf.Host.RSABits, rand.Reader)
+
+		case "secp256k1":
+			logger.Info("host priv key type is Secp256k1")
+			priv, _, err = lcrypto.GenerateSecp256k1Key(rand.Reader)
+
+		default:
+			logger.Errorf("%s is not a supported private key type", conf.Host.KeyType)
+			err = config.ErrUnsupportedKeyType
+		}
+
 		if err != nil {
 			logger.Errorf("err generating private key:\n%v", err)
 			return nil, err

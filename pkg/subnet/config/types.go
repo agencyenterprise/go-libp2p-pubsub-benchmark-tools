@@ -30,6 +30,10 @@ type Subnet struct {
 
 // Host holds the configs for the hosts
 type Host struct {
+	// KeyType sets the key from one of the following supported types: ecdsa, ed25519, rsa and secp256k1
+	KeyType string `json:"keyType,omitempty"`
+	// RSABits is used to set the entropy level only when KeyType == "RSA"
+	RSABits int `json:"rsaBits,omitempty"`
 	// Transports are the transport protocols which the host is to use (e.g. "tcp", "ws", etc)
 	Transports []string `json:"transports,omitempty"`
 	// Muxers are the transport muxers (e.g. yamux, mplex, etc.)
@@ -59,4 +63,6 @@ type Host struct {
 type General struct {
 	// LogerLocation points to the log file. One will be create if not exists. Default is std out.
 	LoggerLocation string `json:"loggerLocation,omitempty"`
+	// Debug sets the log level; true logs everything; false sets logger to warn, error and fatal
+	Debug bool `json:"debug,omitempty"`
 }

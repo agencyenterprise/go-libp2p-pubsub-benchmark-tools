@@ -2,7 +2,7 @@
   "orchestra": {
     "omitSubnet": false,
     "hostRPCAddressesIfOmitSubnet": [],
-    "messageNanoSecondInterval": 100000,
+    "messageNanoSecondInterval": 10000000,
     "clientTimeoutSeconds": 20,
     "messageLocation": "client.message.json",
     "messageByteSize": 1000,
@@ -31,6 +31,7 @@
     "omitRouting": false
   },
   "general": {
-    "loggerLocation": ""
+    "loggerLocation": "",
+    "debug": true
   }
 }

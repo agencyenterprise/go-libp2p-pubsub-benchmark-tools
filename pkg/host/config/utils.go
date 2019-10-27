@@ -166,6 +166,12 @@ func parseDefaults(conf *Config) error {
 
 // note: this could panic!
 func mergeDefaults(conf, defaults *Config) {
+	if conf.Host.KeyType == "" {
+		conf.Host.KeyType = defaults.Host.KeyType
+	}
+	if conf.Host.RSABits <= 0 {
+		conf.Host.RSABits = defaults.Host.RSABits
+	}
 	if len(conf.Host.Listens) == 0 {
 		conf.Host.Listens = defaults.Host.Listens
 	}
@@ -184,7 +190,7 @@ func mergeDefaults(conf, defaults *Config) {
 	if conf.Host.RPCAddress == "" {
 		conf.Host.RPCAddress = defaults.Host.RPCAddress
 	}
-	if conf.Host.LoggerLocation == "" {
-		conf.Host.LoggerLocation = defaults.Host.LoggerLocation
+	if conf.General.LoggerLocation == "" {
+		conf.General.LoggerLocation = defaults.General.LoggerLocation
 	}
 }

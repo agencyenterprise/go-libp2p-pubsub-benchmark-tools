@@ -382,16 +382,22 @@ func TestPrependString(t *testing.T) {
 	}
 }
 
-func TestCalcRMR(t *testing.T) {
+type testCalcRMRAndTotalCountOut struct {
+	rmr   float32
+	count uint
+}
+
+func TestCalcRMRAndTotalCount(t *testing.T) {
 	var (
-		result float32
-		err    error
+		rmr   float32
+		count uint
+		err   error
 	)
 
 	for i, tt := range []struct {
 		in    []*types.MessageLog
 		toErr bool
-		out   float32
+		out   testCalcRMRAndTotalCountOut
 	}{
 		{
 			in: []*types.MessageLog{
@@ -401,7 +407,10 @@ func TestCalcRMR(t *testing.T) {
 				},
 			},
 			toErr: true,
-			out:   0.0,
+			out: testCalcRMRAndTotalCountOut{
+				rmr:   0,
+				count: 1,
+			},
 		},
 		{
 			in: []*types.MessageLog{
@@ -415,7 +424,10 @@ func TestCalcRMR(t *testing.T) {
 				},
 			},
 			toErr: false,
-			out:   1.0,
+			out: testCalcRMRAndTotalCountOut{
+				rmr:   1.0,
+				count: 2,
+			},
 		},
 		{
 			in: []*types.MessageLog{
@@ -437,11 +449,14 @@ func TestCalcRMR(t *testing.T) {
 				},
 			},
 			toErr: false,
-			out:   3.0,
+			out: testCalcRMRAndTotalCountOut{
+				rmr:   3.0,
+				count: 2,
+			},
 		},
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			result, err = calcRMR(tt.in)
+			rmr, count, err = calcRMRAndTotalCount(tt.in)
 
 			if err != nil {
 				if !tt.toErr {
@@ -450,11 +465,14 @@ func TestCalcRMR(t *testing.T) {
 			} else {
 				if tt.toErr {
 					t.Fatal("expected err but received none")
+				} else {
+					if rmr != tt.out.rmr {
+						t.Errorf("want rmr %v; got %v", tt.out.rmr, rmr)
+					}
+					if count != tt.out.count {
+						t.Errorf("want count %v; got %v", tt.out.count, count)
+					}
 				}
-			}
-
-			if result != tt.out {
-				t.Errorf("want %v; got %v", tt.out, result)
 			}
 		})
 	}
@@ -930,6 +948,7 @@ func TestBuildMetricsFromSortedMessageLogs(t *testing.T) {
 			out: &types.Metric{
 				MessageID:                 "foo",
 				OriginatorHostID:          "1",
+				TotalHostCount:            2,
 				TotalNanoTime:             0,
 				LastDeliveryHop:           1,
 				RelativeMessageRedundancy: 0,
@@ -972,6 +991,7 @@ func TestBuildMetricsFromSortedMessageLogs(t *testing.T) {
 			out: &types.Metric{
 				MessageID:                 "foo",
 				OriginatorHostID:          "1",
+				TotalHostCount:            5,
 				TotalNanoTime:             4,
 				LastDeliveryHop:           4,
 				RelativeMessageRedundancy: (5.0 / (5.0 - 1.0)) - 1.0,
@@ -1040,6 +1060,7 @@ func TestBuildMetricsFromSortedMessageLogs(t *testing.T) {
 				OriginatorHostID:          "1",
 				TotalNanoTime:             7,
 				LastDeliveryHop:           5,
+				TotalHostCount:            9,
 				RelativeMessageRedundancy: (9.0 / (9.0 - 1.0)) - 1.0,
 			},
 		},
@@ -1176,6 +1197,7 @@ func TestBuildMetricsFromMessageLogs(t *testing.T) {
 			},
 			out: []*types.Metric{
 				&types.Metric{
+					TotalHostCount:            2,
 					MessageID:                 "1",
 					OriginatorHostID:          "1",
 					TotalNanoTime:             0,
@@ -1183,6 +1205,7 @@ func TestBuildMetricsFromMessageLogs(t *testing.T) {
 					RelativeMessageRedundancy: 0,
 				},
 				&types.Metric{
+					TotalHostCount:            5,
 					MessageID:                 "2",
 					OriginatorHostID:          "1",
 					TotalNanoTime:             4,
@@ -1190,6 +1213,7 @@ func TestBuildMetricsFromMessageLogs(t *testing.T) {
 					RelativeMessageRedundancy: (5.0 / (5.0 - 1.0)) - 1.0,
 				},
 				&types.Metric{
+					TotalHostCount:            9,
 					MessageID:                 "3",
 					OriginatorHostID:          "1",
 					TotalNanoTime:             7,
@@ -1213,8 +1237,16 @@ func TestBuildMetricsFromMessageLogs(t *testing.T) {
 					}
 				}
 
-				if !reflect.DeepEqual(result, tt.out[idx]) {
-					t.Errorf("want %v; got %v", tt.out[idx], result)
+				var expected *types.Metric
+				for _, metric := range tt.out {
+					if result.MessageID == metric.MessageID {
+						expected = metric
+						break
+					}
+				}
+
+				if !reflect.DeepEqual(result, expected) {
+					t.Errorf("want %v; got %v", expected, result)
 				}
 			}
 		})
@@ -1344,9 +1376,11 @@ func TestBuildMetricsFromMessageLogsGroups(t *testing.T) {
 					OriginatorHostID:          "1",
 					TotalNanoTime:             0,
 					LastDeliveryHop:           1,
+					TotalHostCount:            2,
 					RelativeMessageRedundancy: 0,
 				},
 				&types.Metric{
+					TotalHostCount:            5,
 					MessageID:                 "2",
 					OriginatorHostID:          "1",
 					TotalNanoTime:             4,
@@ -1354,6 +1388,7 @@ func TestBuildMetricsFromMessageLogsGroups(t *testing.T) {
 					RelativeMessageRedundancy: (5.0 / (5.0 - 1.0)) - 1.0,
 				},
 				&types.Metric{
+					TotalHostCount:            9,
 					MessageID:                 "3",
 					OriginatorHostID:          "1",
 					TotalNanoTime:             7,
@@ -1376,9 +1411,16 @@ func TestBuildMetricsFromMessageLogsGroups(t *testing.T) {
 						t.Fatal("expected err but received none")
 					}
 				}
+				var expected *types.Metric
+				for _, metric := range tt.out {
+					if result.MessageID == metric.MessageID {
+						expected = metric
+						break
+					}
+				}
 
-				if !reflect.DeepEqual(result, tt.out[idx]) {
-					t.Errorf("want %v; got %v", tt.out[idx], result)
+				if !reflect.DeepEqual(result, expected) {
+					t.Errorf("want %v; got %v", expected, result)
 				}
 			}
 		})

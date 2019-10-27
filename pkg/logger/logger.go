@@ -62,8 +62,11 @@ func Warn(s string) {
 }
 
 // Set modifies the logger
-func Set(hook ContextHook, fileLoc string, setReport bool) error {
+func Set(hook ContextHook, fileLoc string, debug bool, setReport bool) error {
 	logrus.SetReportCaller(setReport)
+	if !debug {
+		logrus.SetLevel(logrus.WarnLevel)
+	}
 	logrus.AddHook(hook)
 	if fileLoc != "" {
 		// note: need to pass back some way to file.Close()?
@@ -97,4 +100,12 @@ func SetLoggerLoc(loc string) error {
 	}
 
 	return nil
+}
+
+// SetLoggerLevel sets the logger level
+func SetLoggerLevel(debug bool) {
+	logrus.Info("setting log level to warn")
+	if !debug {
+		logrus.SetLevel(logrus.WarnLevel)
+	}
 }

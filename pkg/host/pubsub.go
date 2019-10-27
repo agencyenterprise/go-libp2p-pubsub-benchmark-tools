@@ -28,7 +28,8 @@ func pubsubHandler(ctx context.Context, hostID peer.ID, sub *pubsub.Subscription
 		}
 		//spew.Dump(msg)
 
-		// TODO: how to increment sequence before sending out?
-		logger.Infof("Pubsub message received: %v,%v,%v,%v,%d,%d", hostID, nxt.GetFrom(), msg.GetId(), binary.BigEndian.Uint64(nxt.GetSeqno()), time.Now().UnixNano(), msg.GetSequence())
+		logger.Warnf("Pubsub message received: %v,%v,%v,%v,%d,%d", hostID, peerID, msg.GetId(), binary.BigEndian.Uint64(pMSG.GetSeqno()), time.Now().UnixNano(), msg.GetSequence())
+
+		return true
 	}
 }

@@ -44,3 +44,35 @@ logs.txt
 
 # data
 *.csv
+examples/benchmark-tests/data/flood/analyses/*.json
+examples/benchmark-tests/data/gossip/analyses/*.json
+examples/benchmark-tests/data/random/analyses/*.json
+!examples/benchmark-tests/data/flood/analyses/.gitkeep
+!examples/benchmark-tests/data/gossip/analyses/.gitkeep
+!examples/benchmark-tests/data/random/analyses/.gitkeep
+
+examples/benchmark-tests-2/data/flood/analyses/*.json
+examples/benchmark-tests-2/data/gossip/analyses/*.json
+examples/benchmark-tests-2/data/random/analyses/*.json
+!examples/benchmark-tests-2/data/flood/analyses/.gitkeep
+!examples/benchmark-tests-2/data/gossip/analyses/.gitkeep
+!examples/benchmark-tests-2/data/random/analyses/.gitkeep
+
+examples/benchmark-tests-3/data/gossip/discovery/analyses/*.json
+examples/benchmark-tests-3/data/gossip/no-discovery/analyses/*.json
+!examples/benchmark-tests-3/data/gossip/discovery/analyses/.gitkeep
+!examples/benchmark-tests-3/data/gossip/non-discovery/analyses/.gitkeep
+
+# custom configs, analyses, etc
+./*.txt
+./*config.json
+./*analysis.json
+
+examples/benchmark-tests/.venv/
+!examples/benchmark-tests/.venv/.gitkeep
+
+examples/benchmark-tests-2/.venv/
+!examples/benchmark-tests-3/.venv/.gitkeep
+
+examples/benchmark-tests-3/.venv/
+!examples/benchmark-tests-3/.venv/.gitkeep

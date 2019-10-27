@@ -144,8 +144,11 @@ The host has many configuration options which can be set between a combination o
     "omitNATPortMap": false,
     "omitRPCServer": false,
     "omitDiscoveryService": false,
-    "omitRouting": false,
-    "loggerLocation": ""
+    "omitRouting": false
+  },
+  "general": {
+    "loggerLocation": "",
+    "debug": true
   }
 }
 ```
@@ -180,7 +183,7 @@ The orchestration can be configured via a json file. The default configuration l
   "orchestra": {
     "omitSubnet": false,
     "hostsIfOmitSubnet": [],
-    "messageNanoSecondInterval": 100000,
+    "messageNanoSecondInterval": 10000000,
     "clientTimeoutSeconds": 20,
     "messageLocation": "client.message.json",
     "messageByteSize": 1000
@@ -206,7 +209,8 @@ The orchestration can be configured via a json file. The default configuration l
     "omitRouting": false
   },
   "general": {
-    "loggerLocation": ""
+    "loggerLocation": "",
+    "debug": true
   }
 }
 
@@ -258,7 +262,8 @@ The subnet can be configured via a json file. The default configuration location
     "omitRouting": false
   },
   "general": {
-    "loggerLocation": ""
+    "loggerLocation": "",
+    "debug": true
   }
 }
 ```

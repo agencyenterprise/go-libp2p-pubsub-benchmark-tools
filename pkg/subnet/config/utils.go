@@ -134,6 +134,12 @@ func mergeDefaults(conf, defaults *Config) {
 	}
 
 	// host
+	if conf.Host.KeyType == "" {
+		conf.Host.KeyType = defaults.Host.KeyType
+	}
+	if conf.Host.RSABits <= 0 {
+		conf.Host.RSABits = defaults.Host.RSABits
+	}
 	if len(conf.Host.Transports) == 0 {
 		conf.Host.Transports = defaults.Host.Transports
 	}

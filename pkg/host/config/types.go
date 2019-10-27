@@ -13,7 +13,8 @@ const (
 
 // Config is a struct to hold the config options
 type Config struct {
-	Host Host `json:"host,omitempty"`
+	Host    Host    `json:"host,omitempty"`
+	General General `json:"general,omitempty"`
 }
 
 // Host contains configs for the host
@@ -22,6 +23,10 @@ type Host struct {
 	PrivPEM string `json:"privPEM,omitempty"`
 	// Priv is the parsed, host's private key
 	Priv lcrypto.PrivKey
+	// KeyType sets the key from one of the following supported types: ecdsa, ed25519, rsa and secp256k1
+	KeyType string `json:"keyType,omitempty"`
+	// RSABits is used to set the entropy level only when KeyType == "RSA"
+	RSABits int `json:"rsaBits,omitempty"`
 	// Listen are addresses on which to listen
 	Listens []string `json:"listens,omitempty"`
 	// RPCAddress is the address to listen on for RPC
@@ -52,8 +57,14 @@ type Host struct {
 	// OmitRouting disables ipfs routing (e.g. dht);
 	// note: DHT is the only router supported, for now...
 	OmitRouting bool `json:"omitRouting,omitempty"`
+}
+
+// General store general config directives
+type General struct {
 	// LogerLocation points to the log file. One will be create if not exists. Default is std out.
 	LoggerLocation string `json:"loggerLocation,omitempty"`
+	// Debug sets the log level; true logs everything; false sets logger to warn, error and fatal
+	Debug bool `json:"debug,omitempty"`
 }
 
 // ErrNilConfig is returned when a config is expected but none is given
@@ -61,3 +72,6 @@ const ErrNilConfig = cerr.Error("unknown nil config")
 
 // ErrIncorrectKeyType is returned when the private key is not of the correct type
 const ErrIncorrectKeyType = cerr.Error("incorrect private key type")
+
+// ErrUnsupportedKeyType is returned when the specified private key type is not supported
+const ErrUnsupportedKeyType = cerr.Error("unsupported key type")

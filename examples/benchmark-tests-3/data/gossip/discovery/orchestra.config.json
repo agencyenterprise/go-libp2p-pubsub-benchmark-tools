@@ -2,7 +2,7 @@
   "orchestra": {
     "omitSubnet": false,
     "hostRPCAddressesIfOmitSubnet": [],
-    "messageNanoSecondInterval": 10000000,
+    "messageNanoSecondInterval": 100000000,
     "clientTimeoutSeconds": 20,
     "messageLocation": "client.message.json",
     "messageByteSize": 1000,
@@ -11,7 +11,7 @@
     "testCooldownSeconds": 10
   },
   "subnet": {
-    "numHosts": 10,
+    "numHosts": 50,
     "pubsubCIDR": "127.0.0.1/8",
     "pubsubPortRange": [3000, 4000],
     "rpcCIDR": "127.0.0.1/8",
@@ -19,8 +19,6 @@
     "peerTopology": "whiteblocks"
   },
   "host": {
-    "keyType": "ecdsa",
-    "rsaBits": 2048,
     "transports": ["tcp", "ws"],
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
@@ -33,7 +31,6 @@
     "omitRouting": false
   },
   "general": {
-    "loggerLocation": "",
-    "debug": true
+    "loggerLocation": ""
   }
 }

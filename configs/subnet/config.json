@@ -8,6 +8,8 @@
     "peerTopology": "whiteblocks"
   },
   "host": {
+    "keyType": "ecdsa",
+    "rsaBits": 2048,
     "transports": ["tcp", "ws"],
     "muxers": [["yamux", "/yamux/1.0.0"], ["mplex", "/mplex/6.7.0"]],
     "security": "secio",
@@ -20,6 +22,7 @@
     "omitRouting": false
   },
   "general": {
-    "loggerLocation": ""
+    "loggerLocation": "",
+    "debug": true
   }
 }

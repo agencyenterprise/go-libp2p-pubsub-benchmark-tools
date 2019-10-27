@@ -16,6 +16,10 @@ const (
 // Beijing, China (2007) 301 – 310
 // https://drive.google.com/file/d/1_evRQujY28K7LBqhuiefiml3QgmWafe-/view
 type Metric struct {
+	// MessageID is the message id associated with this metric
+	MessageID string `json:"messageID,omitempty"`
+	// OriginatorHostID is the firsth host who received the message
+	OriginatorHostID string `json:"originatorHostID,omitempty"`
 	// TotalNanoTime is the time (in nano seconds) for the message to propagate the network
 	TotalNanoTime uint64 `json:"totalNanoTime,omitempty"`
 	// LastDeliveryHop is the hop count of the last message that is delivered by a gossip protocol or,\
@@ -38,6 +42,8 @@ type Metric struct {
 	// protocols that exhibit similar reliability. Finally, note that in pure gossip approaches, RMR is closely related with \
 	// the protocol fanout, as it tends to fanout−1.
 	RelativeMessageRedundancy float32 `json:"relativeMessageRedundancy,omitempty"`
+	// TotalHostCount is the toal count of hosts who received this message
+	TotalHostCount uint `json:"totalCount,omitempty"`
 }
 
 // MessageLog is a log output by the host that contains important pubsub metric data
