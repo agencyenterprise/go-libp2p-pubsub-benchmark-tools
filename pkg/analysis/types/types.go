@@ -42,6 +42,8 @@ type Metric struct {
 	// protocols that exhibit similar reliability. Finally, note that in pure gossip approaches, RMR is closely related with \
 	// the protocol fanout, as it tends to fanout−1.
 	RelativeMessageRedundancy float32 `json:"relativeMessageRedundancy,omitempty"`
+	// TotalHostCount is the toal count of hosts who received this message
+	TotalHostCount uint `json:"totalCount,omitempty"`
 }
 
 // MessageLog is a log output by the host that contains important pubsub metric data

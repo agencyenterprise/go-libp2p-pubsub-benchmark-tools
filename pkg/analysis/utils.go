@@ -137,7 +137,7 @@ func buildMetricsFromSortedMessageLogs(sortedMessageLogs []*types.MessageLog) (*
 		return nil, err
 	}
 
-	metric.RelativeMessageRedundancy, err = calcRMR(sortedMessageLogs)
+	metric.RelativeMessageRedundancy, metric.TotalHostCount, err = calcRMRAndTotalCount(sortedMessageLogs)
 	if err != nil {
 		logger.Errorf("err calculating rmr for msg %s:\n%v", metric.MessageID, err)
 		return nil, err
@@ -156,13 +156,13 @@ func calcTotalNanoTime(sortedMessageLogs []*types.MessageLog) (uint64, error) {
 	return uint64(sortedMessageLogs[len(sortedMessageLogs)-1].NanoTime - sortedMessageLogs[0].NanoTime), nil
 }
 
-func calcRMR(sortedMessageLogs []*types.MessageLog) (float32, error) {
+func calcRMRAndTotalCount(sortedMessageLogs []*types.MessageLog) (float32, uint, error) {
 	uniqueHosts := countUniqueHosts(sortedMessageLogs)
 	if uniqueHosts == 0 || uniqueHosts == 1 {
-		return 0.0, errors.New("cannot calculate RMR with none or one host")
+		return 0.0, 0, errors.New("cannot calculate RMR with none or one host")
 	}
 
-	return (float32(len(sortedMessageLogs)) / (float32(uniqueHosts - 1))) - 1.0, nil
+	return (float32(len(sortedMessageLogs)) / (float32(uniqueHosts - 1))) - 1.0, uniqueHosts, nil
 }
 
 func calcLastDeliveryHop(sortedMessageLogs []*types.MessageLog) uint {
